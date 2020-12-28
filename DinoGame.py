@@ -479,8 +479,14 @@ class DinoGame():
                 new_ground.update()
 
                 alive = f'Alive: {len(self.dinoArray)}/{nIndividuals}'
-                text_rect = ft_font.get_rect(alive)
-                text_rect.topright = self.screen.get_rect().topright + (-1, -1)
+                alive_rect = ft_font.get_rect(alive)
+                alive_rect.topright = self.screen.get_rect().topright
+                alive_rect.move_ip(-2, 2)
+
+                best = f'Best fitness: {DinoGame.train.currentBest}'
+                best_rect = ft_font.get_rect(best)
+                best_rect.topright = alive_rect.bottomright
+                best_rect.move_ip(0, 2)
 
                 if pygame.display.get_surface() is not None:
                     self.screen.fill(BG_COLOR)
@@ -490,17 +496,20 @@ class DinoGame():
                     pteras.draw(self.screen)
                     for d in self.dinoArray:
                         d.draw(self.screen)
-                    ft_font.render_to(self.screen, text_rect.topleft, alive, (255, 0, 0))
+                    ft_font.render_to(self.screen, alive_rect.topleft, alive, (255, 0, 0))
+                    if DinoGame.train.currentBest is not None:
+                        ft_font.render_to(self.screen, best_rect.topleft, best, (255, 0, 0))
                     pygame.display.update()
                 self.clock.tick(self.FPS)
 
                 if not self.dinoArray:
                     DinoGame.train.currentGeneration += 1
-                    if self.train.currentGeneration > nGenerations:
-                        rank = ag.ranquearIndividuos(rankedBrains)
+                    rank = ag.ranquearIndividuos(rankedBrains)
+                    if DinoGame.train.currentGeneration > nGenerations:
                         RedeNeural.RedeNeural.save_object(rankedBrains[rank[0][0]][1], 'bestDino.din')
                         gameOver = True
                     else:
+                        DinoGame.train.currentBest = rank[0][1]
                         newPopulation = ag.proximaGeracao(rankedBrains)
                         self.train(nIndividuals=nIndividuals, nGenerations=nGenerations, population=newPopulation)
 
@@ -548,6 +557,7 @@ class DinoGame():
             if train and nIndividuals is not None:
                 print('Starting training.')
                 DinoGame.train.currentGeneration = 1
+                DinoGame.train.currentBest = None
                 self.train(nIndividuals=nIndividuals, nGenerations=nGenerations)
             elif auto:
                 self.gameplay()

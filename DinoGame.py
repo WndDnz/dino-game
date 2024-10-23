@@ -438,9 +438,9 @@ class DinoGame():
                     s = gamespeed
                     for d in self.dinoArray:
                         activation = d.getAction(np.array([[t - d.rect.right], [y], [h], [w], [s]]))
-                        if activation < 0.6:
+                        if activation < 0.99:
                             d.isDucking = False
-                        elif activation < 0.8:
+                        elif activation < 0.99:
                             d.isDucking = False
                             if not d.isJumping:
                                 d.isJumping = True
@@ -468,7 +468,7 @@ class DinoGame():
                             last_obstacle.add(Ptera(gamespeed, 46, 40))
 
                 if len(clouds) < 5 and random.randrange(0, 300) == 10:
-                    Cloud(self.width, random.randrange(self.height / 5, self.height / 2))
+                    Cloud(self.width, random.randrange(self.height // 5, self.height // 2))
 
                 for d in self.dinoArray:
                     d.update()

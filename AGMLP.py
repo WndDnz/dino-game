@@ -73,10 +73,10 @@ class RNA_AG:
         escolhendo aleatoriamente um segmento da fita de DNA dos pais para ser cortado e trocado entre
         os filhos.
         """
-        b1 = pai1.bias
-        b2 = pai2.bias
-        w1 = pai1.pesos
-        w2 = pai2.pesos
+        b1 = pai1.bias.copy()
+        b2 = pai2.bias.copy()
+        w1 = pai1.pesos.copy()
+        w2 = pai2.pesos.copy()
 
         filho = RedeNeural.RedeNeural(self.configRede)
 
@@ -85,15 +85,15 @@ class RNA_AG:
             cortes = (int(random.random() * b1[i].shape[0]), int(random.random() * b1[i].shape[0]))
             com, fim = (min(cortes), max(cortes))
 
-            filhoP1c = b1[i].ravel()[:com]
+            genep11 = b1[i].ravel()[:com]
             # filhoP1i = b1[i].ravel()[com:fim]
-            filhoP1f = b1[i].ravel()[fim:]
+            genep12 = b1[i].ravel()[fim:]
 
             # filhoP2c = b2[i].ravel()[:com]
-            filhoP2i = b2[i].ravel()[com:fim]
+            genep2 = b2[i].ravel()[com:fim]
             # filhoP2f = b2[i].ravel()[fim:]
 
-            biasfilho = np.concatenate((filhoP1c, filhoP2i, filhoP1f))
+            biasfilho = np.concatenate((genep11, genep2, genep12))
             biasfilho = biasfilho.reshape(shapeOrig)
 
             # Cromossomo do peso

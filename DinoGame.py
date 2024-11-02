@@ -7,6 +7,7 @@ import random
 import numpy as np
 import RedeNeural
 import AGMLP
+import math
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -18,6 +19,7 @@ pygame.init()
 
 class DinoGame():
     scr_size = (width, height) = (600, 150)
+    accel = 1
     FPS = 60
     gravity = 0.6
     high_score = 0
@@ -112,9 +114,9 @@ class DinoGame():
         if number > -1:
             digits = []
             i = 0
-            while(number / 10 != 0):
+            while(number // 10 != 0):
                 digits.append(number % 10)
-                number = int(number / 10)
+                number = number // 10
 
             digits.append(number % 10)
             for i in range(len(digits), 5):
@@ -342,10 +344,11 @@ class DinoGame():
         startMenu = False
         gameOver = False
         gameQuit = False
+        l = a = nl = na = s = 0
         self.dinoArray.clear()
         for i in range(nIndividuals):
             self.dinoArray.append(Dino(44, 47))
-        ag = AGMLP.RNA_AG((5, 10, 1), None, 0.1, nIndividuals, nGenerations, elite=0.2)
+        ag = AGMLP.RNA_AG((4, 8, 2), None, 0.1, nIndividuals, nGenerations, elite=0.05)
         if population is None:
             brains = ag.iniciaPopulacao()
         else:
@@ -378,7 +381,7 @@ class DinoGame():
         while not gameQuit:
             while startMenu:
                 pass
-            while not gameOver:
+            while not gameOver and not gameQuit:
                 if pygame.display.get_surface() is None:
                     print("Couldn't load display surface")
                     gameQuit = True
@@ -395,8 +398,15 @@ class DinoGame():
                             if event.key == pygame.K_q:
                                 gameQuit = True
                                 gameOver = True
+                            if event.key == pygame.K_RIGHT:
+                                DinoGame.accel += 1
+                                DinoGame.FPS *= DinoGame.accel
+                            if event.key == pygame.K_LEFT:
+                                DinoGame.accel -= 1
+                                DinoGame.FPS *= DinoGame.accel
 
-                nearest = None
+                cac = None
+                pte = None
                 for c in cacti:
                     c.movement[0] = -1 * gamespeed
                     for d in self.dinoArray:
@@ -408,11 +418,11 @@ class DinoGame():
                             if pygame.mixer.get_init() is not None:
                                 DinoGame.die_sound.play()
 
-                    if nearest is None:
-                        nearest = c
+                    if cac is None:
+                        cac = c
                     else:
-                        if c.rect.left < nearest.rect.left:
-                            nearest = c
+                        if c.rect.left >= 65:
+                            cac = c
 
                 for p in pteras:
                     p.movement[0] = -1 * gamespeed
@@ -424,33 +434,41 @@ class DinoGame():
                             self.dinoArray.remove(d)
                             if pygame.mixer.get_init() is not None:
                                 DinoGame.die_sound.play()
-                    if nearest is None:
-                        nearest = p
+                    if pte is None:
+                        pte = p
                     else:
-                        if p.rect.left < nearest.rect.left:
-                            nearest = p
+                        if p.rect.left < pte.rect.left:
+                            pte = p
 
-                if nearest is not None:
-                    t = nearest.rect.left
-                    y = nearest.rect.bottom
-                    h = nearest.rect.height
-                    w = nearest.rect.width
+                if cac is not None or pte is not None:
+                    if cac is not None:
+                        l = (cac.rect.left - dino.rect.right)
+                    else:
+                        l = 632
+                    
+                    if pte is not None:
+                        nl = (pte.rect.left - dino.rect.right)
+                        na = pte.rect.bottom
+                    else:
+                        nl = 632
+                        na =  147
                     s = gamespeed
-                    for d in self.dinoArray:
-                        activation = d.getAction(np.array([[t - d.rect.right], [y], [h], [w], [s]]))
-                        if activation < 0.99:
-                            d.isDucking = False
-                        elif activation < 0.99:
-                            d.isDucking = False
-                            if not d.isJumping:
-                                d.isJumping = True
+                    for dino in self.dinoArray:
+                        activation = dino.getAction(np.array([[l], [nl], [na], [s]]))
+                        # print(f"Activation: {activation}")
+                        if activation[1][0] > 0.99:
+                            dino.isDucking = True
+                        else:
+                            dino.isDucking = False
+
+                        if activation[0][0] > 0.99:
+                            if not dino.isJumping:
+                                dino.isJumping = True
                                 if pygame.mixer.get_init() is not None:
                                     DinoGame.jump_sound.play()
-                                    d.movement[1] = -1 * d.jumpSpeed
-                        else:
-                            d.isDucking = True
+                                    dino.movement[1] = -1 * dino.jumpSpeed
 
-                if len(cacti) < 2:
+                if len(cacti) < 1:
                     if len(cacti) == 0:
                         nearest = None
                         last_obstacle.empty()
@@ -461,11 +479,17 @@ class DinoGame():
                                 last_obstacle.empty()
                                 last_obstacle.add(Cactus(gamespeed, 40, 40))
 
-                if len(pteras) == 0 and random.randrange(0, 200) == 10 and counter > 500:
+                if len(pteras) == 0 and random.randrange(0, 200) == 10 and counter > 10:
                     for last in last_obstacle:
                         if last.rect.right < self.width * 0.8:
                             last_obstacle.empty()
-                            last_obstacle.add(Ptera(gamespeed, 46, 40))
+                            p = Ptera(gamespeed, 46, 40)
+                            if len(cacti) == 0:
+                                for c in cacti:
+                                    if not pygame.sprite.collide_mask(p, c):
+                                        last_obstacle.add(p)
+                            else:
+                                last_obstacle.add(p)
 
                 if len(clouds) < 5 and random.randrange(0, 300) == 10:
                     Cloud(self.width, random.randrange(self.height // 5, self.height // 2))
@@ -483,10 +507,15 @@ class DinoGame():
                 alive_rect.topright = self.screen.get_rect().topright
                 alive_rect.move_ip(-2, 2)
 
-                best = f'Best fitness: {DinoGame.train.currentBest}'
+                best = f'Best fitness (prev gen): {DinoGame.train.currentBest}'
                 best_rect = ft_font.get_rect(best)
                 best_rect.topright = alive_rect.bottomright
                 best_rect.move_ip(0, 2)
+
+                sens = f'Senses: l: {l} nl: {nl} na: {na} s: {s}'
+                sens_rect = ft_font.get_rect(sens)
+                sens_rect.topleft = self.screen.get_rect().topleft
+                sens_rect.move_ip(2, 2)
 
                 if pygame.display.get_surface() is not None:
                     self.screen.fill(BG_COLOR)
@@ -497,9 +526,13 @@ class DinoGame():
                     for d in self.dinoArray:
                         d.draw(self.screen)
                     ft_font.render_to(self.screen, alive_rect.topleft, alive, (255, 0, 0))
+                    if cac is not None or pte is not None:
+                        ft_font.render_to(self.screen, sens_rect.topleft, sens, (0, 0, 255))
                     if DinoGame.train.currentBest is not None:
                         ft_font.render_to(self.screen, best_rect.topleft, best, (255, 0, 0))
                     pygame.display.update()
+                # if len(self.dinoArray) > 0 and counter % 3 == 0:
+                #     print(f"Activation: {self.dinoArray[0].getAction(np.array([[l], [nl], [na], [s]]))}")
                 self.clock.tick(self.FPS)
 
                 if not self.dinoArray:
@@ -588,10 +621,10 @@ class Dino():
 
     def getAction(self, senses):
         if isinstance(senses, np.ndarray):
-            if senses.shape == (5, 1):
+            if senses.shape == (4, 1):
                 return self.brain.feedForward(senses)
         else:
-            return np.array([0.44])
+            return None
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -635,7 +668,7 @@ class Dino():
         self.rect = self.rect.move(self.movement)
         self.checkbounds()
 
-        if not self.isDead and self.counter % 7 == 6 and self.isBlinking is False:
+        if not self.isDead and self.counter % 7 == 6 and not self.isBlinking:
             self.score += 1
             if self.score % 100 == 0 and self.score != 0:
                 if pygame.mixer.get_init() is not None:

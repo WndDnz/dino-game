@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import AGMLP
 import numpy as np
 from RedeNeural import RedeNeural

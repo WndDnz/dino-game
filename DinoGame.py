@@ -261,7 +261,7 @@ class DinoGame():
                                 last_obstacle.empty()
                                 last_obstacle.add(Cactus(gamespeed, 40, 40))
 
-                if len(pteras) == 0 and random.randrange(0, 200) == 10 and counter > 500:
+                if len(pteras) == 0 and random.randrange(0, 200) == 10 and counter > 700:
                     for last in last_obstacle:
                         if last.rect.right < self.width * 0.8:
                             last_obstacle.empty()
@@ -451,7 +451,7 @@ class DinoGame():
                         na = pte.rect.bottom
                     else:
                         nl = 632
-                        na =  147
+                        na =  110
                     s = gamespeed
                     for dino in self.dinoArray:
                         activation = dino.getAction(np.array([[l], [nl], [na], [s]]))
@@ -479,11 +479,11 @@ class DinoGame():
                                 last_obstacle.empty()
                                 last_obstacle.add(Cactus(gamespeed, 40, 40))
 
-                if len(pteras) == 0 and random.randrange(0, 200) == 10 and counter > 10:
+                if len(pteras) == 0 and random.randrange(0, 200) == 10 and counter > 600:
                     for last in last_obstacle:
                         if last.rect.right < self.width * 0.8:
                             last_obstacle.empty()
-                            p = Ptera(gamespeed, 46, 40)
+                            p = Ptera(gamespeed, 56, 40)
                             if len(cacti) == 0:
                                 for c in cacti:
                                     if not pygame.sprite.collide_mask(p, c):

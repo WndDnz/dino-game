@@ -8,8 +8,8 @@ class RedeNeural:
     def __init__(self, tamanhos):
         self.ncamadas = len(tamanhos)
         self.tamanhos = tamanhos
-        self.bias  = [np.random.uniform(-1, 1, (y, 1)) for y in tamanhos[1:]]
-        self.pesos = [np.random.uniform(-1, 1, (y, x)) for x, y in zip(tamanhos[:-1], tamanhos[1:])]
+        self.bias  = [np.random.uniform(-10., 10., (y, 1)) for y in tamanhos[1:]]
+        self.pesos = [np.random.uniform(-10., 10., (y, x)) for x, y in zip(tamanhos[:-1], tamanhos[1:])]
     
     def sigmoide(self, z):
         return 1. / (1. + np.exp(-z))

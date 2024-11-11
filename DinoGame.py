@@ -364,7 +364,7 @@ class DinoGame:
         quit()
 
     def train(self, nIndividuals=20, nGenerations=100, population=None):
-        # DinoGame.FPS *= 3
+        self.FPS *= 3
         gamespeed = 4
         startMenu = False
         gameOver = False
@@ -373,9 +373,7 @@ class DinoGame:
         self.dinoArray.clear()
         for i in range(nIndividuals):
             self.dinoArray.append(Dino(44, 47))
-        ag = AGMLP.RNA_AG(
-            (4, 8, 4, 2), None, 0.1, nIndividuals, nGenerations, elite=0.05
-        )
+        ag = AGMLP.RNA_AG((4, 4, 2), None, 0.1, nIndividuals, nGenerations, elite=0.05)
         if population is None:
             brains = ag.iniciaPopulacao()
         else:
@@ -531,7 +529,7 @@ class DinoGame:
                     for last in last_obstacle:
                         if last.rect.right < self.width * 0.8:
                             last_obstacle.empty()
-                            p = Ptera(gamespeed, 56, 40)
+                            p = Ptera(gamespeed, 40, 40)
                             if len(cacti) == 0:
                                 for c in cacti:
                                     if not pygame.sprite.collide_mask(p, c):

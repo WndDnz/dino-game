@@ -57,7 +57,7 @@ class RNA_AG:
         fitness = {key: specimen[0] for (key, specimen) in enumerate(populacao)}
         return sorted(fitness.items(), key=operator.itemgetter(1), reverse=True)
 
-    def selecao(self, popRanqueada, tamElite, numPartTorneio=0.1):
+    def selecao(self, popRanqueada, tamElite, numPartTorneio=0.2):
         """
         Este método implementa a seleção por torneio. Uma fração da população é sorteada aleatoriamente
         e o melhor indíviduo do grupo é promovido para o grupo de reprodução. Note que retornamos uma lista
@@ -94,15 +94,14 @@ class RNA_AG:
 
         filho = RedeNeural.RedeNeural(self.configRede)
 
-        alpha = 0.25
-
+        alpha = 0.1
+        beta = np.random.uniform(-alpha, 1 + alpha)
         for i in range(pai1.ncamadas - 1):
-            shapeOrig = b1[i].shape
-            beta = np.random.uniform(-alpha, 1 + alpha, shapeOrig)
+            # shapeOrig = b1[i].shape
             bias_filho = b1[i] + beta * (b2[i] - b1[i])
 
-            shapeOrig = w1[i].shape
-            beta = np.random.uniform(-alpha, 1 + alpha, shapeOrig)
+            # shapeOrig = w1[i].shape
+            # beta = np.random.uniform(-alpha, 1 + alpha, shapeOrig)
             pesos_filho = w1[i] + beta * (w2[i] - w1[i])
 
             filho.bias[i] = bias_filho

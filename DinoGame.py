@@ -8,6 +8,7 @@ import numpy as np
 import RedeNeural
 import AGMLP
 import math
+import concurrent.futures
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -17,15 +18,15 @@ pygame.mixer.pre_init(44100, -16, 2, 2048)  # fix audio delay
 pygame.init()
 
 
-class DinoGame():
+class DinoGame:
     scr_size = (width, height) = (600, 150)
     accel = 1
     FPS = 60
     gravity = 0.6
     high_score = 0
-    checkPoint_sound = pygame.mixer.Sound('sprites/checkPoint.wav')
-    jump_sound = pygame.mixer.Sound('sprites/jump.wav')
-    die_sound = pygame.mixer.Sound('sprites/die.wav')
+    checkPoint_sound = pygame.mixer.Sound("sprites/checkPoint.wav")
+    jump_sound = pygame.mixer.Sound("sprites/jump.wav")
+    die_sound = pygame.mixer.Sound("sprites/die.wav")
 
     def __init__(self):
         self.screen = pygame.display.set_mode(self.scr_size)
@@ -42,7 +43,7 @@ class DinoGame():
         sizey=-1,
         colorkey=None,
     ):
-        fullname = os.path.join('sprites', name)
+        fullname = os.path.join("sprites", name)
         image = pygame.image.load(fullname)
         image = image.convert()
         if colorkey is not None:
@@ -65,7 +66,7 @@ class DinoGame():
         scaley=-1,
         colorkey=None,
     ):
-        fullname = os.path.join('sprites', sheetname)
+        fullname = os.path.join("sprites", sheetname)
         sheet = pygame.image.load(fullname)
         sheet = sheet.convert()
 
@@ -114,7 +115,7 @@ class DinoGame():
         if number > -1:
             digits = []
             i = 0
-            while(number // 10 != 0):
+            while number // 10 != 0:
                 digits.append(number % 10)
                 number = number // 10
 
@@ -129,15 +130,17 @@ class DinoGame():
         temp_dino.isBlinking = True
         gameStart = False
 
-        callout, callout_rect = self.load_image('call_out.png', 196, 45, -1)
+        callout, callout_rect = self.load_image("call_out.png", 196, 45, -1)
         callout_rect.left = self.width * 0.05
         callout_rect.top = self.height * 0.4
 
-        temp_ground, temp_ground_rect = self.load_sprite_sheet('ground.png', 15, 1, -1, -1, -1)
+        temp_ground, temp_ground_rect = self.load_sprite_sheet(
+            "ground.png", 15, 1, -1, -1, -1
+        )
         temp_ground_rect.left = self.width / 20
         temp_ground_rect.bottom = self.height
 
-        logo, logo_rect = self.load_image('logo.png', 240, 40, -1)
+        logo, logo_rect = self.load_image("logo.png", 240, 40, -1)
         logo_rect.centerx = self.width * 0.6
         logo_rect.centery = self.height * 0.6
         while not gameStart:
@@ -191,10 +194,14 @@ class DinoGame():
         Ptera.containers = pteras
         Cloud.containers = clouds
 
-        retbutton_image, retbutton_rect = self.load_image('replay_button.png', 35, 31, -1)
-        gameover_image, gameover_rect = self.load_image('game_over.png', 190, 11, -1)
+        retbutton_image, retbutton_rect = self.load_image(
+            "replay_button.png", 35, 31, -1
+        )
+        gameover_image, gameover_rect = self.load_image("game_over.png", 190, 11, -1)
 
-        temp_images, temp_rect = self.load_sprite_sheet('numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
+        temp_images, temp_rect = self.load_sprite_sheet(
+            "numbers.png", 12, 1, 11, int(11 * 6 / 5), -1
+        )
         HI_image = pygame.Surface((22, int(11 * 6 / 5)))
         HI_rect = HI_image.get_rect()
         HI_image.fill(BG_COLOR)
@@ -220,14 +227,20 @@ class DinoGame():
 
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_SPACE:
-                                if self.playerDino.rect.bottom == int(0.98 * self.height):
+                                if self.playerDino.rect.bottom == int(
+                                    0.98 * self.height
+                                ):
                                     self.playerDino.isJumping = True
                                     if pygame.mixer.get_init() is not None:
                                         DinoGame.jump_sound.play()
-                                    self.playerDino.movement[1] = -1 * self.playerDino.jumpSpeed
+                                    self.playerDino.movement[1] = (
+                                        -1 * self.playerDino.jumpSpeed
+                                    )
 
                             if event.key == pygame.K_DOWN:
-                                if not (self.playerDino.isJumping and self.playerDino.isDead):
+                                if not (
+                                    self.playerDino.isJumping and self.playerDino.isDead
+                                ):
                                     self.playerDino.isDucking = True
 
                             if event.key == pygame.K_q:
@@ -257,18 +270,27 @@ class DinoGame():
                         last_obstacle.add(Cactus(gamespeed, 40, 40))
                     else:
                         for last in last_obstacle:
-                            if last.rect.right < self.width * 0.7 and random.randrange(0, 50) == 10:
+                            if (
+                                last.rect.right < self.width * 0.7
+                                and random.randrange(0, 50) == 10
+                            ):
                                 last_obstacle.empty()
                                 last_obstacle.add(Cactus(gamespeed, 40, 40))
 
-                if len(pteras) == 0 and random.randrange(0, 200) == 10 and counter > 700:
+                if (
+                    len(pteras) == 0
+                    and random.randrange(0, 200) == 10
+                    and counter > 700
+                ):
                     for last in last_obstacle:
                         if last.rect.right < self.width * 0.8:
                             last_obstacle.empty()
                             last_obstacle.add(Ptera(gamespeed, 46, 40))
 
                 if len(clouds) < 5 and random.randrange(0, 300) == 10:
-                    Cloud(self.width, random.randrange(self.height / 5, self.height / 2))
+                    Cloud(
+                        self.width, random.randrange(self.height / 5, self.height / 2)
+                    )
 
                 self.playerDino.update()
                 cacti.update()
@@ -302,7 +324,7 @@ class DinoGame():
                     new_ground.speed -= 1
                     gamespeed += 1
 
-                counter = (counter + 1)
+                counter = counter + 1
 
             if gameQuit:
                 break
@@ -322,7 +344,10 @@ class DinoGame():
                                 gameQuit = True
                                 gameOver = False
 
-                            if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                            if (
+                                event.key == pygame.K_RETURN
+                                or event.key == pygame.K_SPACE
+                            ):
                                 gameOver = False
                                 self.gameplay()
 
@@ -360,7 +385,7 @@ class DinoGame():
         new_ground = Ground(-1 * gamespeed)
         counter = 0
 
-        ft_font = pygame.freetype.SysFont('Input', 12)
+        ft_font = pygame.freetype.SysFont("Input", 12)
 
         cacti = pygame.sprite.Group()
         pteras = pygame.sprite.Group()
@@ -371,10 +396,14 @@ class DinoGame():
         Ptera.containers = pteras
         Cloud.containers = clouds
 
-        retbutton_image, retbutton_rect = self.load_image('replay_button.png', 35, 31, -1)
-        gameover_image, gameover_rect = self.load_image('game_over.png', 190, 11, -1)
+        retbutton_image, retbutton_rect = self.load_image(
+            "replay_button.png", 35, 31, -1
+        )
+        gameover_image, gameover_rect = self.load_image("game_over.png", 190, 11, -1)
 
-        temp_images, temp_rect = self.load_sprite_sheet('numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
+        temp_images, temp_rect = self.load_sprite_sheet(
+            "numbers.png", 12, 1, 11, int(11 * 6 / 5), -1
+        )
 
         print(f"Starting generation {DinoGame.train.currentGeneration}.")
 
@@ -442,26 +471,35 @@ class DinoGame():
 
                 if cac is not None or pte is not None:
                     if cac is not None:
-                        l = (cac.rect.left - dino.rect.right)
+                        l = cac.rect.left - dino.rect.right
                     else:
-                        l = 632
-                    
+                        l = 0
+
                     if pte is not None:
-                        nl = (pte.rect.left - dino.rect.right)
+                        nl = pte.rect.left - dino.rect.right
                         na = pte.rect.bottom
                     else:
-                        nl = 632
-                        na =  110
+                        nl = 0
+                        na = 0
                     s = gamespeed
-                    for dino in self.dinoArray:
-                        activation = dino.getAction(np.array([[l], [nl], [na], [s]]))
+                    actions = []
+                    with concurrent.futures.ThreadPoolExecutor(
+                        max_workers=20
+                    ) as executor:
+                        for dino in self.dinoArray:
+                            action = executor.submit(
+                                dino.getAction, np.array([[l], [nl], [na], [s]])
+                            )
+                            actions.append(action)
+                    for dino, activation in zip(self.dinoArray, actions):
+                        # activation = dino.getAction(np.array([[l], [nl], [na], [s]]))
                         # print(f"Activation: {activation}")
-                        if activation[1][0] > 0.99:
+                        if activation.result()[1][0] > 0.99:
                             dino.isDucking = True
                         else:
                             dino.isDucking = False
 
-                        if activation[0][0] > 0.99:
+                        if activation.result()[0][0] > 0.99:
                             if not dino.isJumping:
                                 dino.isJumping = True
                                 if pygame.mixer.get_init() is not None:
@@ -475,11 +513,18 @@ class DinoGame():
                         last_obstacle.add(Cactus(gamespeed, 40, 40))
                     else:
                         for last in last_obstacle:
-                            if last.rect.right < self.width * 0.7 and random.randrange(0, 50) == 10:
+                            if (
+                                last.rect.right < self.width * 0.7
+                                and random.randrange(0, 50) == 10
+                            ):
                                 last_obstacle.empty()
                                 last_obstacle.add(Cactus(gamespeed, 40, 40))
 
-                if len(pteras) == 0 and random.randrange(0, 200) == 10 and counter > 600:
+                if (
+                    len(pteras) == 0
+                    and random.randrange(0, 200) == 10
+                    and counter > 600
+                ):
                     for last in last_obstacle:
                         if last.rect.right < self.width * 0.8:
                             last_obstacle.empty()
@@ -492,7 +537,9 @@ class DinoGame():
                                 last_obstacle.add(p)
 
                 if len(clouds) < 5 and random.randrange(0, 300) == 10:
-                    Cloud(self.width, random.randrange(self.height // 5, self.height // 2))
+                    Cloud(
+                        self.width, random.randrange(self.height // 5, self.height // 2)
+                    )
 
                 for d in self.dinoArray:
                     d.update()
@@ -502,17 +549,17 @@ class DinoGame():
                 clouds.update()
                 new_ground.update()
 
-                alive = f'Alive: {len(self.dinoArray)}/{nIndividuals}'
+                alive = f"Alive: {len(self.dinoArray)}/{nIndividuals}"
                 alive_rect = ft_font.get_rect(alive)
                 alive_rect.topright = self.screen.get_rect().topright
                 alive_rect.move_ip(-2, 2)
 
-                best = f'Best fitness (prev gen): {DinoGame.train.currentBest}'
+                best = f"Best fitness (prev gen): {DinoGame.train.currentBest}"
                 best_rect = ft_font.get_rect(best)
                 best_rect.topright = alive_rect.bottomright
                 best_rect.move_ip(0, 2)
 
-                sens = f'Senses: l: {l} nl: {nl} na: {na} s: {s}'
+                sens = f"Senses: l: {l} nl: {nl} na: {na} s: {s}"
                 sens_rect = ft_font.get_rect(sens)
                 sens_rect.topleft = self.screen.get_rect().topleft
                 sens_rect.move_ip(2, 2)
@@ -525,11 +572,17 @@ class DinoGame():
                     pteras.draw(self.screen)
                     for d in self.dinoArray:
                         d.draw(self.screen)
-                    ft_font.render_to(self.screen, alive_rect.topleft, alive, (255, 0, 0))
+                    ft_font.render_to(
+                        self.screen, alive_rect.topleft, alive, (255, 0, 0)
+                    )
                     if cac is not None or pte is not None:
-                        ft_font.render_to(self.screen, sens_rect.topleft, sens, (0, 0, 255))
+                        ft_font.render_to(
+                            self.screen, sens_rect.topleft, sens, (0, 0, 255)
+                        )
                     if DinoGame.train.currentBest is not None:
-                        ft_font.render_to(self.screen, best_rect.topleft, best, (255, 0, 0))
+                        ft_font.render_to(
+                            self.screen, best_rect.topleft, best, (255, 0, 0)
+                        )
                     pygame.display.update()
                 # if len(self.dinoArray) > 0 and counter % 3 == 0:
                 #     print(f"Activation: {self.dinoArray[0].getAction(np.array([[l], [nl], [na], [s]]))}")
@@ -539,18 +592,24 @@ class DinoGame():
                     DinoGame.train.currentGeneration += 1
                     rank = ag.ranquearIndividuos(rankedBrains)
                     if DinoGame.train.currentGeneration > nGenerations:
-                        RedeNeural.RedeNeural.save_object(rankedBrains[rank[0][0]][1], 'bestDino.din')
+                        RedeNeural.RedeNeural.save_object(
+                            rankedBrains[rank[0][0]][1], "bestDino.din"
+                        )
                         gameOver = True
                     else:
                         DinoGame.train.currentBest = rank[0][1]
                         newPopulation = ag.proximaGeracao(rankedBrains)
-                        self.train(nIndividuals=nIndividuals, nGenerations=nGenerations, population=newPopulation)
+                        self.train(
+                            nIndividuals=nIndividuals,
+                            nGenerations=nGenerations,
+                            population=newPopulation,
+                        )
 
                 if counter % 700 == 699:
                     new_ground.speed -= 1
                     gamespeed += 1
 
-                counter = (counter + 1)
+                counter = counter + 1
 
             if gameQuit:
                 break
@@ -570,11 +629,16 @@ class DinoGame():
                                 gameQuit = True
                                 gameOver = False
 
-                            if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                            if (
+                                event.key == pygame.K_RETURN
+                                or event.key == pygame.K_SPACE
+                            ):
                                 gameOver = False
                                 # TODO Check if want to run again, save population
                                 DinoGame.train.currentGeneration = 1
-                                self.train(nIndividuals=nIndividuals, nGenerations=nGenerations)
+                                self.train(
+                                    nIndividuals=nIndividuals, nGenerations=nGenerations
+                                )
 
                 if pygame.display.get_surface() is not None:
                     self.disp_gameOver_msg(retbutton_image, gameover_image)
@@ -588,7 +652,7 @@ class DinoGame():
         isGameQuit = self.introscreen()
         if not isGameQuit:
             if train and nIndividuals is not None:
-                print('Starting training.')
+                print("Starting training.")
                 DinoGame.train.currentGeneration = 1
                 DinoGame.train.currentBest = None
                 self.train(nIndividuals=nIndividuals, nGenerations=nGenerations)
@@ -598,10 +662,14 @@ class DinoGame():
                 self.gameplay()
 
 
-class Dino():
+class Dino:
     def __init__(self, sizex=-1, sizey=-1):
-        self.images, self.rect = DinoGame.load_sprite_sheet('dino.png', 5, 1, sizex, sizey, -1)
-        self.images1, self.rect1 = DinoGame.load_sprite_sheet('dino_ducking.png', 2, 1, 59, sizey, -1)
+        self.images, self.rect = DinoGame.load_sprite_sheet(
+            "dino.png", 5, 1, sizex, sizey, -1
+        )
+        self.images1, self.rect1 = DinoGame.load_sprite_sheet(
+            "dino_ducking.png", 2, 1, 59, sizey, -1
+        )
         self.rect.bottom = int(0.98 * DinoGame.height)
         self.rect.left = DinoGame.width / 15
         self.image = self.images[0]
@@ -674,13 +742,15 @@ class Dino():
                 if pygame.mixer.get_init() is not None:
                     DinoGame.checkPoint_sound.play()
 
-        self.counter = (self.counter + 1)
+        self.counter = self.counter + 1
 
 
 class Cactus(pygame.sprite.Sprite):
     def __init__(self, speed=5, sizex=-1, sizey=-1):
         pygame.sprite.Sprite.__init__(self, self.containers)
-        self.images, self.rect = DinoGame.load_sprite_sheet('cacti-small.png', 3, 1, sizex, sizey, -1)
+        self.images, self.rect = DinoGame.load_sprite_sheet(
+            "cacti-small.png", 3, 1, sizex, sizey, -1
+        )
         self.rect.bottom = int(0.98 * DinoGame.height)
         self.rect.left = DinoGame.width + self.rect.width
         self.image = self.images[random.randrange(0, 3)]
@@ -699,8 +769,14 @@ class Cactus(pygame.sprite.Sprite):
 class Ptera(pygame.sprite.Sprite):
     def __init__(self, speed=5, sizex=-1, sizey=-1):
         pygame.sprite.Sprite.__init__(self, self.containers)
-        self.images, self.rect = DinoGame.load_sprite_sheet('ptera.png', 2, 1, sizex, sizey, -1)
-        self.ptera_height = [DinoGame.height * 0.82, DinoGame.height * 0.75, DinoGame.height * 0.60]
+        self.images, self.rect = DinoGame.load_sprite_sheet(
+            "ptera.png", 2, 1, sizex, sizey, -1
+        )
+        self.ptera_height = [
+            DinoGame.height * 0.82,
+            DinoGame.height * 0.75,
+            DinoGame.height * 0.60,
+        ]
         self.rect.centery = self.ptera_height[random.randrange(0, 3)]
         self.rect.left = DinoGame.width + self.rect.width
         self.image = self.images[0]
@@ -716,15 +792,15 @@ class Ptera(pygame.sprite.Sprite):
             self.index = (self.index + 1) % 2
         self.image = self.images[self.index]
         self.rect = self.rect.move(self.movement)
-        self.counter = (self.counter + 1)
+        self.counter = self.counter + 1
         if self.rect.right < 0:
             self.kill()
 
 
-class Ground():
+class Ground:
     def __init__(self, speed=-5):
-        self.image, self.rect = DinoGame.load_image('ground.png', -1, -1, -1)
-        self.image1, self.rect1 = DinoGame.load_image('ground.png', -1, -1, -1)
+        self.image, self.rect = DinoGame.load_image("ground.png", -1, -1, -1)
+        self.image1, self.rect1 = DinoGame.load_image("ground.png", -1, -1, -1)
         self.rect.bottom = DinoGame.height
         self.rect1.bottom = DinoGame.height
         self.rect1.left = self.rect.right
@@ -749,7 +825,9 @@ class Ground():
 class Cloud(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self, self.containers)
-        self.image, self.rect = DinoGame.load_image('cloud.png', int(90 * 30 / 42), 30, -1)
+        self.image, self.rect = DinoGame.load_image(
+            "cloud.png", int(90 * 30 / 42), 30, -1
+        )
         self.speed = 1
         self.rect.left = x
         self.rect.top = y
@@ -765,10 +843,12 @@ class Cloud(pygame.sprite.Sprite):
             self.kill()
 
 
-class Scoreboard():
+class Scoreboard:
     def __init__(self, x=-1, y=-1):
         self.score = 0
-        self.tempimages, self.temprect = DinoGame.load_sprite_sheet('numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
+        self.tempimages, self.temprect = DinoGame.load_sprite_sheet(
+            "numbers.png", 12, 1, 11, int(11 * 6 / 5), -1
+        )
         self.image = pygame.Surface((55, int(11 * 6 / 5)))
         self.rect = self.image.get_rect()
         if x == -1:

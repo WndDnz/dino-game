@@ -73,6 +73,7 @@ class RNA_AG:
             max(random.sample(popRanqueada, numTorneio), key=operator.itemgetter(1))[0]
             for i in range(tam)
         ]
+        random.shuffle(res)
         return res
 
     def grupoDeReproducao(self, populacao, selecao):
@@ -82,6 +83,34 @@ class RNA_AG:
         return [populacao[indice][1] for indice in selecao]
 
     def acasala(self, pai1, pai2):
+        """
+        A função acasala aplica o operador genético BLX-alpha. Esse operador gera
+        um filho seguindo a equação F = P1 + \beta * (P2 - P1), onde \beta
+        """
+        b1 = pai1.bias.copy()
+        b2 = pai2.bias.copy()
+        w1 = pai1.pesos.copy()
+        w2 = pai2.pesos.copy()
+
+        filho = RedeNeural.RedeNeural(self.configRede)
+
+        alpha = 0.25
+
+        for i in range(pai1.ncamadas - 1):
+            shapeOrig = b1[i].shape
+            beta = np.random.uniform(-alpha, 1 + alpha, shapeOrig)
+            bias_filho = b1[i] + beta * (b2[i] - b1[i])
+
+            shapeOrig = w1[i].shape
+            beta = np.random.uniform(-alpha, 1 + alpha, shapeOrig)
+            pesos_filho = w1[i] + beta * (w2[i] - w1[i])
+
+            filho.bias[i] = bias_filho
+            filho.pesos[i] = pesos_filho
+
+        return filho
+
+    def acasala2(self, pai1, pai2):
         """
         A função acasala aplica o operador genético de crossover. Consideramos que cada indivíduo possui
         dois cromossomos, a lista de bias e a lista de pesos de cada camada da RNA. Fazemos o crossover

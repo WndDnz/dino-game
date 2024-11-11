@@ -3,7 +3,6 @@ import random
 import pickle
 from tqdm.auto import tqdm, trange
 
-
 class RedeNeural:
     def __init__(self, tamanhos):
         self.ncamadas = len(tamanhos)

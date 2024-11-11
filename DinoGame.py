@@ -373,7 +373,9 @@ class DinoGame:
         self.dinoArray.clear()
         for i in range(nIndividuals):
             self.dinoArray.append(Dino(44, 47))
-        ag = AGMLP.RNA_AG((4, 8, 2), None, 0.1, nIndividuals, nGenerations, elite=0.05)
+        ag = AGMLP.RNA_AG(
+            (4, 8, 4, 2), None, 0.1, nIndividuals, nGenerations, elite=0.05
+        )
         if population is None:
             brains = ag.iniciaPopulacao()
         else:
@@ -470,17 +472,18 @@ class DinoGame:
                             pte = p
 
                 if cac is not None or pte is not None:
-                    if cac is not None:
-                        l = cac.rect.left - dino.rect.right
-                    else:
-                        l = 0
+                    l = (cac.rect.left - dino.rect.right) if cac is not None else 0
+                    # if cac is not None:
+                    #     l = (cac.rect.left - dino.rect.right)
+                    # else:
+                    #     l = 632
 
-                    if pte is not None:
-                        nl = pte.rect.left - dino.rect.right
-                        na = pte.rect.bottom
-                    else:
-                        nl = 0
-                        na = 0
+                    # if pte is not None:
+                    nl = (pte.rect.left - dino.rect.right) if pte is not None else 0
+                    na = pte.rect.bottom if pte is not None else 0
+                    # else:
+                    #     nl = 632
+                    #     na =  110
                     s = gamespeed
                     actions = []
                     with concurrent.futures.ThreadPoolExecutor(

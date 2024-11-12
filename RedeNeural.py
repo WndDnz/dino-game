@@ -3,13 +3,14 @@ import random
 import pickle
 from tqdm.auto import tqdm, trange
 
+
 class RedeNeural:
     def __init__(self, tamanhos):
         self.ncamadas = len(tamanhos)
         self.tamanhos = tamanhos
-        self.bias = [np.random.uniform(-10.0, 10.0, (y, 1)) for y in tamanhos[1:]]
+        self.bias = [np.random.uniform(-5.0, 5.0, (y, 1)) for y in tamanhos[1:]]
         self.pesos = [
-            np.random.uniform(-10.0, 10.0, (y, x))
+            np.random.uniform(-5.0, 5.0, (y, x))
             for x, y in zip(tamanhos[:-1], tamanhos[1:])
         ]
 

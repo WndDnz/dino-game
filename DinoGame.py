@@ -364,16 +364,18 @@ class DinoGame:
         quit()
 
     def train(self, nIndividuals=20, nGenerations=100, population=None):
-        self.FPS *= 3
+        self.FPS *= 1
         gamespeed = 4
         startMenu = False
         gameOver = False
         gameQuit = False
-        l = a = nl = na = s = 0
+        l = a = nl = na = ds = s = 0
         self.dinoArray.clear()
         for i in range(nIndividuals):
             self.dinoArray.append(Dino(44, 47))
-        ag = AGMLP.RNA_AG((4, 4, 2), None, 0.1, nIndividuals, nGenerations, elite=0.05)
+        ag = AGMLP.RNA_AG(
+            (5, 500, 2), None, 0.1, nIndividuals, nGenerations, elite=0.05
+        )
         if population is None:
             brains = ag.iniciaPopulacao()
         else:
@@ -470,18 +472,30 @@ class DinoGame:
                             pte = p
 
                 if cac is not None or pte is not None:
-                    l = (cac.rect.left - dino.rect.right) if cac is not None else 0
+                    l = (
+                        1 - (cac.rect.left - dino.rect.right) / 552.0
+                        if cac is not None
+                        else 0
+                    )
                     # if cac is not None:
                     #     l = (cac.rect.left - dino.rect.right)
                     # else:
                     #     l = 632
 
                     # if pte is not None:
-                    nl = (pte.rect.left - dino.rect.right) if pte is not None else 0
-                    na = pte.rect.bottom if pte is not None else 0
+                    nl = (
+                        1 - (pte.rect.left - dino.rect.right) / 552.0
+                        if pte is not None
+                        else 0
+                    )
+                    na = 1 - pte.rect.bottom / 147.0 if pte is not None else 0
                     # else:
                     #     nl = 632
                     #     na =  110
+                    if pte and cac:
+                        ds = (cac.rect.right - pte.rect.left) / 560
+                    else:
+                        ds = 0
                     s = gamespeed
                     actions = []
                     with concurrent.futures.ThreadPoolExecutor(
@@ -489,7 +503,8 @@ class DinoGame:
                     ) as executor:
                         for dino in self.dinoArray:
                             action = executor.submit(
-                                dino.getAction, np.array([[l], [nl], [na], [s]])
+                                dino.getAction,
+                                np.array([[l], [nl], [na], [ds], [s]]),
                             )
                             actions.append(action)
                     for dino, activation in zip(self.dinoArray, actions):
@@ -560,7 +575,9 @@ class DinoGame:
                 best_rect.topright = alive_rect.bottomright
                 best_rect.move_ip(0, 2)
 
-                sens = f"Senses: l: {l} nl: {nl} na: {na} s: {s}"
+                sens = (
+                    f"Senses: l: {l:.2f} nl: {nl:.2f} na: {na:.2f} d: {ds:.2f} s: {s}"
+                )
                 sens_rect = ft_font.get_rect(sens)
                 sens_rect.topleft = self.screen.get_rect().topleft
                 sens_rect.move_ip(2, 2)
@@ -585,8 +602,10 @@ class DinoGame:
                             self.screen, best_rect.topleft, best, (255, 0, 0)
                         )
                     pygame.display.update()
-                # if len(self.dinoArray) > 0 and counter % 3 == 0:
-                #     print(f"Activation: {self.dinoArray[0].getAction(np.array([[l], [nl], [na], [s]]))}")
+                    # if self.dinoArray:
+                    #     print(
+                    #         f"Activation: {self.dinoArray[0].getAction(np.array([[l], [nl], [na], [s]]))}"
+                    #     )
                 self.clock.tick(self.FPS)
 
                 if not self.dinoArray:
@@ -690,7 +709,7 @@ class Dino:
 
     def getAction(self, senses):
         if isinstance(senses, np.ndarray):
-            if senses.shape == (4, 1):
+            if senses.shape == (5, 1):
                 return self.brain.feedForward(senses)
         else:
             return None

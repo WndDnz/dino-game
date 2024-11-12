@@ -191,11 +191,11 @@ class RNA_AG:
             for b in range(individuo.bias[c].shape[0]):
                 if random.random() < taxaMutacao:
                     # v = np.array([random.random()])
-                    individuo.bias[c][b][0] = np.random.randn()
+                    individuo.bias[c][b][0] *= np.random.random()
             for w in range(individuo.pesos[c].shape[0]):
                 if random.random() < taxaMutacao:
                     ind = random.randint(0, individuo.pesos[c][w].shape[0] - 1)
-                    individuo.pesos[c][w][ind] = np.random.randn()
+                    individuo.pesos[c][w][ind] *= np.random.random()
         return individuo
 
     def mutacaoPopulacao(self, populacao, taxaMutacao):

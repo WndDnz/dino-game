@@ -470,30 +470,22 @@ class DinoGame:
                     else:
                         if p.rect.left < pte.rect.left:
                             pte = p
-
+                res = None
                 if cac is not None or pte is not None:
-                    l = (
-                        1 - (cac.rect.left - dino.rect.right) / 552.0
-                        if cac is not None
-                        else 0
-                    )
+                    l = cac.rect.left - dino.rect.right if cac else 0
                     # if cac is not None:
                     #     l = (cac.rect.left - dino.rect.right)
                     # else:
                     #     l = 632
 
                     # if pte is not None:
-                    nl = (
-                        1 - (pte.rect.left - dino.rect.right) / 552.0
-                        if pte is not None
-                        else 0
-                    )
-                    na = 1 - pte.rect.bottom / 147.0 if pte is not None else 0
+                    nl = pte.rect.left - dino.rect.right if pte else 0
+                    na = pte.rect.bottom if pte is not None else 0
                     # else:
                     #     nl = 632
                     #     na =  110
                     if pte and cac:
-                        ds = (cac.rect.right - pte.rect.left) / 560
+                        ds = cac.rect.right - pte.rect.left
                     else:
                         ds = 0
                     s = gamespeed
@@ -502,20 +494,22 @@ class DinoGame:
                         max_workers=20
                     ) as executor:
                         for dino in self.dinoArray:
-                            action = executor.submit(
-                                dino.getAction,
-                                np.array([[l], [nl], [na], [ds], [s]]),
+                            actions.append(
+                                executor.submit(
+                                    dino.getAction,
+                                    np.array([[l], [nl], [na], [ds], [s]]),
+                                )
                             )
-                            actions.append(action)
                     for dino, activation in zip(self.dinoArray, actions):
                         # activation = dino.getAction(np.array([[l], [nl], [na], [s]]))
                         # print(f"Activation: {activation}")
-                        if activation.result()[1][0] > 0.99:
+                        action = activation.result()
+                        if action[1][0] > 0.99:
                             dino.isDucking = True
                         else:
                             dino.isDucking = False
 
-                        if activation.result()[0][0] > 0.99:
+                        if action[0][0] > 0.99:
                             if not dino.isJumping:
                                 dino.isJumping = True
                                 if pygame.mixer.get_init() is not None:
@@ -540,6 +534,7 @@ class DinoGame:
                     len(pteras) == 0
                     and random.randrange(0, 200) == 10
                     and counter > 600
+                    and True
                 ):
                     for last in last_obstacle:
                         if last.rect.right < self.width * 0.8:

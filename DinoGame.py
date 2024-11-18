@@ -22,7 +22,7 @@ class DinoGame:
     scr_size = (width, height) = (600, 150)
     accel = 1
     FPS = 60
-    gravity = 0.6
+    gravity = 0.65
     high_score = 0
     checkPoint_sound = pygame.mixer.Sound("sprites/checkPoint.wav")
     jump_sound = pygame.mixer.Sound("sprites/jump.wav")
@@ -490,20 +490,22 @@ class DinoGame:
                         ds = 0
                     s = gamespeed
                     actions = []
-                    with concurrent.futures.ThreadPoolExecutor(
-                        max_workers=20
-                    ) as executor:
-                        for dino in self.dinoArray:
-                            actions.append(
-                                executor.submit(
-                                    dino.getAction,
-                                    np.array([[l], [nl], [na], [ds], [s]]),
-                                )
-                            )
-                    for dino, activation in zip(self.dinoArray, actions):
-                        # activation = dino.getAction(np.array([[l], [nl], [na], [s]]))
-                        # print(f"Activation: {activation}")
-                        action = activation.result()
+                    # with concurrent.futures.ThreadPoolExecutor(
+                    #     max_workers=20
+                    # ) as executor:
+                    #     for dino in self.dinoArray:
+                    #         actions.append(
+                    #             executor.submit(
+                    #                 dino.getAction,
+                    #                 np.array([[l], [nl], [na], [ds], [s]]),
+                    #             )
+                    #         )
+                    # for dino, activation in zip(self.dinoArray, actions):
+                    #     # activation = dino.getAction(np.array([[l], [nl], [na], [s]]))
+                    #     # print(f"Activation: {activation}")
+                    #     action = activation.result()
+                    for dino in self.dinoArray:
+                        action = dino.getAction(np.array([[l], [nl], [na], [ds], [s]]))
                         if action[1][0] > 0.99:
                             dino.isDucking = True
                         else:

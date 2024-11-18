@@ -708,9 +708,13 @@ class Dino:
         self.duck_pos_width = self.rect1.width
 
     def getAction(self, senses):
-        if isinstance(senses, np.ndarray):
-            if senses.shape == (5, 1):
-                return self.brain.feedForward(senses)
+        if isinstance(senses, np.ndarray) and senses.shape == (5, 1):
+            output = self.brain.feedForward(senses)
+            onehot = np.zeros_like(output)
+            if(np.all(output) > .9) :
+                onehot[np.argmax(output)][0] = 1
+            return onehot
+
         else:
             return None
 

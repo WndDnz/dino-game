@@ -11,7 +11,17 @@ A classe RNA_AG usa um algoritmo genético para treinar uma RNA do tipo feed-for
 
 class RNA_AG:
 
-    def __init__(self, configRede, treino, eta, nIndividuos, geracoes, taxaMutacao=0.01, elite=None, teste=None):
+    def __init__(
+        self,
+        configRede,
+        treino,
+        eta,
+        nIndividuos,
+        geracoes,
+        taxaMutacao=0.01,
+        elite=None,
+        teste=None,
+    ):
         """
         No construtor, passamos a configuração das Redes Neurais, o arquivo de dados de treinamento,
         o número de indíviduos de cada geração, a taxa de mutação, o número de indivíduos a serem
@@ -35,7 +45,9 @@ class RNA_AG:
         if nIndividuos is not None and nIndividuos > 0:
             return [RedeNeural.RedeNeural(self.configRede) for i in range(nIndividuos)]
         else:
-            return [RedeNeural.RedeNeural(self.configRede) for i in range(self.nIndividuos)]
+            return [
+                RedeNeural.RedeNeural(self.configRede) for i in range(self.nIndividuos)
+            ]
 
     def ranquearIndividuos(self, populacao):
         """
@@ -54,9 +66,10 @@ class RNA_AG:
         res = []
         tam = len(popRanqueada) - tamElite if tamElite else len(popRanqueada)
         numTorneio = int(len(popRanqueada) * numPartTorneio)
-        if(tamElite):
-            for i in range(tamElite):
-                res.append(popRanqueada[i][0])
+        if tamElite:
+            # for i in range(tamElite):
+            #     res.append(popRanqueada[i][0])
+            res += [popRanqueada[i][0] for i in range(tamElite)]
         res += [max(random.sample(popRanqueada, numTorneio), key=operator.itemgetter(1))[0] for i in range(tam)]
         return res
 
@@ -67,6 +80,30 @@ class RNA_AG:
         return [populacao[indice][1] for indice in selecao]
 
     def acasala(self, pai1, pai2):
+        """
+        Aplica o operador BLX-alpha
+        """
+        b1 = pai1.bias.copy()
+        b2 = pai2.bias.copy()
+        w1 = pai1.pesos.copy()
+        w2 = pai2.pesos.copy()
+        filho = RedeNeural.RedeNeural(self.configRede)
+        alpha = 0.1
+        beta = random.uniform(-alpha, 1+alpha)
+
+        for i in range(pai1.ncamadas - 1):
+            shapeOrig = b1[i].shape
+            bias_filho = b1[i].ravel() + beta * (b2[i].ravel() - b1[i].ravel())
+            bias_filho = bias_filho.reshape(shapeOrig)
+
+            shapeOrig = w1[i].shape
+            pesos_filho = w1[i].ravel() + beta * (w2[i].ravel() - w1[i].ravel())
+            pesos_filho = pesos_filho.reshape(shapeOrig)
+            filho.bias[i] = bias_filho
+            filho.pesos[i] = pesos_filho
+        return filho        
+
+    def acasala0(self, pai1, pai2):
         """
         A função acasala aplica o operador genético de crossover. Consideramos que cada indivíduo possui
         dois cromossomos, a lista de bias e a lista de pesos de cada camada da RNA. Fazemos o crossover
@@ -82,7 +119,10 @@ class RNA_AG:
 
         for i in range(pai1.ncamadas - 1):
             shapeOrig = b1[i].shape
-            cortes = (int(random.random() * b1[i].shape[0]), int(random.random() * b1[i].shape[0]))
+            cortes = (
+                int(random.random() * b1[i].shape[0]),
+                int(random.random() * b1[i].shape[0]),
+            )
             com, fim = (min(cortes), max(cortes))
 
             genep11 = b1[i].ravel()[:com]
@@ -102,7 +142,10 @@ class RNA_AG:
             cw1 = w1[i].ravel()
             cw2 = w2[i].ravel()
 
-            cortes = (int(random.random() * cw1.shape[0]), int(random.random() * cw1.shape[0]))
+            cortes = (
+                int(random.random() * cw1.shape[0]),
+                int(random.random() * cw1.shape[0]),
+            )
             com, fim = (min(cortes), max(cortes))
 
             filhoP1wc = cw1[:com]
@@ -128,7 +171,7 @@ class RNA_AG:
         tam = len(pais) - tamElite if tamElite else len(pais)
         pool = random.sample(pais, len(pais))
 
-        if(tamElite):
+        if tamElite:
             filhos = [pais[i] for i in range(tamElite)]
         filhos += [self.acasala(pool[i], pool[len(pais) - i - 1]) for i in range(tam)]
         return filhos
@@ -137,14 +180,14 @@ class RNA_AG:
         """
         Aplicamos a mutação, variando conforme a taxa, valores de cada cromossomo.
         """
-        camadas  = individuo.ncamadas - 1
+        camadas = individuo.ncamadas - 1
         for c in range(camadas):
             for b in range(individuo.bias[c].shape[0]):
-                if(random.random() < taxaMutacao):
+                if random.random() < taxaMutacao:
                     v = np.array([random.random()])
                     individuo.bias[c][b] = v
             for w in range(individuo.pesos[c].shape[0]):
-                if(random.random() < taxaMutacao):
+                if random.random() < taxaMutacao:
                     ind = random.randint(0, individuo.pesos[c][w].shape[0] - 1)
                     individuo.pesos[c][w][ind] = np.random.randn()
         return individuo
@@ -163,7 +206,9 @@ class RNA_AG:
         população.
         """
         popRanqueada = self.ranquearIndividuos(geracaoAtual)
-        print(f"Best: {popRanqueada[0][0]}: {popRanqueada[0][1]}") # -> {geracaoAtual[popRanqueada[0][0]][1].pesos}")
+        print(
+            f"Best: {popRanqueada[0][0]}: {popRanqueada[0][1]}"
+        )  # -> {geracaoAtual[popRanqueada[0][0]][1].pesos}")
         resSelecao = self.selecao(popRanqueada, self.tamElite)
         grReproducao = self.grupoDeReproducao(geracaoAtual, resSelecao)
         filhos = self.acasalaPppulacao(grReproducao, self.tamElite)

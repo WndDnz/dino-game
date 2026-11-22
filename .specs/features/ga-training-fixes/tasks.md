@@ -109,9 +109,9 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_importa_sem_janela` passa
-- [ ] Gate check passes: `python -m pytest test_ga.py -v`
-- [ ] Test count: 1 test passes
+- [x] `test_importa_sem_janela` passa
+- [x] Gate check passes: `python -m pytest test_ga.py -v`
+- [x] Test count: 1 test passes
 
 **Tests**: unit
 **Gate**: quick

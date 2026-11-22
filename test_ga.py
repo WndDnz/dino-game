@@ -91,3 +91,49 @@ def test_torneio_de_3():
 def test_torneio_populacao_menor_que_3():
     ranqueada = [(1, 9.0), (0, 2.0)]
     assert _ag().selecao(ranqueada, 50) == [1] * 50
+
+
+def _geracao(n=50):
+    """n pares (score, rede) com scores distintos; a rede de indice i tem score i."""
+    return [(float(i), RedeNeural.RedeNeural(CFG)) for i in range(n)]
+
+
+def _iguais(a, b):
+    return all(np.array_equal(x, y) for x, y in zip(a.bias + a.pesos, b.bias + b.pesos))
+
+
+def test_proxima_geracao_devolve_n(capsys):
+    nova = _ag(50).proximaGeracao(_geracao(50))
+    assert len(nova) == 50
+    assert all(isinstance(r, RedeNeural.RedeNeural) for r in nova)
+
+
+def test_elite_identica(capsys):
+    ag = _ag(50, elite=0.1)
+    ag.taxaMutacao = 1.0  # qualquer mutacao que vaze para a elite aparece
+    atual = _geracao(50)
+    nova = ag.proximaGeracao(atual)
+    melhores = [rede for _, rede in atual[-5:]]  # scores 45..49
+    for melhor in melhores:
+        copias = [r for r in nova if _iguais(r, melhor)]
+        assert len(copias) == 1
+        assert copias[0] is not melhor
+
+
+def test_entrada_inalterada(capsys):
+    ag = _ag(50, elite=0.1)
+    ag.taxaMutacao = 1.0
+    atual = _geracao(50)
+    antes = [_copia(rede) for _, rede in atual]
+    ag.proximaGeracao(atual)
+    for a, (_, rede) in zip(antes, atual):
+        assert all(np.array_equal(x, y) for x, y in zip(a, rede.bias + rede.pesos))
+
+
+def test_sem_elite_gera_n_filhos(capsys):
+    ag = _ag(50, elite=0.01)
+    assert ag.tamElite == 0
+    atual = _geracao(50)
+    nova = ag.proximaGeracao(atual)
+    assert len(nova) == 50
+    assert not any(r is rede for r in nova for _, rede in atual)

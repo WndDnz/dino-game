@@ -1,6 +1,7 @@
 from tqdm.autonotebook import tqdm, trange
 import RedeNeural
 import random
+import copy
 import operator
 import numpy as np
 
@@ -70,12 +71,6 @@ class RNA_AG:
             max(random.sample(popRanqueada, k), key=operator.itemgetter(1))[0]
             for i in range(n)
         ]
-
-    def grupoDeReproducao(self, populacao, selecao):
-        """
-        Aqui, apenas montamos uma lista com os indivíduos que foram selecinados no torneio.
-        """
-        return [populacao[indice][1] for indice in selecao]
 
     def acasala(self, pai1, pai2):
         """
@@ -196,19 +191,6 @@ class RNA_AG:
             filho.pesos[i] = pesosfilho
         return filho
 
-    def acasalaPppulacao(self, pais, tamElite):
-        """
-        Aplicamos o crossover sobre todos os indivíduos para gerar a próxima geração.
-        """
-        filhos = []
-        tam = len(pais) - tamElite if tamElite else len(pais)
-        pool = random.sample(pais, len(pais))
-
-        if tamElite:
-            filhos = [pais[i] for i in range(tamElite)]
-        filhos += [self.acasala(pool[i], pool[len(pais) - i - 1]) for i in range(tam)]
-        return filhos
-
     def aplicaMutacao(self, individuo, taxaMutacao, sigma=0.5):
         """
         Mutação gaussiana: cada gene (peso ou bias) recebe + N(0, sigma) com
@@ -219,31 +201,21 @@ class RNA_AG:
             genes += mascara * np.random.normal(0.0, sigma, genes.shape)
         return individuo
 
-    def mutacaoPopulacao(self, populacao, taxaMutacao):
-        """
-        Agora, aplicamos a mutação à população gerada pelo crossover.
-        """
-        return [self.aplicaMutacao(individuo, taxaMutacao) for individuo in populacao]
-
     def proximaGeracao(self, geracaoAtual):
         """
-        Organizamos a chamada de cada método, realizando a sequência geral do AG:
-        Ranquear a população, selecionar os que vão se reproduzir, gerar o grupo
-        de reprodução, aplicar o crossover e aplicar a mutação, retornando a nova
-        população.
+        Sequência geral do AG: ranquear a população, copiar a elite sem alteração,
+        gerar os demais indivíduos por torneio + crossover e aplicar a mutação só
+        nos filhos. Recebe N pares (aptidão, rede) e retorna exatamente N redes.
         """
         popRanqueada = self.ranquearIndividuos(geracaoAtual)
-        print(
-            f"Best: {popRanqueada[0][0]}: {popRanqueada[0][1]}"
-        )  # -> {geracaoAtual[popRanqueada[0][0]][1].pesos}")
-        print(
-            f"Best: {popRanqueada[0][0]}: {popRanqueada[0][1]}"
-        )  # -> {geracaoAtual[popRanqueada[0][0]][1].pesos}")
-        resSelecao = self.selecao(popRanqueada, len(popRanqueada))
-        grReproducao = self.grupoDeReproducao(geracaoAtual, resSelecao)
-        filhos = self.acasalaPppulacao(grReproducao, self.tamElite)
-        proximaGeracao = self.mutacaoPopulacao(filhos, self.taxaMutacao)
-        return proximaGeracao
+        print(f"Best: {popRanqueada[0][0]}: {popRanqueada[0][1]}")
+        elite = [
+            copy.deepcopy(geracaoAtual[i][1]) for i, _ in popRanqueada[: self.tamElite]
+        ]
+        nFilhos = len(geracaoAtual) - len(elite)
+        pais = [geracaoAtual[i][1] for i in self.selecao(popRanqueada, 2 * nFilhos)]
+        filhos = [self.acasala(pais[2 * i], pais[2 * i + 1]) for i in range(nFilhos)]
+        return elite + [self.aplicaMutacao(f, self.taxaMutacao) for f in filhos]
 
     def AGT(self):
         """

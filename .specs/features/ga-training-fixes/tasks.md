@@ -193,12 +193,12 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_proxima_geracao_devolve_n`: 50 pares de entrada, 50 redes de saída
-- [ ] `test_elite_identica`: com `elite=0.1` e N=50, as 5 redes de maior score aparecem na saída com pesos e bias idênticos, em objetos distintos dos de entrada
-- [ ] `test_entrada_inalterada`: pesos e bias das 50 redes de entrada iguais antes e depois
-- [ ] `test_sem_elite_gera_n_filhos`: com `elite=0.01` e N=50 (`tamElite` = 0), saída com 50 redes
-- [ ] Gate check passes: `python -m pytest test_ga.py -v`
-- [ ] Test count: 11 tests pass
+- [x] `test_proxima_geracao_devolve_n`: 50 pares de entrada, 50 redes de saída
+- [x] `test_elite_identica`: com `elite=0.1` e N=50, as 5 redes de maior score aparecem na saída com pesos e bias idênticos, em objetos distintos dos de entrada
+- [x] `test_entrada_inalterada`: pesos e bias das 50 redes de entrada iguais antes e depois
+- [x] `test_sem_elite_gera_n_filhos`: com `elite=0.01` e N=50 (`tamElite` = 0), saída com 50 redes
+- [x] Gate check passes: `python -m pytest test_ga.py -v`
+- [x] Test count: 11 tests pass
 
 **Tests**: unit
 **Gate**: quick

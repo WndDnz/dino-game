@@ -390,6 +390,9 @@ Proof: run unit | test_modos.py::test_sensor_vale_1_quando_cactos_passaram PASSE
 **C25** - `--individuos` ou `--geracoes` menor que 1: erro de uso, código 2, sem treinar (CLI-01, Edge Case 1)
 Proof: run unit | test_modos.py::test_individuos_ou_geracoes_menor_que_1 PASSED
 
+**C29** - `--semente` menor que 0 ou maior que 4294967295: erro de uso, código 2, sem treinar nem abrir partida; 0 e 4294967295 são aceitos (CLI-03, Edge Case 4)
+Proof: run unit | test_modos.py::test_semente_fora_da_faixa_e_erro_de_uso[-1] PASSED
+
 **C26** - `--sem-janela` com `--assistir`: erro de uso, código 2 (CLI-02, Edge Case 2)
 Proof: run unit | test_modos.py::test_sem_janela_com_assistir_e_erro PASSED
 

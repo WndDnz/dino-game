@@ -133,6 +133,7 @@ O treino só roda com janela, desenhando 350 dinos e o HUD a cada frame, e o tem
 - IF `--individuos` ou `--geracoes` é menor que 1 THEN o programa SHALL imprimir uma mensagem de erro de uso e encerrar com código de saída 2, sem treinar.
 - IF `--sem-janela` e `--assistir` são informados juntos THEN o programa SHALL imprimir uma mensagem de erro de uso e encerrar com código de saída 2.
 - IF o treino sem janela é interrompido antes da última geração THEN `bestDino.din` SHALL conter a melhor rede das gerações concluídas.
+- IF `--semente` é menor que 0 ou maior que 4294967295 THEN o programa SHALL imprimir uma mensagem de erro de uso e encerrar com código de saída 2, sem treinar nem abrir partida. (Acrescentado na verificação: fora dessa faixa `np.random.seed` quebrava o treino com traceback.)
 
 ---
 
@@ -183,6 +184,7 @@ O treino só roda com janela, desenhando 350 dinos e o HUD a cada frame, e o tem
 | CLI-01 | Edge case 1 | Tasks | In Tasks |
 | CLI-02 | Edge case 2 | Tasks | In Tasks |
 | HEAD-08 | Edge case 3 | Tasks | In Tasks |
+| CLI-03 | Edge case 4 (acrescentado na verificação) | Tasks | In Tasks |
 
 **Coverage:** 26 total, 26 mapped to tasks, 0 unmapped.
 

@@ -14,6 +14,13 @@ def _um_ou_mais(texto):
     return n
 
 
+def _semente(texto):
+    n = int(texto)
+    if not 0 <= n <= 2**32 - 1:  # faixa aceita por np.random.seed
+        raise argparse.ArgumentTypeError("deve estar entre 0 e 4294967295")
+    return n
+
+
 def main(argv=None):
     """Interpreta as opções, roda o modo pedido e devolve o código de saída."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -32,7 +39,7 @@ def main(argv=None):
     parser.add_argument("--geracoes", type=_um_ou_mais, default=30)
     parser.add_argument(
         "--semente",
-        type=int,
+        type=_semente,
         help="treino: semente base (padrão 0); assistir: mesma pista em toda partida",
     )
     args = parser.parse_args(argv)  # opção inválida: mensagem de uso e código 2

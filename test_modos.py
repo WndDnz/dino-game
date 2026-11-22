@@ -907,3 +907,19 @@ def test_assistir_processo_sai_com_codigo_0(pasta, evento):
     p = _processo(pasta, ["-c", codigo])
     assert p.returncode == 0, p.stderr
     assert "Traceback" not in p.stderr
+
+
+@pytest.mark.parametrize("valor", ["-1", "-4", "4294967296"])
+def test_semente_fora_da_faixa_e_erro_de_uso(pasta, monkeypatch, capsys, valor):
+    chamadas, partidas = _espia_treino(monkeypatch), _espia_assistir(monkeypatch)
+    RedeNeural.RedeNeural.save_object(_rede_fixa(pula=False), "bestDino.din")
+    for modo in ([], ["--sem-janela"], ["--assistir"]):
+        with pytest.raises(SystemExit) as saida:
+            autodino.main([*modo, "--semente", valor])
+        assert saida.value.code == 2
+        assert "usage:" in capsys.readouterr().err
+    assert chamadas == [] and partidas == []
+    # os limites da faixa sao aceitos
+    monkeypatch.setattr(DinoGame.DinoGame, "introscreen", lambda self: False)
+    assert autodino.main(["--semente", "0"]) == 0 and autodino.main(["--semente", "4294967295"]) == 0
+    assert [c["semente"] for c in chamadas] == [0, 4294967295]

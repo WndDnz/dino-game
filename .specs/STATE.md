@@ -62,11 +62,11 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 
 ## Handoff
 
-- **Feature**: `.specs/features/headless-training-and-watch/` - spec e design aprovados em 2026-11-22; `tasks.md` em rascunho, sem aprovação
-- **Phase / Task**: Tasks - aguardando aprovação do usuário
-- **Completed**: none
+- **Feature**: `.specs/features/headless-training-and-watch/` - concluída em 2026-11-22
+- **Phase / Task**: Execute encerrado: 10/10 tarefas, 5 achados do Verifier fechados, gate final verde
+- **Completed**: T1-T10; achados fechados por e74fc87 + 465a33a, ffd1082, 3d9e657, 33a18e5, 0e6573c
 - **In-progress** (file:line): none
-- **Next step**: Usuário aprova `tasks.md` e responde a oferta de sub-agentes (10 tarefas); então Execute a partir de T1.
+- **Next step**: Nenhum nesta feature. Pendências conhecidas: o `bestDino.din` versionado tem topologia (4, 8, 2) e `--assistir` o recusa até um treino regravá-lo; `fitness.csv` e `bestDino.din` de treinos reais não estão no `.gitignore`. Candidata a próxima feature: limpeza de código morto (`AGT`, `SGD`, `acasala0`, `acasala2`, `start`) e dos arquivos `AGMLP`, `np`, `profile`.
 - **Blockers**: none
-- **Uncommitted files**: `.specs/features/headless-training-and-watch/` (spec, design, tasks), `.specs/STATE.md`
-- **Branch**: master
+- **Uncommitted files**: none
+- **Branch**: master (commits locais desta feature, sem push)

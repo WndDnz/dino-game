@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/headless-training-and-watch/design.md`
-**Status**: In Progress - 10/10 tarefas feitas, em verificação
+**Status**: Done
 **Approved**: 2026-11-22 - user: "Aprovo, pode executar."
 **Build**: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py`
 **Run unit**: `python -m pytest test_ga.py test_modos.py -v`
@@ -404,7 +404,7 @@ Proof: run unit | test_modos.py::test_sem_janela_com_assistir_e_erro PASSED
 ## Handoff
 
 **Settled mid-build:** 2026-11-22 - execução inline, sem sub-agentes: oferta feita com o plano ("Aprova o plano de tarefas, com execução nesta sessão?"), usuário: "Aprovo, pode executar."
-**Dispatched:** Verifier (sub-agente independente) em `HEAD` df1427e, 2026-11-22 - aguardando retorno. Sem sub-agente de telas: nenhum critério cita captura.
+**Dispatched:** Verifier (sub-agente independente) em `HEAD` df1427e, 2026-11-22 - returned: FAIL, 5 achados, nenhum critério quebrado (3 testes frouxos, 2 entradas sem critério que davam traceback). Fechados por e74fc87 + 465a33a, ffd1082, 3d9e657, 33a18e5, 0e6573c. Sem sub-agente de telas: nenhum critério cita captura.
 **Walked:** 2026-11-22, em `df1427e`, com driver `dummy` e capturas de tela salvas a cada estado.
 - Treino sem janela: `python autodino.py --sem-janela --individuos 60 --geracoes 6` imprimiu 6 linhas `Geração <g>: melhor=... media=...`, saiu com código 0 e deixou `fitness.csv` com 6 linhas de dados e `bestDino.din`. Critério de sucesso: `--individuos 350 --geracoes 30` terminou sozinho em 35 s, código 0, `fitness.csv` com 30 linhas de dados (melhor 113 na geração 1, 430 na 27).
 - Assistir: `python autodino.py --assistir` abriu a partida com um dino azul controlado pela rede; no frame 150 ele estava no ar sobre um cacto, com o placar em 00021 no canto superior direito e um segundo cacto à frente. Na colisão (com um ptera baixo, score 158) apareceram o letreiro GAME OVER, o botão de reinício e `HI 00158`. ESPAÇO iniciou a segunda partida (score 125); ESC na tela de fim encerrou com código 0.

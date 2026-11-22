@@ -159,34 +159,34 @@ O treino só roda com janela, desenhando 350 dinos e o HUD a cada frame, e o tem
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| HEAD-01 | P1: Treino sem janela (critério 1) | Tasks | In Tasks |
-| HEAD-02 | P1: Treino sem janela (critério 2) | Tasks | In Tasks |
-| HEAD-03 | P1: Treino sem janela (critério 3) | Tasks | In Tasks |
-| HEAD-04 | P1: Treino sem janela (critério 4) | Tasks | In Tasks |
-| HEAD-05 | P1: Treino sem janela (critério 5) | Tasks | In Tasks |
-| HEAD-06 | P1: Treino sem janela (critério 6) | Tasks | In Tasks |
-| HEAD-07 | P1: Treino sem janela (critério 7) | Tasks | In Tasks |
-| WATCH-01 | P1: Assistir (critério 1) | Tasks | In Tasks |
-| WATCH-02 | P1: Assistir (critério 2) | Tasks | In Tasks |
-| WATCH-03 | P1: Assistir (critério 3) | Tasks | In Tasks |
-| WATCH-04 | P1: Assistir (critério 4) | Tasks | In Tasks |
-| WATCH-05 | P1: Assistir (critério 5) | Tasks | In Tasks |
-| WATCH-06 | P1: Assistir (critério 6) | Tasks | In Tasks |
-| WATCH-07 | P1: Assistir (critério 7) | Tasks | In Tasks |
-| WATCH-08 | P1: Assistir (critério 8) | Tasks | In Tasks |
-| WATCH-09 | P1: Assistir (critério 9) | Tasks | In Tasks |
-| WATCH-10 | P1: Assistir (critério 10) | Tasks | In Tasks |
-| WATCH-11 | P1: Assistir (critério 11, acrescentado na verificação) | Tasks | In Tasks |
-| WIN-01 | P1: Treino com janela (critério 1) | Tasks | In Tasks |
-| WIN-02 | P1: Treino com janela (critério 2) | Tasks | In Tasks |
-| TRACK-01 | P1: Pista única (critério 1) | Tasks | In Tasks |
-| TRACK-02 | P1: Pista única (critério 2) | Tasks | In Tasks |
-| TRACK-03 | P1: Pista única (critério 3) | Tasks | In Tasks |
-| TRACK-04 | P1: Pista única (critério 4) | Tasks | In Tasks |
-| CLI-01 | Edge case 1 | Tasks | In Tasks |
-| CLI-02 | Edge case 2 | Tasks | In Tasks |
-| HEAD-08 | Edge case 3 | Tasks | In Tasks |
-| CLI-03 | Edge case 4 (acrescentado na verificação) | Tasks | In Tasks |
+| HEAD-01 | P1: Treino sem janela (critério 1) | Execute | Verified |
+| HEAD-02 | P1: Treino sem janela (critério 2) | Execute | Verified |
+| HEAD-03 | P1: Treino sem janela (critério 3) | Execute | Verified |
+| HEAD-04 | P1: Treino sem janela (critério 4) | Execute | Verified |
+| HEAD-05 | P1: Treino sem janela (critério 5) | Execute | Verified |
+| HEAD-06 | P1: Treino sem janela (critério 6) | Execute | Verified |
+| HEAD-07 | P1: Treino sem janela (critério 7) | Execute | Verified |
+| WATCH-01 | P1: Assistir (critério 1) | Execute | Verified |
+| WATCH-02 | P1: Assistir (critério 2) | Execute | Verified |
+| WATCH-03 | P1: Assistir (critério 3) | Execute | Verified |
+| WATCH-04 | P1: Assistir (critério 4) | Execute | Verified |
+| WATCH-05 | P1: Assistir (critério 5) | Execute | Verified |
+| WATCH-06 | P1: Assistir (critério 6) | Execute | Verified |
+| WATCH-07 | P1: Assistir (critério 7) | Execute | Verified |
+| WATCH-08 | P1: Assistir (critério 8) | Execute | Verified |
+| WATCH-09 | P1: Assistir (critério 9) | Execute | Verified |
+| WATCH-10 | P1: Assistir (critério 10) | Execute | Verified |
+| WATCH-11 | P1: Assistir (critério 11, acrescentado na verificação) | Execute | Verified |
+| WIN-01 | P1: Treino com janela (critério 1) | Execute | Verified |
+| WIN-02 | P1: Treino com janela (critério 2) | Execute | Verified |
+| TRACK-01 | P1: Pista única (critério 1) | Execute | Verified |
+| TRACK-02 | P1: Pista única (critério 2) | Execute | Verified |
+| TRACK-03 | P1: Pista única (critério 3) | Execute | Verified |
+| TRACK-04 | P1: Pista única (critério 4) | Execute | Verified |
+| CLI-01 | Edge case 1 | Execute | Verified |
+| CLI-02 | Edge case 2 | Execute | Verified |
+| HEAD-08 | Edge case 3 | Execute | Verified |
+| CLI-03 | Edge case 4 (acrescentado na verificação) | Execute | Verified |
 
 **Coverage:** 28 total, 28 mapped to tasks, 0 unmapped.
 

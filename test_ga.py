@@ -213,6 +213,9 @@ def test_limiar_05(jogo):
     abaixa = DinoGame.Dino(44, 47)
     abaixa.agir(np.array([[0.49], [0.51]]))
     assert abaixa.isJumping is False and abaixa.isDucking is True
+    limite = DinoGame.Dino(44, 47)  # exatamente 0.5 nao e "maior que 0.5"
+    limite.agir(np.array([[0.5], [0.5]]))
+    assert limite.isJumping is False and limite.isDucking is False
 
 
 def test_pulo_sem_mixer(jogo):

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 6,
+  "next_id": 11,
   "lessons": [
     {
       "id": "L-001",
@@ -94,6 +94,96 @@
       ],
       "created": "2026-11-22T22:17:14Z",
       "last_seen": "2026-11-22T22:17:14Z"
+    },
+    {
+      "id": "L-006",
+      "key": "weak_test::assert every item a criterion lists not one representative of the group",
+      "text": "Assert every item a criterion lists, not one representative of the group",
+      "signal": "weak_test",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "headless-training-and-watch"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/headless-training-and-watch/verification.md finding 1 / C20 (tests)"
+      ],
+      "created": "2026-11-22T23:52:29Z",
+      "last_seen": "2026-11-22T23:52:29Z"
+    },
+    {
+      "id": "L-007",
+      "key": "weak_test::give every numeric goal in the spec its own check and measure the number before writing it",
+      "text": "Give every numeric goal in the spec its own check, and measure the number before writing it",
+      "signal": "weak_test",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "headless-training-and-watch"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/headless-training-and-watch/verification.md finding 2 / C27 (spec)"
+      ],
+      "created": "2026-11-22T23:52:29Z",
+      "last_seen": "2026-11-22T23:52:29Z"
+    },
+    {
+      "id": "L-008",
+      "key": "weak_test::prove an exit code on the process not on the exception that precedes it",
+      "text": "Prove an exit code on the process, not on the exception that precedes it",
+      "signal": "weak_test",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "headless-training-and-watch"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/headless-training-and-watch/verification.md finding 3 / C28 (tests)"
+      ],
+      "created": "2026-11-22T23:52:29Z",
+      "last_seen": "2026-11-22T23:52:29Z"
+    },
+    {
+      "id": "L-009",
+      "key": "ac_gap::bound every numeric command line option to the range its consumer accepts",
+      "text": "Bound every numeric command-line option to the range its consumer accepts",
+      "signal": "ac_gap",
+      "scope": "cli",
+      "status": "candidate",
+      "features": [
+        "headless-training-and-watch"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/headless-training-and-watch/verification.md finding 4 / C29 (cli)"
+      ],
+      "created": "2026-11-22T23:52:29Z",
+      "last_seen": "2026-11-22T23:52:29Z"
+    },
+    {
+      "id": "L-010",
+      "key": "ac_gap::treat a path that exists but is not a readable file as invalid input not only a missing one",
+      "text": "Treat a path that exists but is not a readable file as invalid input, not only a missing one",
+      "signal": "ac_gap",
+      "scope": "cli",
+      "status": "candidate",
+      "features": [
+        "headless-training-and-watch"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/headless-training-and-watch/verification.md finding 5 / C30 (cli)"
+      ],
+      "created": "2026-11-22T23:52:30Z",
+      "last_seen": "2026-11-22T23:52:30Z"
     }
   ]
 }

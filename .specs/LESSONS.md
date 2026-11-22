@@ -44,6 +44,36 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: .specs/features/ga-training-fixes/verification.md finding 5 / C22 (ag)
 - last seen: 2026-11-22T22:17:14Z
 
+### L-006 - Assert every item a criterion lists, not one representative of the group
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: headless-training-and-watch
+- evidence: .specs/features/headless-training-and-watch/verification.md finding 1 / C20 (tests)
+- last seen: 2026-11-22T23:52:29Z
+
+### L-007 - Give every numeric goal in the spec its own check, and measure the number before writing it
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: headless-training-and-watch
+- evidence: .specs/features/headless-training-and-watch/verification.md finding 2 / C27 (spec)
+- last seen: 2026-11-22T23:52:29Z
+
+### L-008 - Prove an exit code on the process, not on the exception that precedes it
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: headless-training-and-watch
+- evidence: .specs/features/headless-training-and-watch/verification.md finding 3 / C28 (tests)
+- last seen: 2026-11-22T23:52:29Z
+
+### L-009 - Bound every numeric command-line option to the range its consumer accepts
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `cli` · harmful: 0
+- features: headless-training-and-watch
+- evidence: .specs/features/headless-training-and-watch/verification.md finding 4 / C29 (cli)
+- last seen: 2026-11-22T23:52:29Z
+
+### L-010 - Treat a path that exists but is not a readable file as invalid input, not only a missing one
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `cli` · harmful: 0
+- features: headless-training-and-watch
+- evidence: .specs/features/headless-training-and-watch/verification.md finding 5 / C30 (cli)
+- last seen: 2026-11-22T23:52:30Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

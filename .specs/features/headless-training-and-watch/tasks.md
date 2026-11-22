@@ -288,17 +288,17 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_sem_janela_usa_driver_dummy`: em um processo novo sem `SDL_VIDEODRIVER`, `--sem-janela` deixa `pygame.display.get_driver()` igual a `dummy`
-- [ ] `test_sem_janela_termina_com_codigo_0`: `python autodino.py --sem-janela --individuos 10 --geracoes 2` termina sozinho com código 0, 2 linhas de geração e `fitness.csv` com 2 linhas de dados
-- [ ] `test_opcoes_de_treino_sao_usadas`: `--individuos 7 --geracoes 2 --semente 9` treina 7 dinos por 2 gerações com semente 9; sem as opções, 350, 30 e 0
-- [ ] `test_assistir_carrega_o_arquivo_indicado`: `--assistir outro.din` joga com a rede de `outro.din`; sem caminho, com a de `bestDino.din`
-- [ ] `test_assistir_arquivo_inexistente`: imprime `Arquivo não encontrado: <caminho>`, código 1, nenhuma janela criada
-- [ ] `test_assistir_arquivo_invalido`: imprime `Arquivo inválido: <caminho>`, código 1, nenhuma janela criada
-- [ ] `test_sem_opcoes_treina_350_por_30_com_janela`: sem opções, passa pela tela inicial e treina 350 por 30 com janela
-- [ ] `test_individuos_ou_geracoes_menor_que_1`: 0 e -1 em cada opção dão código 2, sem treinar
-- [ ] `test_sem_janela_com_assistir_e_erro`: as duas opções juntas dão código 2
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 35 de `test_modos.py` passam
+- [x] `test_sem_janela_usa_driver_dummy`: em um processo novo sem `SDL_VIDEODRIVER`, `--sem-janela` deixa `pygame.display.get_driver()` igual a `dummy`
+- [x] `test_sem_janela_termina_com_codigo_0`: `python autodino.py --sem-janela --individuos 10 --geracoes 2` termina sozinho com código 0, 2 linhas de geração e `fitness.csv` com 2 linhas de dados
+- [x] `test_opcoes_de_treino_sao_usadas`: `--individuos 7 --geracoes 2 --semente 9` treina 7 dinos por 2 gerações com semente 9; sem as opções, 350, 30 e 0
+- [x] `test_assistir_carrega_o_arquivo_indicado`: `--assistir outro.din` joga com a rede de `outro.din`; sem caminho, com a de `bestDino.din`
+- [x] `test_assistir_arquivo_inexistente`: imprime `Arquivo não encontrado: <caminho>`, código 1, nenhuma janela criada
+- [x] `test_assistir_arquivo_invalido`: imprime `Arquivo inválido: <caminho>`, código 1, nenhuma janela criada
+- [x] `test_sem_opcoes_treina_350_por_30_com_janela`: sem opções, passa pela tela inicial e treina 350 por 30 com janela
+- [x] `test_individuos_ou_geracoes_menor_que_1`: 0 e -1 em cada opção dão código 2, sem treinar
+- [x] `test_sem_janela_com_assistir_e_erro`: as duas opções juntas dão código 2
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 35 de `test_modos.py` passam
 
 **Tests**: integration
 **Gate**: full

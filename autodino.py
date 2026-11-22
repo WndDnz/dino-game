@@ -1,11 +1,74 @@
 #!/usr/bin/python3
+"""Treina os dinos com janela (padrão) ou sem janela, ou mostra uma rede salva jogando."""
 
-import DinoGame
+import argparse
+import os
+import sys
 import traceback
 
-try:
+
+def _um_ou_mais(texto):
+    n = int(texto)
+    if n < 1:
+        raise argparse.ArgumentTypeError("deve ser 1 ou mais")
+    return n
+
+
+def main(argv=None):
+    """Interpreta as opções, roda o modo pedido e devolve o código de saída."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    modo = parser.add_mutually_exclusive_group()
+    modo.add_argument(
+        "--sem-janela", action="store_true", help="treina sem abrir janela"
+    )
+    modo.add_argument(
+        "--assistir",
+        nargs="?",
+        const="bestDino.din",
+        metavar="ARQUIVO",
+        help="mostra a rede salva jogando (padrão: bestDino.din)",
+    )
+    parser.add_argument("--individuos", type=_um_ou_mais, default=350)
+    parser.add_argument("--geracoes", type=_um_ou_mais, default=30)
+    parser.add_argument(
+        "--semente",
+        type=int,
+        help="treino: semente base (padrão 0); assistir: mesma pista em toda partida",
+    )
+    args = parser.parse_args(argv)  # opção inválida: mensagem de uso e código 2
+
+    if args.sem_janela:
+        os.environ["SDL_VIDEODRIVER"] = "dummy"
+        os.environ["SDL_AUDIODRIVER"] = "dummy"
+    # só agora: o pygame escolhe o driver de vídeo quando é iniciado, na importação
+    import DinoGame
+
+    if args.assistir is not None:
+        try:
+            rede = DinoGame.carrega_rede(args.assistir)
+        except FileNotFoundError:
+            print(f"Arquivo não encontrado: {args.assistir}")
+            return 1
+        except ValueError:
+            print(f"Arquivo inválido: {args.assistir}")
+            return 1
+        DinoGame.DinoGame().gameplay(rede=rede, semente=args.semente)
+        return 0
+
+    semente = args.semente or 0
     game = DinoGame.DinoGame()
-    game.start(nIndividuals=350, nGenerations=30, train=True)
-except Exception as e:
-    traceback.print_exception(e)
-    wait_for_it = input("Press enter to close the terminal window")
+    if args.sem_janela:
+        game.train(args.individuos, args.geracoes, semente_base=semente, janela=False)
+    elif not game.introscreen():  # introscreen devolve True se o usuário fechou
+        game.train(args.individuos, args.geracoes, semente_base=semente)
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except Exception as e:
+        traceback.print_exception(e)
+        if len(sys.argv) == 1:  # aberto com duplo clique: não fecha o terminal na hora
+            input("Press enter to close the terminal window")
+        sys.exit(1)

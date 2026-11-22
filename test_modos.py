@@ -4,6 +4,9 @@ import inspect
 import os
 import pickle
 import random
+import shutil
+import subprocess
+import sys
 import time
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
@@ -13,6 +16,7 @@ import numpy as np  # noqa: E402
 import pygame  # noqa: E402
 import pytest  # noqa: E402
 
+import autodino  # noqa: E402
 import DinoGame  # noqa: E402
 import RedeNeural  # noqa: E402
 
@@ -670,3 +674,185 @@ def test_tres_modos_mesma_pista(jogo, monkeypatch, tmp_path):
     treino_log = roda(lambda: jogo.train(3, 1, semente_base=S - 1, saida=str(tmp_path), janela=False))
     assert len(manual_log) > 10 and any(tipo == "Ptera" for _, tipo, _, _ in manual_log)
     assert manual_log == assistir_log == treino_log
+
+
+REPO = os.path.dirname(os.path.abspath(__file__))
+
+
+@pytest.fixture
+def pasta(tmp_path, monkeypatch):
+    """Diretorio de trabalho temporario com os sprites: os modos gravam fitness.csv e bestDino.din em '.'."""
+    shutil.copytree(os.path.join(REPO, "sprites"), tmp_path / "sprites")
+    monkeypatch.chdir(tmp_path)
+    pygame.init()
+    pygame.mixer.quit()
+    return tmp_path
+
+
+def _processo(pasta, codigo_ou_script, *args):
+    """Processo Python novo, sem SDL_VIDEODRIVER no ambiente, na pasta temporaria."""
+    env = {k: v for k, v in os.environ.items() if not k.startswith("SDL_")}
+    env["PYTHONIOENCODING"] = "utf-8"
+    return subprocess.run(
+        [sys.executable, *codigo_ou_script, *args],
+        cwd=pasta, env=env, stdin=subprocess.DEVNULL, capture_output=True, encoding="utf-8", timeout=120,
+    )
+
+
+def test_sem_janela_usa_driver_dummy(pasta):
+    codigo = (
+        f"import sys; sys.path.insert(0, {REPO!r}); import autodino; "
+        "rc = autodino.main(['--sem-janela', '--individuos', '3', '--geracoes', '1']); "
+        "import pygame; print('DRIVER=' + pygame.display.get_driver()); sys.exit(rc)"
+    )
+    p = _processo(pasta, ["-c", codigo])
+    assert p.returncode == 0, p.stderr
+    assert "DRIVER=dummy" in p.stdout
+
+
+def test_sem_janela_termina_com_codigo_0(pasta):
+    p = _processo(pasta, [os.path.join(REPO, "autodino.py")], "--sem-janela", "--individuos", "10", "--geracoes", "2")
+    assert p.returncode == 0, p.stderr  # terminou sozinho: stdin fechado, nenhuma tecla
+    linhas = [l for l in p.stdout.splitlines() if l.startswith("Geração")]
+    assert [l.split(":")[0] for l in linhas] == ["Geração 1", "Geração 2"]
+    csv = (pasta / "fitness.csv").read_text().splitlines()
+    assert csv[0] == "geracao,melhor,media" and len(csv) == 3
+    assert (pasta / "bestDino.din").exists()
+
+
+def _espia_treino(monkeypatch):
+    """Troca train por um registrador: devolve a lista das chamadas (argumentos nomeados)."""
+    chamadas = []
+
+    def train(self, nIndividuals=20, nGenerations=100, semente_base=0, saida=".", janela=True):
+        chamadas.append(dict(n=nIndividuals, g=nGenerations, semente=semente_base, janela=janela))
+
+    monkeypatch.setattr(DinoGame.DinoGame, "train", train)
+    return chamadas
+
+
+def test_opcoes_de_treino_sao_usadas(pasta, monkeypatch, capsys):
+    # treino de verdade com as opcoes: 7 dinos, 2 geracoes, semente 9
+    tamanhos, estados = [], []
+    registra = DinoGame.registra_geracao
+    cacto_init = DinoGame.Cactus.__init__
+
+    def anota(ranked, *args):
+        tamanhos.append(len(ranked))
+        return registra(ranked, *args)
+
+    def espia(self, *args, **kwargs):
+        if len(estados) == len(tamanhos):  # primeiro cacto da geracao
+            estados.append(random.getstate())
+        cacto_init(self, *args, **kwargs)
+
+    monkeypatch.setattr(DinoGame, "registra_geracao", anota)
+    monkeypatch.setattr(DinoGame.Cactus, "__init__", espia)
+    assert autodino.main(["--sem-janela", "--individuos", "7", "--geracoes", "2", "--semente", "9"]) == 0
+    assert tamanhos == [7, 7]
+    assert estados == [_estado_apos_seed(9 + 1), _estado_apos_seed(9 + 2)]
+    monkeypatch.undo()
+    # sem as opcoes: 350, 30 e 0, nos dois modos de treino
+    monkeypatch.chdir(pasta)
+    chamadas = _espia_treino(monkeypatch)
+    monkeypatch.setattr(DinoGame.DinoGame, "introscreen", lambda self: False)
+    assert autodino.main(["--sem-janela"]) == 0
+    assert autodino.main([]) == 0
+    assert chamadas == [dict(n=350, g=30, semente=0, janela=False), dict(n=350, g=30, semente=0, janela=True)]
+    chamadas.clear()
+    assert autodino.main(["--individuos", "12", "--geracoes", "4", "--semente", "3"]) == 0
+    assert chamadas == [dict(n=12, g=4, semente=3, janela=True)]
+
+
+def _espia_assistir(monkeypatch):
+    partidas = []
+    monkeypatch.setattr(
+        DinoGame.DinoGame, "gameplay", lambda self, rede=None, semente=None: partidas.append((rede, semente))
+    )
+    return partidas
+
+
+def test_assistir_carrega_o_arquivo_indicado(pasta, monkeypatch):
+    padrao, outra = _redes(2, semente=8)
+    RedeNeural.RedeNeural.save_object(padrao, "bestDino.din")
+    RedeNeural.RedeNeural.save_object(outra, "outro.din")
+    partidas = _espia_assistir(monkeypatch)
+    assert autodino.main(["--assistir", "outro.din"]) == 0
+    assert autodino.main(["--assistir"]) == 0
+    assert autodino.main(["--assistir", "outro.din", "--semente", "5"]) == 0
+    assert _mesma_rede(partidas[0][0], outra) and not _mesma_rede(partidas[0][0], padrao)
+    assert _mesma_rede(partidas[1][0], padrao)
+    assert [semente for _, semente in partidas] == [None, None, 5]
+
+
+def _sem_janela_criada(monkeypatch):
+    janelas = []
+    set_mode = pygame.display.set_mode
+    monkeypatch.setattr(pygame.display, "set_mode", lambda *a, **k: janelas.append(a) or set_mode(*a, **k))
+    return janelas
+
+
+def test_assistir_arquivo_inexistente(pasta, monkeypatch, capsys):
+    janelas, partidas = _sem_janela_criada(monkeypatch), _espia_assistir(monkeypatch)
+    assert autodino.main(["--assistir", "nao_existe.din"]) == 1
+    assert capsys.readouterr().out.splitlines() == ["Arquivo não encontrado: nao_existe.din"]
+    assert autodino.main(["--assistir"]) == 1  # o padrao bestDino.din tambem nao existe aqui
+    assert capsys.readouterr().out.splitlines() == ["Arquivo não encontrado: bestDino.din"]
+    assert janelas == [] and partidas == []
+
+
+def test_assistir_arquivo_invalido(pasta, monkeypatch, capsys):
+    janelas, partidas = _sem_janela_criada(monkeypatch), _espia_assistir(monkeypatch)
+    RedeNeural.RedeNeural.save_object(RedeNeural.RedeNeural((5, 4, 2)), "pequena.din")
+    (pasta / "texto.din").write_text("isto nao e uma rede")
+    for caminho in ("pequena.din", "texto.din"):
+        assert autodino.main(["--assistir", caminho]) == 1
+        assert capsys.readouterr().out.splitlines() == [f"Arquivo inválido: {caminho}"]
+    assert janelas == [] and partidas == []
+
+
+def test_sem_opcoes_treina_350_por_30_com_janela(pasta, monkeypatch):
+    ordem = []
+    chamadas = _espia_treino(monkeypatch)
+    intro = DinoGame.DinoGame.introscreen
+
+    def tela_inicial(self):
+        # a tela inicial de verdade, com o usuario apertando ESPACO
+        ordem.append("tela inicial")
+        self.clock = _Relogio()
+        pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+        fechou = intro(self)
+        ordem.append("treino liberado" if not fechou else "fechou")
+        return fechou
+
+    monkeypatch.setattr(DinoGame.DinoGame, "introscreen", tela_inicial)
+    assert autodino.main([]) == 0
+    assert ordem == ["tela inicial", "treino liberado"]
+    assert chamadas == [dict(n=350, g=30, semente=0, janela=True)]
+    # se o usuario fecha a janela na tela inicial, nao ha treino
+    chamadas.clear()
+    monkeypatch.setattr(DinoGame.DinoGame, "introscreen", lambda self: True)
+    assert autodino.main([]) == 0
+    assert chamadas == []
+
+
+@pytest.mark.parametrize("opcao", ["--individuos", "--geracoes"])
+@pytest.mark.parametrize("valor", ["0", "-1"])
+def test_individuos_ou_geracoes_menor_que_1(pasta, monkeypatch, capsys, opcao, valor):
+    chamadas = _espia_treino(monkeypatch)
+    for modo in ([], ["--sem-janela"]):
+        with pytest.raises(SystemExit) as saida:
+            autodino.main([*modo, opcao, valor])
+        assert saida.value.code == 2
+        assert "usage:" in capsys.readouterr().err
+    assert chamadas == []
+
+
+def test_sem_janela_com_assistir_e_erro(pasta, monkeypatch, capsys):
+    chamadas, partidas = _espia_treino(monkeypatch), _espia_assistir(monkeypatch)
+    for argv in (["--sem-janela", "--assistir"], ["--assistir", "bestDino.din", "--sem-janela"]):
+        with pytest.raises(SystemExit) as saida:
+            autodino.main(argv)
+        assert saida.value.code == 2
+        assert "usage:" in capsys.readouterr().err
+    assert chamadas == [] and partidas == []

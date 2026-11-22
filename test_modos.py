@@ -315,6 +315,7 @@ def test_treino_com_janela_desenha_dinos_e_hud(jogo, monkeypatch):
             return self.fonte.render_to(tela, pos, texto, cor)
 
     monkeypatch.setattr(pygame.freetype, "SysFont", _Fonte)
+    jogo.clock = _Relogio()
     with pytest.raises(_Fim):
         jogo.roda_geracao(_redes(5), janela=True)
     ultimo_frame = textos[-4:]

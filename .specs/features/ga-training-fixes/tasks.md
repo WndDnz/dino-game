@@ -303,10 +303,10 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_semente_por_geracao`: dois treinos sem janela (N=10, 2 gerações, mesma `semente_base`, `np.random.seed` igual) produzem `fitness.csv` idênticos
-- [ ] `test_treino_interrompido_mantem_melhor`: treino de 3 gerações interrompido depois da primeira deixa `bestDino.din` com a melhor rede da geração 1
-- [ ] Gate check passes: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py; python -m pytest test_ga.py -v`
-- [ ] Test count: 22 tests pass, em menos de 10 s
+- [x] `test_semente_por_geracao`: dois treinos sem janela (N=10, 2 gerações, mesma `semente_base`, `np.random.seed` igual) produzem `fitness.csv` idênticos
+- [x] `test_treino_interrompido_mantem_melhor`: treino de 3 gerações interrompido depois da primeira deixa `bestDino.din` com a melhor rede da geração 1
+- [x] Gate check passes: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py; python -m pytest test_ga.py -v`
+- [x] Test count: 22 tests pass, em menos de 10 s
 
 **Tests**: integration
 **Gate**: full

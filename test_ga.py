@@ -144,6 +144,8 @@ def test_sem_elite_gera_n_filhos(capsys):
 @pytest.fixture
 def jogo():
     """Tela dummy e grupos de sprites, como train() monta."""
+    pygame.init()  # um teste de treino pode ter encerrado o pygame
+    pygame.mixer.quit()  # sem som nos testes
     j = DinoGame.DinoGame()
     DinoGame.Cactus.containers = pygame.sprite.Group()
     DinoGame.Ptera.containers = pygame.sprite.Group()
@@ -257,3 +259,66 @@ def test_salva_melhor_de_todos(tmp_path):
     # novo recorde regrava
     assert DinoGame.registra_geracao([(31, outra)], 4, recorde, str(tmp_path)) == 31
     assert _iguais(_salva(tmp_path), outra)
+
+
+class _FimDoTreino(Exception):
+    pass
+
+
+def _treina(jogo, monkeypatch, saida, geracoes, semente_base=0):
+    """Roda train() sem janela e sem limite de FPS ate a tela de fim de treino."""
+    def fim(*args):
+        raise _FimDoTreino
+
+    monkeypatch.setattr(DinoGame.DinoGame, "FPS", 0)
+    monkeypatch.setattr(DinoGame.DinoGame, "disp_gameOver_msg", fim)
+    np.random.seed(0)
+    with pytest.raises(_FimDoTreino):
+        jogo.train(nIndividuals=10, nGenerations=geracoes, semente_base=semente_base, saida=str(saida))
+
+
+def test_semente_por_geracao(jogo, monkeypatch, tmp_path, capsys):
+    estados = []  # (geracao, estado do random quando nasce o primeiro obstaculo)
+    cacto_init = DinoGame.Cactus.__init__
+
+    def espia(self, *args, **kwargs):
+        g = DinoGame.DinoGame.train.currentGeneration
+        if g not in [e[0] for e in estados]:
+            estados.append((g, random.getstate()))
+        cacto_init(self, *args, **kwargs)
+
+    monkeypatch.setattr(DinoGame.Cactus, "__init__", espia)
+    csvs = []
+    for nome in ("a", "b"):
+        (tmp_path / nome).mkdir()
+        _treina(jogo, monkeypatch, tmp_path / nome, geracoes=2, semente_base=7)
+        csvs.append((tmp_path / nome / "fitness.csv").read_text())
+    # o primeiro obstaculo da geracao g nasce com o random recem-semeado em semente_base + g
+    assert [g for g, _ in estados[:2]] == [1, 2]
+    for g, estado in estados[:2]:
+        random.seed(7 + g)
+        assert estado == random.getstate()
+    # mesma semente, mesmo treino
+    assert len(csvs[0].splitlines()) == 3
+    assert csvs[0] == csvs[1]
+
+
+def test_treino_interrompido_mantem_melhor(jogo, monkeypatch, tmp_path, capsys):
+    registra = DinoGame.registra_geracao
+    geracoes = []
+
+    def registra_e_fecha_a_janela(ranked, *args):
+        geracoes.append(list(ranked))
+        recorde = registra(ranked, *args)
+        pygame.event.post(pygame.event.Event(pygame.QUIT))  # usuario fecha apos a 1a geracao
+        return recorde
+
+    monkeypatch.setattr(DinoGame, "registra_geracao", registra_e_fecha_a_janela)
+    monkeypatch.setattr(DinoGame.DinoGame, "FPS", 0)
+    np.random.seed(0)
+    with pytest.raises(SystemExit):
+        jogo.train(nIndividuals=10, nGenerations=3, saida=str(tmp_path))
+    assert len(geracoes) == 1
+    melhor = max(geracoes[0], key=lambda par: par[0])[1]
+    assert _iguais(_salva(tmp_path), melhor)
+    assert len((tmp_path / "fitness.csv").read_text().splitlines()) == 2

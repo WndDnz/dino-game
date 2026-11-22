@@ -132,24 +132,24 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| INIT-01 | P1: População inicial reativa (critério 1) | Tasks | In Tasks |
-| SENS-01 | P1: População inicial reativa (critério 2) | Tasks | In Tasks |
-| SENS-02 | P1: População inicial reativa (critério 3) | Tasks | In Tasks |
-| SENS-03 | P1: População inicial reativa (critério 4) | Tasks | In Tasks |
-| SENS-04 | P1: População inicial reativa (critério 5) | Tasks | In Tasks |
-| SENS-05 | P1: População inicial reativa (critério 6) | Tasks | In Tasks |
-| AGT-01 | P1: Operadores genéticos (critério 1) | Tasks | In Tasks |
-| AGT-02 | P1: Operadores genéticos (critério 2) | Tasks | In Tasks |
-| AGT-03 | P1: Operadores genéticos (critério 3) | Tasks | In Tasks |
-| AGT-04 | P1: Operadores genéticos (critério 4) | Tasks | In Tasks |
-| MUT-01 | P1: Operadores genéticos (critério 5) | Tasks | In Tasks |
-| MUT-02 | P1: Operadores genéticos (critério 6) | Tasks | In Tasks |
-| MUT-03 | P1: Operadores genéticos (critério 7) | Tasks | In Tasks |
-| FIT-01 | P1: Fitness independente (critério 1) | Tasks | In Tasks |
-| FIT-02 | P1: Fitness independente (critério 2) | Tasks | In Tasks |
-| LOG-01 | P2: Treino reproduzível (critério 1) | Tasks | In Tasks |
-| LOG-02 | P2: Treino reproduzível (critério 2) | Tasks | In Tasks |
-| LOG-03 | P2: Treino reproduzível (critério 3) | Tasks | In Tasks |
+| INIT-01 | P1: População inicial reativa (critério 1) | Execute | Implementing |
+| SENS-01 | P1: População inicial reativa (critério 2) | Execute | Implementing |
+| SENS-02 | P1: População inicial reativa (critério 3) | Execute | Implementing |
+| SENS-03 | P1: População inicial reativa (critério 4) | Execute | Implementing |
+| SENS-04 | P1: População inicial reativa (critério 5) | Execute | Implementing |
+| SENS-05 | P1: População inicial reativa (critério 6) | Execute | Implementing |
+| AGT-01 | P1: Operadores genéticos (critério 1) | Execute | Implementing |
+| AGT-02 | P1: Operadores genéticos (critério 2) | Execute | Implementing |
+| AGT-03 | P1: Operadores genéticos (critério 3) | Execute | Implementing |
+| AGT-04 | P1: Operadores genéticos (critério 4) | Execute | Implementing |
+| MUT-01 | P1: Operadores genéticos (critério 5) | Execute | Implementing |
+| MUT-02 | P1: Operadores genéticos (critério 6) | Execute | Implementing |
+| MUT-03 | P1: Operadores genéticos (critério 7) | Execute | Implementing |
+| FIT-01 | P1: Fitness independente (critério 1) | Execute | Implementing |
+| FIT-02 | P1: Fitness independente (critério 2) | Execute | Implementing |
+| LOG-01 | P2: Treino reproduzível (critério 1) | Execute | Implementing |
+| LOG-02 | P2: Treino reproduzível (critério 2) | Execute | Implementing |
+| LOG-03 | P2: Treino reproduzível (critério 3) | Execute | Implementing |
 
 **Coverage:** 18 total, 18 mapped to tasks, 0 unmapped.
 

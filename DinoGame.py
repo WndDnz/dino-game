@@ -378,7 +378,22 @@ class DinoGame:
         pygame.quit()
         quit()
 
-    def train(self, nIndividuals=20, nGenerations=100, population=None):
+    def train(
+        self,
+        nIndividuals=20,
+        nGenerations=100,
+        population=None,
+        semente_base=0,
+        saida=".",
+    ):
+        if population is None:  # início de um treino: zera o estado e o registro
+            DinoGame.train.currentGeneration = 1
+            DinoGame.train.currentBest = None
+            DinoGame.train.recorde = None
+            if os.path.exists(os.path.join(saida, "fitness.csv")):
+                os.remove(os.path.join(saida, "fitness.csv"))
+        # pista reproduzível: mesma semente, mesma sequência de obstáculos
+        random.seed(semente_base + DinoGame.train.currentGeneration)
         self.FPS *= 1
         gamespeed = 4
         startMenu = False
@@ -394,7 +409,7 @@ class DinoGame:
             0.1,
             nIndividuals,
             nGenerations,
-            taxaMutacao=0.01,
+            taxaMutacao=0.05,
             elite=0.1,
         )
         if population is None:
@@ -584,12 +599,15 @@ class DinoGame:
                 self.clock.tick(self.FPS)
 
                 if not self.dinoArray:
+                    DinoGame.train.recorde = registra_geracao(
+                        rankedBrains,
+                        DinoGame.train.currentGeneration,
+                        DinoGame.train.recorde,
+                        saida,
+                    )
                     DinoGame.train.currentGeneration += 1
                     rank = ag.ranquearIndividuos(rankedBrains)
                     if DinoGame.train.currentGeneration > nGenerations:
-                        RedeNeural.RedeNeural.save_object(
-                            rankedBrains[rank[0][0]][1], "bestDino.din"
-                        )
                         gameOver = True
                     else:
                         DinoGame.train.currentBest = rank[0][1]
@@ -598,6 +616,8 @@ class DinoGame:
                             nIndividuals=nIndividuals,
                             nGenerations=nGenerations,
                             population=newPopulation,
+                            semente_base=semente_base,
+                            saida=saida,
                         )
 
                 if counter % 700 == 699:
@@ -632,7 +652,10 @@ class DinoGame:
                                 # TODO Check if want to run again, save population
                                 DinoGame.train.currentGeneration = 1
                                 self.train(
-                                    nIndividuals=nIndividuals, nGenerations=nGenerations
+                                    nIndividuals=nIndividuals,
+                                    nGenerations=nGenerations,
+                                    semente_base=semente_base,
+                                    saida=saida,
                                 )
 
                 if pygame.display.get_surface() is not None:

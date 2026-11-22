@@ -81,10 +81,10 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_mascara_em_cache_igual_a_da_imagem`: para dino em pé, abaixado, cacto e ptera, `sprite.mask` tem os mesmos bits de `pygame.mask.from_surface(sprite.image)`
-- [ ] `test_sprites_carregados_uma_vez`: criar 50 dinos chama `pygame.image.load` no máximo 2 vezes
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 2 de `test_modos.py` passam
+- [x] `test_mascara_em_cache_igual_a_da_imagem`: para dino em pé, abaixado, cacto e ptera, `sprite.mask` tem os mesmos bits de `pygame.mask.from_surface(sprite.image)`
+- [x] `test_sprites_carregados_uma_vez`: criar 50 dinos chama `pygame.image.load` no máximo 2 vezes
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 2 de `test_modos.py` passam
 
 **Tests**: unit
 **Gate**: quick

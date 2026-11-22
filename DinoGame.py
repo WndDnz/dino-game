@@ -9,6 +9,7 @@ import RedeNeural
 import AGMLP
 import math
 import concurrent.futures
+import functools
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -30,6 +31,7 @@ class DinoGame:
 
     def __init__(self):
         self.screen = pygame.display.set_mode(self.scr_size)
+        folha.cache_clear()  # sprites são convertidos para a tela atual
         self.clock = pygame.time.Clock()
         self.dinoArray = []
         self.playerDino = None
@@ -681,6 +683,13 @@ class DinoGame:
                 self.gameplay()
 
 
+@functools.lru_cache(maxsize=None)
+def folha(sheetname, nx, ny, scalex, scaley):
+    """Folha de sprites carregada uma vez por tela: (imagens, máscaras de colisão)."""
+    imagens, _ = DinoGame.load_sprite_sheet(sheetname, nx, ny, scalex, scaley, -1)
+    return imagens, [pygame.mask.from_surface(imagem) for imagem in imagens]
+
+
 def sensores(dino, cac, pte, gamespeed):
     """
     Entrada (5,1) da rede, normalizada (AD-005): distância ao cacto, distância ao
@@ -735,15 +744,14 @@ def registra_geracao(ranked, geracao, melhor_score, saida="."):
 
 class Dino:
     def __init__(self, sizex=-1, sizey=-1):
-        self.images, self.rect = DinoGame.load_sprite_sheet(
-            "dino.png", 5, 1, sizex, sizey, -1
-        )
-        self.images1, self.rect1 = DinoGame.load_sprite_sheet(
-            "dino_ducking.png", 2, 1, 59, sizey, -1
-        )
+        self.images, self.masks = folha("dino.png", 5, 1, sizex, sizey)
+        self.images1, self.masks1 = folha("dino_ducking.png", 2, 1, 59, sizey)
+        self.rect = self.images[0].get_rect()
+        self.rect1 = self.images1[0].get_rect()
         self.rect.bottom = int(0.98 * DinoGame.height)
         self.rect.left = DinoGame.width / 15
         self.image = self.images[0]
+        self.mask = self.masks[0]  # usada por pygame.sprite.collide_mask
         self.index = 0
         self.counter = 0
         self.score = 0
@@ -808,9 +816,11 @@ class Dino:
 
         if not self.isDucking:
             self.image = self.images[self.index]
+            self.mask = self.masks[self.index]
             self.rect.width = self.stand_pos_width
         else:
             self.image = self.images1[(self.index) % 2]
+            self.mask = self.masks1[(self.index) % 2]
             self.rect.width = self.duck_pos_width
 
         self.rect = self.rect.move(self.movement)
@@ -828,12 +838,13 @@ class Dino:
 class Cactus(pygame.sprite.Sprite):
     def __init__(self, speed=5, sizex=-1, sizey=-1):
         pygame.sprite.Sprite.__init__(self, self.containers)
-        self.images, self.rect = DinoGame.load_sprite_sheet(
-            "cacti-small.png", 3, 1, sizex, sizey, -1
-        )
+        self.images, self.masks = folha("cacti-small.png", 3, 1, sizex, sizey)
+        self.rect = self.images[0].get_rect()
         self.rect.bottom = int(0.98 * DinoGame.height)
         self.rect.left = DinoGame.width + self.rect.width
-        self.image = self.images[random.randrange(0, 3)]
+        i = random.randrange(0, 3)
+        self.image = self.images[i]
+        self.mask = self.masks[i]
         self.movement = [-1 * speed, 0]
 
     def draw(self, screen):
@@ -849,9 +860,8 @@ class Cactus(pygame.sprite.Sprite):
 class Ptera(pygame.sprite.Sprite):
     def __init__(self, speed=5, sizex=-1, sizey=-1):
         pygame.sprite.Sprite.__init__(self, self.containers)
-        self.images, self.rect = DinoGame.load_sprite_sheet(
-            "ptera.png", 2, 1, sizex, sizey, -1
-        )
+        self.images, self.masks = folha("ptera.png", 2, 1, sizex, sizey)
+        self.rect = self.images[0].get_rect()
         self.ptera_height = [
             DinoGame.height * 0.82,
             DinoGame.height * 0.75,
@@ -860,6 +870,7 @@ class Ptera(pygame.sprite.Sprite):
         self.rect.centery = self.ptera_height[random.randrange(0, 3)]
         self.rect.left = DinoGame.width + self.rect.width
         self.image = self.images[0]
+        self.mask = self.masks[0]
         self.movement = [-1 * speed, 0]
         self.index = 0
         self.counter = 0
@@ -871,6 +882,7 @@ class Ptera(pygame.sprite.Sprite):
         if self.counter % 10 == 0:
             self.index = (self.index + 1) % 2
         self.image = self.images[self.index]
+        self.mask = self.masks[self.index]
         self.rect = self.rect.move(self.movement)
         self.counter = self.counter + 1
         if self.rect.right < 0:

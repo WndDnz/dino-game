@@ -176,7 +176,14 @@ class DinoGame:
             if temp_dino.isJumping is False and temp_dino.isBlinking is False:
                 gameStart = True
 
-    def gameplay(self):
+    def gameplay(self, rede=None, semente=None):
+        """
+        Uma partida do jogo. Sem `rede`, o teclado controla o dino (jogo manual);
+        com `rede`, é ela quem decide a cada frame (modo assistir). Com `semente`,
+        toda partida começa com random.seed(semente): a mesma pista.
+        """
+        if semente is not None:
+            random.seed(semente)
         DinoGame.FPS = 60
         startMenu = False
         gameOver = False
@@ -218,7 +225,7 @@ class DinoGame:
                             gameOver = True
 
                         if event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_SPACE:
+                            if event.key == pygame.K_SPACE and rede is None:
                                 if self.playerDino.rect.bottom == int(
                                     
                                     0.98 * self.height
@@ -234,7 +241,7 @@ class DinoGame:
                                         -1 * self.playerDino.jumpSpeed
                                     )
 
-                            if event.key == pygame.K_DOWN:
+                            if event.key == pygame.K_DOWN and rede is None:
                                 if not (
                                     
                                     self.playerDino.isJumping and self.playerDino.isDead
@@ -242,11 +249,11 @@ class DinoGame:
                                 ):
                                     self.playerDino.isDucking = True
 
-                            if event.key == pygame.K_q:
+                            if event.key in (pygame.K_q, pygame.K_ESCAPE):
                                 gameQuit = True
                                 gameOver = True
 
-                        if event.type == pygame.KEYUP:
+                        if event.type == pygame.KEYUP and rede is None:
                             if event.key == pygame.K_DOWN:
                                 self.playerDino.isDucking = False
                 for obstaculo in (*pista.cacti, *pista.pteras):
@@ -254,6 +261,12 @@ class DinoGame:
                         self.playerDino.isDead = True
                         if pygame.mixer.get_init() is not None:
                             DinoGame.die_sound.play()
+
+                if rede is not None and not self.playerDino.isDead:
+                    dino = self.playerDino
+                    cac = cacto_a_frente(dino, pista.cacti)
+                    pte = min(pista.pteras, key=lambda p: p.rect.left, default=None)
+                    dino.agir(rede.feedForward(sensores(dino, cac, pte, pista.gamespeed)))
 
                 pista.passo()
                 self.playerDino.update()
@@ -299,7 +312,7 @@ class DinoGame:
                                 or event.key == pygame.K_SPACE
                             ):
                                 gameOver = False
-                                self.gameplay()
+                                self.gameplay(rede, semente)
  
                 highsc.update(DinoGame.high_score)
                 if pygame.display.get_surface() is not None:

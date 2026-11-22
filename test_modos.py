@@ -421,3 +421,252 @@ def test_carrega_rede_arquivo_invalido_levanta(tmp_path):
     for caminho in (outra_topologia, outro_objeto, str(nao_pickle), str(vazio)):
         with pytest.raises(ValueError):
             DinoGame.carrega_rede(caminho)
+
+
+def _rede_fixa(pula):
+    """Rede (5, 8, 4, 2) de pesos zero: a saida so depende do bias da ultima camada."""
+    rede = RedeNeural.RedeNeural(CFG)
+    for a in rede.pesos + rede.bias:
+        a[:] = 0.0
+    rede.bias[-1][:] = [[10.0 if pula else -10.0], [-10.0]]  # [pular, abaixar]
+    return rede
+
+
+def _novo_jogo():
+    pygame.init()
+    pygame.mixer.quit()
+    j = DinoGame.DinoGame()
+    j.clock = _Relogio()
+    return j
+
+
+CHAO = int(0.98 * DinoGame.DinoGame.height)
+
+
+def test_assistir_rede_controla_o_dino_a_60_fps(jogo, monkeypatch):
+    jogo.clock = _Relogio()
+    _grava_pista(monkeypatch, 30)
+    with pytest.raises(_Fim):
+        jogo.gameplay(rede=_rede_fixa(pula=True))  # nenhuma tecla e enviada
+    assert isinstance(jogo.playerDino, DinoGame.Dino)
+    assert jogo.playerDino.isJumping and jogo.playerDino.rect.bottom < CHAO
+    assert jogo.dinoArray == []  # um unico dino: o do jogador
+    assert len(jogo.clock.fps) == 29 and set(jogo.clock.fps) == {60}
+
+    jogo.clock = _Relogio()
+    with pytest.raises(_Fim):
+        jogo.gameplay(rede=_rede_fixa(pula=False))
+    assert not jogo.playerDino.isJumping and jogo.playerDino.rect.bottom == CHAO
+
+    # a rede manda, nao o teclado: ESPACO nao faz pular o dino da rede que nunca pula
+    pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+    with pytest.raises(_Fim):
+        jogo.gameplay(rede=_rede_fixa(pula=False))
+    assert not jogo.playerDino.isJumping and jogo.playerDino.rect.bottom == CHAO
+
+
+def test_assistir_mostra_pontuacao(jogo, monkeypatch):
+    jogo.clock = _Relogio()
+    placares = set()
+    update = pygame.display.update
+    area = DinoGame.Scoreboard().rect
+
+    def fotografa(*args):
+        placares.add(pygame.image.tostring(jogo.screen.subsurface(area), "RGB"))
+        update(*args)
+
+    monkeypatch.setattr(pygame.display, "update", fotografa)
+    _grava_pista(monkeypatch, 100)
+    with pytest.raises(_Fim):
+        jogo.gameplay(rede=_rede_fixa(pula=False))
+    score = jogo.playerDino.score
+    assert score == 14  # 1 ponto a cada 7 frames, 99 frames completos
+    assert len(placares) == 15  # o placar mostrou cada valor de 0 a 14
+    esperado = DinoGame.Scoreboard()
+    esperado.update(score)
+    na_tela = pygame.image.tostring(jogo.screen.subsurface(esperado.rect), "RGB")
+    assert na_tela == pygame.image.tostring(esperado.image, "RGB")
+
+
+def test_assistir_usa_regras_do_jogo_manual(jogo, monkeypatch):
+    esperado = _pista_sozinha(monkeypatch, 21, 1500)
+    assert len(esperado) > 10 and any(tipo == "Ptera" for _, tipo, _, _ in esperado)
+    assert max(sum(1 for f, t, _, _ in esperado if t == "Cactus" and f0 <= f < f0 + 100) for f0, _, _, _ in esperado) >= 2
+    log = _grava_pista(monkeypatch, 1500)
+    _sem_colisao(monkeypatch)
+    jogo.clock = _Relogio()
+    random.seed(21)
+    with pytest.raises(_Fim):
+        jogo.gameplay(rede=_rede_fixa(pula=True))
+    assert log == esperado
+
+
+def _ate_o_fim_de_jogo(jogo, monkeypatch, na_tela_de_fim):
+    """Roda gameplay com a rede que nunca pula; `na_tela_de_fim(n)` e chamada a cada frame da tela de fim."""
+    passos = []
+    passo = DinoGame.Pista.passo
+    fim_de_jogo = DinoGame.DinoGame.disp_gameOver_msg
+    chamadas = []
+
+    def conta_passo(self):
+        passos.append(self)
+        passo(self)
+
+    def tela_de_fim(self, *args):
+        fim_de_jogo(self, *args)
+        chamadas.append((len(passos), self.playerDino.score))
+        na_tela_de_fim(len(chamadas))
+
+    monkeypatch.setattr(DinoGame.Pista, "passo", conta_passo)
+    monkeypatch.setattr(DinoGame.DinoGame, "disp_gameOver_msg", tela_de_fim)
+    return passos, chamadas
+
+
+def test_assistir_colisao_mostra_fim_de_jogo(jogo, monkeypatch):
+    jogo.clock = _Relogio()
+
+    def para_no_quinto(n):
+        if n == 5:
+            raise _Fim
+
+    passos, chamadas = _ate_o_fim_de_jogo(jogo, monkeypatch, para_no_quinto)
+    random.seed(1)
+    with pytest.raises(_Fim):
+        jogo.gameplay(rede=_rede_fixa(pula=False))
+    assert jogo.playerDino.isDead
+    assert 100 < chamadas[0][0] < 200  # morreu no primeiro cacto, que chega perto do frame 139
+    # a partida parou: nem a pista nem a pontuacao andam durante a tela de fim
+    assert len({p for p, _ in chamadas}) == 1 and len({s for _, s in chamadas}) == 1
+    fim = pygame.Rect(0, 0, 190, 11)
+    fim.centerx, fim.centery = 300, int(150 * 0.35)
+    assert _cores(jogo.screen, fim) != {DinoGame.BG_COLOR}  # o letreiro de fim de jogo esta na tela
+
+
+@pytest.mark.parametrize("tecla", [pygame.K_SPACE, pygame.K_RETURN])
+def test_assistir_espaco_reinicia_com_a_mesma_rede(jogo, monkeypatch, tecla):
+    jogo.clock = _Relogio()
+    rede = _rede_fixa(pula=False)
+    consultas = []
+    feed = rede.feedForward
+    rede.feedForward = lambda a: consultas.append(len(pistas)) or feed(a)
+    pistas, dinos = [], []
+    pista_init = DinoGame.Pista.__init__
+
+    def nova_pista(self):
+        pistas.append(self)
+        dinos.append(jogo.playerDino)
+        pista_init(self)
+
+    monkeypatch.setattr(DinoGame.Pista, "__init__", nova_pista)
+
+    def aperta_e_depois_para(n):
+        if len(pistas) == 1 and n == 3:
+            pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=tecla))
+        if len(pistas) == 2:
+            raise _Fim  # a segunda partida tambem chegou ao fim de jogo
+
+    _ate_o_fim_de_jogo(jogo, monkeypatch, aperta_e_depois_para)
+    with pytest.raises(_Fim):
+        jogo.gameplay(rede=rede)
+    assert len(pistas) == 2 and dinos[0] is not dinos[1]  # outra partida, outro dino
+    assert consultas.count(1) > 100 and consultas.count(2) > 100  # a mesma rede decidiu nas duas
+
+
+def test_assistir_esc_encerra_com_codigo_0(monkeypatch):
+    sair = [
+        pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE),
+        pygame.event.Event(pygame.QUIT),
+    ]
+    passo = DinoGame.Pista.passo
+    for evento in sair:  # durante a partida
+        jogo = _novo_jogo()
+
+        def no_frame_10(self):
+            if self.counter == 10:
+                pygame.event.post(evento)
+            passo(self)
+
+        monkeypatch.setattr(DinoGame.Pista, "passo", no_frame_10)
+        with pytest.raises(SystemExit) as saida:
+            jogo.gameplay(rede=_rede_fixa(pula=False))
+        assert saida.value.code in (None, 0)
+        assert not jogo.playerDino.isDead
+    monkeypatch.setattr(DinoGame.Pista, "passo", passo)
+    for evento in sair:  # na tela de fim de jogo
+        jogo = _novo_jogo()
+        _ate_o_fim_de_jogo(jogo, monkeypatch, lambda n: n == 2 and pygame.event.post(evento))
+        with pytest.raises(SystemExit) as saida:
+            jogo.gameplay(rede=_rede_fixa(pula=False))
+        assert saida.value.code in (None, 0)
+        assert jogo.playerDino.isDead
+        monkeypatch.undo()
+
+
+def _estado_no_primeiro_cacto(jogo, monkeypatch, semente, antes):
+    """Duas partidas seguidas (reinicio por ESPACO): estado do random quando nasce o 1o cacto de cada uma."""
+    estados = []
+    cacto_init = DinoGame.Cactus.__init__
+    pistas = []
+    pista_init = DinoGame.Pista.__init__
+
+    def nova_pista(self):
+        pistas.append(self)
+        pista_init(self)
+
+    def espia(self, *args, **kwargs):
+        if len(estados) < len(pistas):
+            estados.append(random.getstate())
+        cacto_init(self, *args, **kwargs)
+
+    def reinicia_uma_vez(n):
+        if len(pistas) == 1 and n == 1:
+            pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_SPACE))
+        if len(pistas) == 2:
+            raise _Fim
+
+    monkeypatch.setattr(DinoGame.Pista, "__init__", nova_pista)
+    monkeypatch.setattr(DinoGame.Cactus, "__init__", espia)
+    _ate_o_fim_de_jogo(jogo, monkeypatch, reinicia_uma_vez)
+    random.seed(antes)
+    with pytest.raises(_Fim):
+        jogo.gameplay(rede=_rede_fixa(pula=False), semente=semente)
+    monkeypatch.undo()
+    return estados
+
+
+def _estado_apos_seed(semente):
+    random.seed(semente)
+    return random.getstate()
+
+
+def test_assistir_semente_por_partida(jogo, monkeypatch):
+    jogo.clock = _Relogio()
+    com = _estado_no_primeiro_cacto(jogo, monkeypatch, semente=5, antes=99)
+    assert com == [_estado_apos_seed(5), _estado_apos_seed(5)]  # as duas partidas na mesma pista
+    jogo = _novo_jogo()
+    sem = _estado_no_primeiro_cacto(jogo, monkeypatch, semente=None, antes=99)
+    assert sem[0] == _estado_apos_seed(99)  # sem semente, o jogo nao mexe no random
+    assert sem[1] not in (_estado_apos_seed(99), _estado_apos_seed(5))  # e a 2a partida e outra pista
+
+
+def test_tres_modos_mesma_pista(jogo, monkeypatch, tmp_path):
+    S, FRAMES = 31, 1500
+    _sem_colisao(monkeypatch)
+    jogo.clock = _Relogio()
+
+    def roda(f):
+        log = _grava_pista(monkeypatch, FRAMES)
+        with pytest.raises(_Fim):
+            f()
+        return list(log)
+
+    def manual():
+        random.seed(S)
+        jogo.gameplay()
+
+    manual_log = roda(manual)
+    assistir_log = roda(lambda: jogo.gameplay(rede=_rede_fixa(pula=True), semente=S))
+    # no treino a geracao g usa a semente semente_base + g: base S - 1 da S na geracao 1
+    treino_log = roda(lambda: jogo.train(3, 1, semente_base=S - 1, saida=str(tmp_path), janela=False))
+    assert len(manual_log) > 10 and any(tipo == "Ptera" for _, tipo, _, _ in manual_log)
+    assert manual_log == assistir_log == treino_log

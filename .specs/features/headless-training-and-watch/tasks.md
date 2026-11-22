@@ -260,16 +260,16 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_assistir_rede_controla_o_dino_a_60_fps`: uma rede que sempre pula faz o dino sair do chão sem tecla; uma que nunca pula deixa o dino no chão; o laço limita a 60 FPS
-- [ ] `test_assistir_mostra_pontuacao`: a região do placar na tela muda quando a pontuação sobe
-- [ ] `test_assistir_usa_regras_do_jogo_manual`: a sequência de obstáculos é a da `Pista` com a mesma semente
-- [ ] `test_assistir_colisao_mostra_fim_de_jogo`: depois da colisão a pontuação para de subir e a tela de fim de jogo é desenhada
-- [ ] `test_assistir_espaco_reinicia_com_a_mesma_rede`: ESPAÇO e ENTER na tela de fim iniciam outra partida controlada pela mesma rede
-- [ ] `test_assistir_esc_encerra_com_codigo_0`: ESC e fechar a janela encerram com `SystemExit` de código 0
-- [ ] `test_assistir_semente_por_partida`: com `semente=5`, o primeiro obstáculo de duas partidas seguidas nasce com o `random` recém-semeado em 5; sem semente, não
-- [ ] `test_tres_modos_mesma_pista`: jogo manual, treino e assistir, com a mesma semente e colisões desligadas, criam a mesma sequência de obstáculos em 1500 frames
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 26 de `test_modos.py` passam
+- [x] `test_assistir_rede_controla_o_dino_a_60_fps`: uma rede que sempre pula faz o dino sair do chão sem tecla; uma que nunca pula deixa o dino no chão; o laço limita a 60 FPS
+- [x] `test_assistir_mostra_pontuacao`: a região do placar na tela muda quando a pontuação sobe
+- [x] `test_assistir_usa_regras_do_jogo_manual`: a sequência de obstáculos é a da `Pista` com a mesma semente
+- [x] `test_assistir_colisao_mostra_fim_de_jogo`: depois da colisão a pontuação para de subir e a tela de fim de jogo é desenhada
+- [x] `test_assistir_espaco_reinicia_com_a_mesma_rede`: ESPAÇO e ENTER na tela de fim iniciam outra partida controlada pela mesma rede
+- [x] `test_assistir_esc_encerra_com_codigo_0`: ESC e fechar a janela encerram com `SystemExit` de código 0
+- [x] `test_assistir_semente_por_partida`: com `semente=5`, o primeiro obstáculo de duas partidas seguidas nasce com o `random` recém-semeado em 5; sem semente, não
+- [x] `test_tres_modos_mesma_pista`: jogo manual, treino e assistir, com a mesma semente e colisões desligadas, criam a mesma sequência de obstáculos em 1500 frames
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 26 de `test_modos.py` passam
 
 **Tests**: integration
 **Gate**: full

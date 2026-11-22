@@ -50,15 +50,23 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 - **Trade-off**: Pesos maiores saturam mais a sigmoide; a evidência de treino é uma execução por configuração. Redes salvas com AD-005 continuam válidas: o contrato de entrada e saída não mudou.
 - **Scope**: `RedeNeural.__init__`, `DinoGame.train`, `Dino.agir`, arquivos `*.din`
 - **Date**: 2026-11-22
+- **Status**: superseded by AD-007
+
+### AD-007
+- **Decision**: Jogo manual, treino e modo assistir usam uma única pista: até 2 cactos na tela, ptera de 46x40 depois de 700 frames, velocidade +1 a cada 700 frames, e todo obstáculo novo nasce a pelo menos 160 px dos que já estão na tela. O contrato da rede é o de AD-006 com uma troca na primeira entrada: `l` mede o cacto mais próximo que ainda não passou pelo dino e vale 1.0 quando todos já passaram.
+- **Reason**: O usuário quis assistir a rede na pista do jogo manual ("Vamos tentar usar o jogo manual com até 2 cactos") e treinar nela ("1. Sim, atualize o treino."), para a rede não ser vista numa pista em que nunca treinou. A distância mínima corrige o ptera que nascia em cima de um cacto ("2. Ok.").
+- **Trade-off**: Os scores deixam de ser comparáveis com os treinos anteriores (pista de 1 cacto, ptera de 40x40 depois de 600 frames). Redes salvas antes continuam carregando, mas foram treinadas com `l` negativo depois do cacto e nunca viram 2 cactos.
+- **Scope**: `DinoGame.py` (`Pista`, `gameplay`, `train`, `sensores`), arquivos `*.din`
+- **Date**: 2026-11-22
 - **Status**: active
 
 ## Handoff
 
-- **Feature**: `.specs/features/ga-training-fixes/` - concluída em 2026-11-22
-- **Phase / Task**: Execute encerrado: 11/11 tarefas, 5 achados do Verifier fechados, gate final verde
-- **Completed**: T1-T11; achados fechados por afd3b92, ca0f22c, 285d3e9, b613ccd, 27037c2
+- **Feature**: `.specs/features/headless-training-and-watch/` - spec e design aprovados em 2026-11-22; `tasks.md` em rascunho, sem aprovação
+- **Phase / Task**: Tasks - aguardando aprovação do usuário
+- **Completed**: none
 - **In-progress** (file:line): none
-- **Next step**: Nenhum nesta feature. Candidatas a próxima: treino sem renderização com cálculo em lote das redes; modo "assistir o melhor dino"; limpeza de código morto (`AGT`, `SGD`, `acasala0`, `acasala2`) e dos arquivos `AGMLP`, `np`, `profile`.
+- **Next step**: Usuário aprova `tasks.md` e responde a oferta de sub-agentes (10 tarefas); então Execute a partir de T1.
 - **Blockers**: none
-- **Uncommitted files**: none
-- **Branch**: master (commits locais, sem push)
+- **Uncommitted files**: `.specs/features/headless-training-and-watch/` (spec, design, tasks), `.specs/STATE.md`
+- **Branch**: master

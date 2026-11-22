@@ -372,6 +372,9 @@ Proof: run unit | test_modos.py::test_treino_com_janela_desenha_dinos_e_hud PASS
 **C21** - Jogo manual, treino e assistir criam a mesma sequência de obstáculos para a mesma semente (TRACK-01, AC 1)
 Proof: run unit | test_modos.py::test_tres_modos_mesma_pista PASSED
 
+**C27** - A pista nunca tem mais de 2 cactos, nenhum ptera nasce antes do frame 700, todo ptera tem 46x40 e a velocidade vale 4 + frames // 700 (TRACK-01, AC 1; WATCH-04, AC 4)
+Proof: run unit | test_modos.py::test_pista_regras_do_jogo_manual PASSED
+
 **C22** - Todo obstáculo novo nasce a 160 px ou mais dos que estão na tela (TRACK-02, AC 2)
 Proof: run unit | test_modos.py::test_obstaculo_novo_a_160_px PASSED
 

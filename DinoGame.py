@@ -359,18 +359,13 @@ class DinoGame:
                             if event.key == pygame.K_ESCAPE:
                                 gameQuit = True
                                 gameOver = False
-
-                            if (
-                                event.key == pygame.K_RETURN
-                                or event.key == pygame.K_SPACE
-                            ):
                             if (
                                 event.key == pygame.K_RETURN
                                 or event.key == pygame.K_SPACE
                             ):
                                 gameOver = False
                                 self.gameplay()
-
+ 
                 highsc.update(DinoGame.high_score)
                 if pygame.display.get_surface() is not None:
                     self.disp_gameOver_msg(retbutton_image, gameover_image)
@@ -394,7 +389,7 @@ class DinoGame:
         for i in range(nIndividuals):
             self.dinoArray.append(Dino(44, 47))
         ag = AGMLP.RNA_AG(
-            (4, 8, 2),
+            (5, 8, 4, 2),
             None,
             0.1,
             nIndividuals,
@@ -637,6 +632,7 @@ class DinoGame:
                         ft_font.render_to(
                             self.screen, best_rect.topleft, best, (255, 0, 0)
                         )
+                    ft_font.render_to(self.screen, scr_rect.topleft, scr, (0,0,255))
                     pygame.display.update()
                     # if self.dinoArray:
                     #     print(

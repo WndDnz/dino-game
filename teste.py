@@ -3,7 +3,10 @@
 import AGMLP
 import numpy as np
 from RedeNeural import RedeNeural
+import matplotlib.pyplot as plt
 
-correction = np.zeros((9, 1))
-correction[:2] = [[1], [1]]
-print(correction)
+x = np.linspace(-10, 10, 10000)
+y = 1.0 / (1.0 + np.exp(-x))
+
+plt.plot(x, y)
+plt.show()

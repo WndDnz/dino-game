@@ -22,17 +22,6 @@ class RNA_AG:
         elite=None,
         teste=None,
     ):
-    def __init__(
-        self,
-        configRede,
-        treino,
-        eta,
-        nIndividuos,
-        geracoes,
-        taxaMutacao=0.01,
-        elite=None,
-        teste=None,
-    ):
         """
         No construtor, passamos a configuração das Redes Neurais, o arquivo de dados de treinamento,
         o número de indíviduos de cada geração, a taxa de mutação, o número de indivíduos a serem
@@ -92,7 +81,10 @@ class RNA_AG:
             # for i in range(tamElite):
             #     res.append(popRanqueada[i][0])
             res += [popRanqueada[i][0] for i in range(tamElite)]
-        res += [max(random.sample(popRanqueada, numTorneio), key=operator.itemgetter(1))[0] for i in range(tam)]
+        res += [
+            max(random.sample(popRanqueada, numTorneio), key=operator.itemgetter(1))[0]
+            for i in range(tam)
+        ]
         return res
 
     def grupoDeReproducao(self, populacao, selecao):
@@ -138,7 +130,7 @@ class RNA_AG:
         w2 = pai2.pesos.copy()
         filho = RedeNeural.RedeNeural(self.configRede)
         alpha = 0.1
-        beta = random.uniform(-alpha, 1+alpha)
+        beta = random.uniform(-alpha, 1 + alpha)
 
         for i in range(pai1.ncamadas - 1):
             shapeOrig = b1[i].shape
@@ -150,7 +142,7 @@ class RNA_AG:
             pesos_filho = pesos_filho.reshape(shapeOrig)
             filho.bias[i] = bias_filho
             filho.pesos[i] = pesos_filho
-        return filho        
+        return filho
 
     def acasala0(self, pai1, pai2):
         """
@@ -229,7 +221,6 @@ class RNA_AG:
         pool = random.sample(pais, len(pais))
 
         if tamElite:
-        if tamElite:
             filhos = [pais[i] for i in range(tamElite)]
         filhos += [self.acasala(pool[i], pool[len(pais) - i - 1]) for i in range(tam)]
         return filhos
@@ -249,7 +240,6 @@ class RNA_AG:
                     v = np.array([random.random()])
                     individuo.bias[c][b] = v
             for w in range(individuo.pesos[c].shape[0]):
-                if random.random() < taxaMutacao:
                 if random.random() < taxaMutacao:
                     ind = random.randint(0, individuo.pesos[c][w].shape[0] - 1)
                     individuo.pesos[c][w][ind] *= np.random.random()

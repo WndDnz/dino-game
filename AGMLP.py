@@ -34,7 +34,7 @@ class RNA_AG:
         self.nIndividuos = nIndividuos
         self.geracoes = geracoes
         self.taxaMutacao = taxaMutacao
-        self.elite = elite, trange
+        self.elite = elite
         self.tamElite = int(nIndividuos * elite)
         self.teste = teste
 
@@ -209,8 +209,9 @@ class RNA_AG:
         """
         popRanqueada = self.ranquearIndividuos(geracaoAtual)
         print(f"Best: {popRanqueada[0][0]}: {popRanqueada[0][1]}")
+        tamElite = int(len(geracaoAtual) * self.elite)
         elite = [
-            copy.deepcopy(geracaoAtual[i][1]) for i, _ in popRanqueada[: self.tamElite]
+            copy.deepcopy(geracaoAtual[i][1]) for i, _ in popRanqueada[:tamElite]
         ]
         nFilhos = len(geracaoAtual) - len(elite)
         pais = [geracaoAtual[i][1] for i in self.selecao(popRanqueada, 2 * nFilhos)]

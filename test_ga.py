@@ -122,6 +122,17 @@ def test_elite_identica(capsys):
         assert copias[0] is not melhor
 
 
+def test_elite_proporcional_ao_n_recebido(capsys):
+    ag = _ag(50, elite=0.1)  # AG montado para 50, mas recebe 30 pares: elite = int(30 * 0.1) = 3
+    ag.taxaMutacao = 1.0
+    atual = _geracao(30)
+    nova = ag.proximaGeracao(atual)
+    assert len(nova) == 30
+    intactas = [rede for _, rede in atual if any(_iguais(r, rede) for r in nova)]
+    assert len(intactas) == 3
+    assert all(a is b for a, b in zip(intactas, [rede for _, rede in atual[-3:]]))
+
+
 def test_entrada_inalterada(capsys):
     ag = _ag(50, elite=0.1)
     ag.taxaMutacao = 1.0

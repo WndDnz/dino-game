@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: none - fase Design pulada; as decisões de estrutura estão em "Design inline" abaixo
-**Status**: In Progress
+**Status**: In Progress - 11/11 tarefas feitas, em verificação
 **Approved**: 2026-11-22 - user: "1. Aprova. 2. .gitignore"
 **Build**: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py`
 **Run unit**: `python -m pytest test_ga.py -v`
@@ -341,6 +341,9 @@ Proof: run unit | test_ga.py::test_proxima_geracao_devolve_n PASSED
 **C8** - As 5 redes de maior score reaparecem com pesos e bias idênticos (AGT-02, AC 2)
 Proof: run unit | test_ga.py::test_elite_identica PASSED
 
+**C22** - Com 30 pares recebidos e `elite=0.1`, exatamente as 3 de maior score reaparecem intactas, mesmo com o AG montado para 50 (AGT-02, AC 2)
+Proof: run unit | test_ga.py::test_elite_proporcional_ao_n_recebido PASSED
+
 **C9** - As redes de entrada ficam inalteradas (AGT-03, AC 3)
 Proof: run unit | test_ga.py::test_entrada_inalterada PASSED
 
@@ -385,7 +388,7 @@ Proof: run unit | test_ga.py::test_treino_interrompido_mantem_melhor PASSED
 ## Handoff
 
 **Settled mid-build:** 2026-11-22 - `graphify-out/` vai para o `.gitignore`, não para o commit de base (usuário: "2. .gitignore"). Execução inline, sem sub-agentes: oferta feita junto com o plano ("executo as 11 tarefas nesta sessão, sem sub-agentes"), usuário: "1. Aprova."
-**Dispatched:** none
+**Dispatched:** Verifier (sub-agente independente) em `HEAD` 29bd2d1, 2026-11-22 - aguardando retorno
 **Walked:** none - a feature não tem tela nova
 
 ---

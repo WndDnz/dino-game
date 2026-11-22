@@ -146,10 +146,10 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_sensor_mede_cacto_mais_proximo_a_frente`: com um cacto já passado, um a 200 px e um a 400 px, `sensores(dino, cacto_a_frente(...), None, 4)` dá `l` = 200 / 600; o resultado não depende da ordem dos cactos no grupo
-- [ ] `test_sensor_vale_1_quando_cactos_passaram`: com todos os cactos passados, `l` = 1.0; um cacto com a borda direita exatamente na borda esquerda do dino ainda conta como à frente
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 7 de `test_modos.py` passam
+- [x] `test_sensor_mede_cacto_mais_proximo_a_frente`: com um cacto já passado, um a 200 px e um a 400 px, `sensores(dino, cacto_a_frente(...), None, 4)` dá `l` = 200 / 600; o resultado não depende da ordem dos cactos no grupo
+- [x] `test_sensor_vale_1_quando_cactos_passaram`: com todos os cactos passados, `l` = 1.0; um cacto com a borda direita exatamente na borda esquerda do dino ainda conta como à frente
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 7 de `test_modos.py` passam
 
 **Tests**: unit
 **Gate**: quick

@@ -142,3 +142,36 @@ def test_pista_regras_do_jogo_manual(jogo):
                 assert o.rect.size == (46, 40)
             else:
                 assert o.rect.size == (40, 40)
+
+
+def _cacto(esquerda):
+    c = DinoGame.Cactus(4, 40, 40)
+    c.rect.left = esquerda
+    return c
+
+
+def _l(dino, cactos):
+    return DinoGame.sensores(dino, DinoGame.cacto_a_frente(dino, cactos), None, 4)[0][0]
+
+
+def test_sensor_mede_cacto_mais_proximo_a_frente(jogo):
+    dino = DinoGame.Dino(44, 47)
+    assert (dino.rect.left, dino.rect.right) == (40, 84)
+    passado, perto, longe = _cacto(-10), _cacto(284), _cacto(484)  # perto: 200 px a frente
+    assert passado.rect.right < dino.rect.left
+    for cactos in ([passado, perto, longe], [longe, perto, passado], [perto, longe, passado]):
+        assert _l(dino, cactos) == pytest.approx(200 / 600)
+    assert _l(dino, [longe, passado]) == pytest.approx(400 / 600)
+    # passando por baixo do dino (ainda nao saiu por tras) continua sendo o medido
+    embaixo = _cacto(60)
+    assert _l(dino, [embaixo, perto]) == pytest.approx((60 - 84) / 600)
+
+
+def test_sensor_vale_1_quando_cactos_passaram(jogo):
+    dino = DinoGame.Dino(44, 47)
+    assert _l(dino, [_cacto(-30), _cacto(-5)]) == 1.0  # bordas direitas em 10 e 35, antes de 40
+    assert _l(dino, []) == 1.0
+    no_limite = _cacto(0)  # borda direita em 40, igual a borda esquerda do dino: ainda nao passou
+    assert no_limite.rect.right == dino.rect.left
+    assert _l(dino, [no_limite]) == pytest.approx((0 - 84) / 600)
+    assert _l(dino, [_cacto(-1)]) == 1.0  # um pixel depois, passou

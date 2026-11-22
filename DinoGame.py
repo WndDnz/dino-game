@@ -774,6 +774,12 @@ class Pista:
         self.pteras.draw(screen)
 
 
+def cacto_a_frente(dino, cacti):
+    """O cacto mais próximo que ainda não passou pelo dino, ou None (AD-007)."""
+    a_frente = [c for c in cacti if c.rect.right >= dino.rect.left]
+    return min(a_frente, key=lambda c: c.rect.left, default=None)
+
+
 def sensores(dino, cac, pte, gamespeed):
     """
     Entrada (5,1) da rede, normalizada (AD-005): distância ao cacto, distância ao

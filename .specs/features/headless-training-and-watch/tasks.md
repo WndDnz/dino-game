@@ -103,9 +103,9 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_lote_igual_ao_individual`: para 50 redes e entradas diferentes por rede, o lote é igual a `feedForward` de cada uma (`np.allclose`), inclusive para um subconjunto de índices
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 3 de `test_modos.py` passam
+- [x] `test_lote_igual_ao_individual`: para 50 redes e entradas diferentes por rede, o lote é igual a `feedForward` de cada uma (`np.allclose`), inclusive para um subconjunto de índices
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 3 de `test_modos.py` passam
 
 **Tests**: unit
 **Gate**: quick

@@ -25,6 +25,21 @@ class RedeNeural:
             a = self.sigmoide(np.dot(w, a) + b)
         return a
 
+    @staticmethod
+    def empilha(redes):
+        """Pesos (N, y, x) e bias (N, y, 1) de N redes iguais, uma lista por camada."""
+        camadas = range(len(redes[0].pesos))
+        W = [np.stack([r.pesos[c] for r in redes]) for c in camadas]
+        B = [np.stack([r.bias[c] for r in redes]) for c in camadas]
+        return W, B
+
+    @staticmethod
+    def feed_forward_lote(W, B, a):
+        """feedForward de N redes de uma vez: `a` tem forma (N, entradas, 1)."""
+        for w, b in zip(W, B):
+            a = 1.0 / (1.0 + np.exp(-(w @ a + b)))
+        return a
+
     def SGD(self, treino, epocas, tamanho_lote, eta, teste=None):
         # import ipdb; ipdb.set_trace()
         treino = list(treino)

@@ -70,3 +70,21 @@ def test_sprites_carregados_uma_vez(jogo, monkeypatch):
     dinos = [DinoGame.Dino(44, 47) for _ in range(50)]
     assert len(carregadas) <= 2  # dino.png e dino_ducking.png, uma vez cada
     assert len({id(d.rect) for d in dinos}) == 50  # cada dino com o seu proprio rect
+
+
+def test_lote_igual_ao_individual():
+    np.random.seed(3)
+    redes = [RedeNeural.RedeNeural(CFG) for _ in range(50)]
+    entradas = np.random.uniform(-1, 1, (50, 5, 1))  # uma entrada diferente por rede
+    W, B = RedeNeural.RedeNeural.empilha(redes)
+    lote = RedeNeural.RedeNeural.feed_forward_lote(W, B, entradas)
+    assert lote.shape == (50, 2, 1)
+    for rede, entrada, saida in zip(redes, entradas, lote):
+        assert np.allclose(saida, rede.feedForward(entrada), rtol=0, atol=1e-12)
+    # so as redes ainda vivas: indices 3, 17 e 40
+    vivos = [3, 17, 40]
+    parte = RedeNeural.RedeNeural.feed_forward_lote(
+        [w[vivos] for w in W], [b[vivos] for b in B], entradas[vivos]
+    )
+    for i, saida in zip(vivos, parte):
+        assert np.allclose(saida, redes[i].feedForward(entradas[i]), rtol=0, atol=1e-12)

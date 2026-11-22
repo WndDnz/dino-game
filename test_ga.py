@@ -1,6 +1,7 @@
 """Testes da spec ga-training-fixes. Rodam sem janela: python -m pytest test_ga.py -v"""
 
 import os
+import pickle
 import random
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
@@ -224,3 +225,35 @@ def test_colisoes_mesmo_frame(jogo):
     assert len(ranked) == 10
     assert [score for score, _ in ranked] == list(range(10))
     assert all(sum(r is rede for _, r in ranked) == 1 for rede in redes)
+
+
+def _salva(tmp_path):
+    with open(tmp_path / "bestDino.din", "rb") as f:
+        return pickle.load(f)
+
+
+def test_csv_linha_por_geracao(tmp_path):
+    g1 = [(10, RedeNeural.RedeNeural(CFG)), (30, RedeNeural.RedeNeural(CFG))]
+    g2 = [(50, RedeNeural.RedeNeural(CFG)), (20, RedeNeural.RedeNeural(CFG))]
+    recorde = DinoGame.registra_geracao(g1, 1, None, str(tmp_path))
+    DinoGame.registra_geracao(g2, 2, recorde, str(tmp_path))
+    linhas = (tmp_path / "fitness.csv").read_text().splitlines()
+    assert linhas[0] == "geracao,melhor,media"
+    assert [linha.split(",") for linha in linhas[1:]] == [["1", "30", "20.0"], ["2", "50", "35.0"]]
+
+
+def test_salva_melhor_de_todos(tmp_path):
+    melhor, pior = RedeNeural.RedeNeural(CFG), RedeNeural.RedeNeural(CFG)
+    recorde = DinoGame.registra_geracao([(10, pior), (30, melhor)], 1, None, str(tmp_path))
+    assert recorde == 30
+    assert _iguais(_salva(tmp_path), melhor)
+    # geracao seguinte pior: recorde e arquivo ficam como estavam
+    outra = RedeNeural.RedeNeural(CFG)
+    assert DinoGame.registra_geracao([(25, outra)], 2, recorde, str(tmp_path)) == 30
+    assert _iguais(_salva(tmp_path), melhor)
+    # empate nao e recorde
+    assert DinoGame.registra_geracao([(30, outra)], 3, recorde, str(tmp_path)) == 30
+    assert _iguais(_salva(tmp_path), melhor)
+    # novo recorde regrava
+    assert DinoGame.registra_geracao([(31, outra)], 4, recorde, str(tmp_path)) == 31
+    assert _iguais(_salva(tmp_path), outra)

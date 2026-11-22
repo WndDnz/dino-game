@@ -281,10 +281,10 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_csv_linha_por_geracao`: duas chamadas em diretório temporário deixam cabeçalho e 2 linhas com os valores esperados
-- [ ] `test_salva_melhor_de_todos`: geração com recorde grava `bestDino.din` com a rede de maior score; geração seguinte com score menor não altera o arquivo
-- [ ] Gate check passes: `python -m pytest test_ga.py -v`
-- [ ] Test count: 20 tests pass
+- [x] `test_csv_linha_por_geracao`: duas chamadas em diretório temporário deixam cabeçalho e 2 linhas com os valores esperados
+- [x] `test_salva_melhor_de_todos`: geração com recorde grava `bestDino.din` com a rede de maior score; geração seguinte com score menor não altera o arquivo
+- [x] Gate check passes: `python -m pytest test_ga.py -v`
+- [x] Test count: 20 tests pass
 
 **Tests**: unit
 **Gate**: quick

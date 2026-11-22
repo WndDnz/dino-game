@@ -689,6 +689,26 @@ def remove_colididos(dinos, obstaculo, ranked):
                 DinoGame.die_sound.play()
 
 
+def registra_geracao(ranked, geracao, melhor_score, saida="."):
+    """
+    Acrescenta `geracao,melhor,media` a fitness.csv e salva a melhor rede da geração
+    em bestDino.din quando ela supera `melhor_score` (None = ainda não há recorde).
+    Devolve o recorde atualizado.
+    """
+    score, rede = max(ranked, key=lambda par: par[0])
+    media = sum(s for s, _ in ranked) / len(ranked)
+    caminho = os.path.join(saida, "fitness.csv")
+    novo = not os.path.exists(caminho)
+    with open(caminho, "a") as f:
+        if novo:
+            f.write("geracao,melhor,media\n")
+        f.write(f"{geracao},{score},{media}\n")
+    if melhor_score is None or score > melhor_score:
+        RedeNeural.RedeNeural.save_object(rede, os.path.join(saida, "bestDino.din"))
+        return score
+    return melhor_score
+
+
 class Dino:
     def __init__(self, sizex=-1, sizey=-1):
         self.images, self.rect = DinoGame.load_sprite_sheet(

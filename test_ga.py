@@ -73,3 +73,6 @@ def test_mutacao_delta_normal_0_05():
     assert -0.1 < deltas.mean() < 0.1
     assert 0.4 < deltas.std() < 0.6
     assert (deltas > 0).any() and (deltas < 0).any()
+    # forma de normal com desvio 0.5: ~68.3% dos deltas dentro de 1 desvio, ~50% de cada sinal
+    assert 0.63 < np.mean(np.abs(deltas) < 0.5) < 0.73
+    assert 0.45 < np.mean(deltas > 0) < 0.55

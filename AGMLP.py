@@ -60,32 +60,16 @@ class RNA_AG:
         fitness = {key: specimen[0] for (key, specimen) in enumerate(populacao)}
         return sorted(fitness.items(), key=operator.itemgetter(1), reverse=True)
 
-    def selecao(self, popRanqueada, tamElite, numPartTorneio=0.2):
+    def selecao(self, popRanqueada, n, k=3):
         """
-        Este método implementa a seleção por torneio. Uma fração da população é sorteada aleatoriamente
-        e o melhor indíviduo do grupo é promovido para o grupo de reprodução. Note que retornamos uma lista
-        com os índices dos indivíduos sorteados.
+        Seleção por torneio: cada um dos n pais é o de maior aptidão entre k indivíduos
+        sorteados. Retornamos uma lista com os índices dos vencedores.
         """
-        res = []
-        tam = len(popRanqueada) - tamElite if tamElite else len(popRanqueada)
-        numTorneio = int(len(popRanqueada) * numPartTorneio)
-        if tamElite:
-            for i in range(tamElite):
-                res.append(popRanqueada[i][0])
-        res += [
-            max(random.sample(popRanqueada, numTorneio), key=operator.itemgetter(1))[0]
-            for i in range(tam)
+        k = min(k, len(popRanqueada))
+        return [
+            max(random.sample(popRanqueada, k), key=operator.itemgetter(1))[0]
+            for i in range(n)
         ]
-        random.shuffle(res)
-        if tamElite:
-            # for i in range(tamElite):
-            #     res.append(popRanqueada[i][0])
-            res += [popRanqueada[i][0] for i in range(tamElite)]
-        res += [
-            max(random.sample(popRanqueada, numTorneio), key=operator.itemgetter(1))[0]
-            for i in range(tam)
-        ]
-        return res
 
     def grupoDeReproducao(self, populacao, selecao):
         """
@@ -255,7 +239,7 @@ class RNA_AG:
         print(
             f"Best: {popRanqueada[0][0]}: {popRanqueada[0][1]}"
         )  # -> {geracaoAtual[popRanqueada[0][0]][1].pesos}")
-        resSelecao = self.selecao(popRanqueada, self.tamElite)
+        resSelecao = self.selecao(popRanqueada, len(popRanqueada))
         grReproducao = self.grupoDeReproducao(geracaoAtual, resSelecao)
         filhos = self.acasalaPppulacao(grReproducao, self.tamElite)
         proximaGeracao = self.mutacaoPopulacao(filhos, self.taxaMutacao)

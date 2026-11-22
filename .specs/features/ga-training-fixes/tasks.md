@@ -171,10 +171,10 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_torneio_de_3`: com 100 scores distintos e 5000 sorteios, a posição média do vencedor fica entre 0.72 e 0.78 da escala (valor esperado do máximo de 3 = 0.75)
-- [ ] `test_torneio_populacao_menor_que_3`: com 2 indivíduos, todo vencedor é o de maior score
-- [ ] Gate check passes: `python -m pytest test_ga.py -v`
-- [ ] Test count: 7 tests pass
+- [x] `test_torneio_de_3`: com 100 scores distintos e 5000 sorteios, a posição média do vencedor fica entre 0.72 e 0.78 da escala (valor esperado do máximo de 3 = 0.75)
+- [x] `test_torneio_populacao_menor_que_3`: com 2 indivíduos, todo vencedor é o de maior score
+- [x] Gate check passes: `python -m pytest test_ga.py -v`
+- [x] Test count: 7 tests pass
 
 **Tests**: unit
 **Gate**: quick

@@ -1,6 +1,7 @@
 """Testes da spec ga-training-fixes. Rodam sem janela: python -m pytest test_ga.py -v"""
 
 import os
+import random
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 os.environ["SDL_AUDIODRIVER"] = "dummy"
@@ -76,3 +77,17 @@ def test_mutacao_delta_normal_0_05():
     # forma de normal com desvio 0.5: ~68.3% dos deltas dentro de 1 desvio, ~50% de cada sinal
     assert 0.63 < np.mean(np.abs(deltas) < 0.5) < 0.73
     assert 0.45 < np.mean(deltas > 0) < 0.55
+
+
+def test_torneio_de_3():
+    random.seed(2)
+    ranqueada = [(i, i) for i in range(99, -1, -1)]  # (indice, score), 100 scores distintos
+    vencedores = _ag().selecao(ranqueada, 5000)
+    assert len(vencedores) == 5000
+    # maximo de 3 sorteados entre 100: posicao media esperada 0.75 da escala
+    assert 0.72 < np.mean(vencedores) / 99 < 0.78
+
+
+def test_torneio_populacao_menor_que_3():
+    ranqueada = [(1, 9.0), (0, 2.0)]
+    assert _ag().selecao(ranqueada, 50) == [1] * 50

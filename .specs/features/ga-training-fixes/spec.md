@@ -137,26 +137,26 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
 | INIT-01 | P1: População inicial reativa (critério 1) | - | Superseded by INIT-02 |
-| INIT-02 | P1: População inicial reativa (critério 7) | Execute | Implementing |
-| INIT-03 | P1: População inicial reativa (critério 8) | Execute | Implementing |
-| SENS-01 | P1: População inicial reativa (critério 2) | Execute | Implementing |
-| SENS-02 | P1: População inicial reativa (critério 3) | Execute | Implementing |
-| SENS-03 | P1: População inicial reativa (critério 4) | Execute | Implementing |
-| SENS-04 | P1: População inicial reativa (critério 5) | Execute | Implementing |
-| SENS-05 | P1: População inicial reativa (critério 6) | Execute | Implementing |
-| AGT-01 | P1: Operadores genéticos (critério 1) | Execute | Implementing |
-| AGT-02 | P1: Operadores genéticos (critério 2) | Execute | Implementing |
-| AGT-03 | P1: Operadores genéticos (critério 3) | Execute | Implementing |
-| AGT-04 | P1: Operadores genéticos (critério 4) | Execute | Implementing |
-| MUT-01 | P1: Operadores genéticos (critério 5) | Execute | Implementing |
-| MUT-02 | P1: Operadores genéticos (critério 6) | Execute | Implementing |
-| MUT-03 | P1: Operadores genéticos (critério 7) | Execute | Implementing |
-| FIT-01 | P1: Fitness independente (critério 1) | Execute | Implementing |
-| FIT-02 | P1: Fitness independente (critério 2) | Execute | Implementing |
-| LOG-01 | P2: Treino reproduzível (critério 1) | Execute | Implementing |
-| LOG-02 | P2: Treino reproduzível (critério 2) | Execute | Implementing |
-| LOG-03 | P2: Treino reproduzível (critério 3) | Execute | Implementing |
-| LOG-04 | P2: Treino reproduzível (critério 4) - acrescentado na verificação: população, crossover e mutação usam `np.random`, que o treino não semeava | Execute | Implementing |
+| INIT-02 | P1: População inicial reativa (critério 7) | Execute | Verified |
+| INIT-03 | P1: População inicial reativa (critério 8) | Execute | Verified |
+| SENS-01 | P1: População inicial reativa (critério 2) | Execute | Verified |
+| SENS-02 | P1: População inicial reativa (critério 3) | Execute | Verified |
+| SENS-03 | P1: População inicial reativa (critério 4) | Execute | Verified |
+| SENS-04 | P1: População inicial reativa (critério 5) | Execute | Verified |
+| SENS-05 | P1: População inicial reativa (critério 6) | Execute | Verified |
+| AGT-01 | P1: Operadores genéticos (critério 1) | Execute | Verified |
+| AGT-02 | P1: Operadores genéticos (critério 2) | Execute | Verified |
+| AGT-03 | P1: Operadores genéticos (critério 3) | Execute | Verified |
+| AGT-04 | P1: Operadores genéticos (critério 4) | Execute | Verified |
+| MUT-01 | P1: Operadores genéticos (critério 5) | Execute | Verified |
+| MUT-02 | P1: Operadores genéticos (critério 6) | Execute | Verified |
+| MUT-03 | P1: Operadores genéticos (critério 7) | Execute | Verified |
+| FIT-01 | P1: Fitness independente (critério 1) | Execute | Verified |
+| FIT-02 | P1: Fitness independente (critério 2) | Execute | Verified |
+| LOG-01 | P2: Treino reproduzível (critério 1) | Execute | Verified |
+| LOG-02 | P2: Treino reproduzível (critério 2) | Execute | Verified |
+| LOG-03 | P2: Treino reproduzível (critério 3) | Execute | Verified |
+| LOG-04 | P2: Treino reproduzível (critério 4) - acrescentado na verificação: população, crossover e mutação usam `np.random`, que o treino não semeava | Execute | Verified |
 
 **Coverage:** 21 total, 20 mapped to tasks, 1 superseded (INIT-01), 0 unmapped.
 

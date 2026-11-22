@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: none - fase Design pulada; as decisões de estrutura estão em "Design inline" abaixo
-**Status**: In Progress - 11/11 tarefas feitas, em verificação
+**Status**: Done
 **Approved**: 2026-11-22 - user: "1. Aprova. 2. .gitignore"
 **Build**: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py`
 **Run unit**: `python -m pytest test_ga.py -v`
@@ -394,7 +394,7 @@ Proof: run unit | test_ga.py::test_treino_interrompido_mantem_melhor PASSED
 ## Handoff
 
 **Settled mid-build:** 2026-11-22 - `graphify-out/` vai para o `.gitignore`, não para o commit de base (usuário: "2. .gitignore"). Execução inline, sem sub-agentes: oferta feita junto com o plano ("executo as 11 tarefas nesta sessão, sem sub-agentes"), usuário: "1. Aprova."
-**Dispatched:** Verifier (sub-agente independente) em `HEAD` 29bd2d1, 2026-11-22 - returned: FAIL, 5 achados. 4 fechados por afd3b92, ca0f22c, 285d3e9, b613ccd. Aberto: meta de 70 redes reativas em 350 não atingida (medido: ~8); decisão do usuário.
+**Dispatched:** Verifier (sub-agente independente) em `HEAD` 29bd2d1, 2026-11-22 - returned: FAIL, 5 achados. 4 fechados por afd3b92, ca0f22c, 285d3e9, b613ccd. Meta de redes reativas: usuário escolheu pesos `normal(0, 4)` e meta de 35 em 350 ("Aprovo, pode prosseguir."), fechado por 27037c2.
 **Walked:** none - a feature não tem tela nova
 
 ---

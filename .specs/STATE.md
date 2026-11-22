@@ -54,11 +54,11 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 
 ## Handoff
 
-- **Feature**: `.specs/features/ga-training-fixes/` - spec e tasks aprovadas; 11/11 tarefas commitadas
-- **Phase / Task**: Execute - verificação; 1 achado do Verifier aberto
-- **Completed**: T1-T11; achados 2-5 do Verifier fechados (afd3b92, ca0f22c, 285d3e9, b613ccd)
+- **Feature**: `.specs/features/ga-training-fixes/` - concluída em 2026-11-22
+- **Phase / Task**: Execute encerrado: 11/11 tarefas, 5 achados do Verifier fechados, gate final verde
+- **Completed**: T1-T11; achados fechados por afd3b92, ca0f22c, 285d3e9, b613ccd, 27037c2
 - **In-progress** (file:line): none
-- **Next step**: Usuário decide o achado 1 (meta de 70 redes reativas em 350 não atingida; medido ~8 com `normal(0, 1)`, ~45 com pesos `normal(0, 4)` e bias `normal(0, 1)`). Depois: fechar o achado em `verification.md`, `check_proofs.py`, `validate_verification.py`, lições.
-- **Blockers**: decisão do usuário sobre o achado 1
+- **Next step**: Nenhum nesta feature. Candidatas a próxima: treino sem renderização com cálculo em lote das redes; modo "assistir o melhor dino"; limpeza de código morto (`AGT`, `SGD`, `acasala0`, `acasala2`) e dos arquivos `AGMLP`, `np`, `profile`.
+- **Blockers**: none
 - **Uncommitted files**: none
 - **Branch**: master (commits locais, sem push)

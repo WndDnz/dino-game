@@ -283,9 +283,45 @@ def test_treino_com_janela_desenha_dinos_e_hud(jogo, monkeypatch):
     no_chao = [d for d in jogo.dinoArray if not d.isJumping and not d.isDucking]
     assert no_chao, "ao menos um dino em pe no chao para conferir o desenho"
     assert _cores(jogo.screen, no_chao[0].rect.clip(tela)) != {DinoGame.BG_COLOR}
-    hud = pygame.Rect(0, 0, tela.width, 34)  # as duas linhas de texto de cada lado
-    assert (255, 0, 0) in _cores(jogo.screen, hud)  # vivos e melhor da geracao anterior
-    assert (0, 0, 255) in _cores(jogo.screen, hud)  # sensores e pontuacao
+    # os quatro itens do HUD, cada um no seu lugar e na sua cor
+    VERMELHO, AZUL = (255, 0, 0), (0, 0, 255)
+    fonte = pygame.freetype.SysFont("Input", 12)
+    vivos = fonte.get_rect("Alive: 5/5")
+    vivos.topright = tela.topright
+    vivos.move_ip(-2, 2)
+    melhor = fonte.get_rect("Best fitness (prev gen): 123")
+    melhor.topright = vivos.bottomright
+    melhor.move_ip(0, 2)
+    sensores = pygame.Rect(2, 2, 250, vivos.height)
+    pontos = pygame.Rect(2, sensores.bottom + 2, 120, vivos.height)
+    assert vivos.bottom <= melhor.top and sensores.bottom <= pontos.top  # areas separadas
+    assert VERMELHO in _cores(jogo.screen, vivos)
+    assert VERMELHO in _cores(jogo.screen, melhor)
+    assert AZUL in _cores(jogo.screen, sensores)
+    assert AZUL in _cores(jogo.screen, pontos)
+    # e o texto de cada um
+    textos = []
+    sysfont = pygame.freetype.SysFont
+
+    class _Fonte:
+        def __init__(self, *args):
+            self.fonte = sysfont(*args)
+
+        def get_rect(self, texto):
+            return self.fonte.get_rect(texto)
+
+        def render_to(self, tela, pos, texto, cor):
+            textos.append(texto)
+            return self.fonte.render_to(tela, pos, texto, cor)
+
+    monkeypatch.setattr(pygame.freetype, "SysFont", _Fonte)
+    with pytest.raises(_Fim):
+        jogo.roda_geracao(_redes(5), janela=True)
+    ultimo_frame = textos[-4:]
+    assert ultimo_frame[0] == "Alive: 5/5"
+    assert ultimo_frame[1].startswith("Senses: l: ") and " nl: " in ultimo_frame[1] and " s: " in ultimo_frame[1]
+    assert ultimo_frame[2] == "Best fitness (prev gen): 123"
+    assert ultimo_frame[3] == "Current Score: 4"  # 28 frames completos // 7
     assert len(jogo.clock.fps) == 29  # um limite de FPS por frame completo; o 30o foi interrompido no meio
 
 

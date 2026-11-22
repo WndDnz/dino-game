@@ -260,9 +260,9 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_colisoes_mesmo_frame`: 10 dinos sobre um cacto; uma chamada deixa a lista vazia e `ranked` com 10 entradas, uma por rede
-- [ ] Gate check passes: `python -m pytest test_ga.py -v`
-- [ ] Test count: 18 tests pass
+- [x] `test_colisoes_mesmo_frame`: 10 dinos sobre um cacto; uma chamada deixa a lista vazia e `ranked` com 10 entradas, uma por rede
+- [x] Gate check passes: `python -m pytest test_ga.py -v`
+- [x] Test count: 18 tests pass
 
 **Tests**: unit
 **Gate**: quick

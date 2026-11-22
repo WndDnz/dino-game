@@ -461,14 +461,7 @@ class DinoGame:
                 pte = None
                 for c in cacti:
                     c.movement[0] = -1 * gamespeed
-                    for d in self.dinoArray:
-                        if pygame.sprite.collide_mask(d, c):
-                            d.isDead = True
-                            # print("I'm dead... My score: ", d.score)
-                            rankedBrains.append((d.score, d.brain))
-                            self.dinoArray.remove(d)
-                            if pygame.mixer.get_init() is not None:
-                                DinoGame.die_sound.play()
+                    remove_colididos(self.dinoArray, c, rankedBrains)
 
                     if cac is None:
                         cac = c
@@ -478,14 +471,7 @@ class DinoGame:
 
                 for p in pteras:
                     p.movement[0] = -1 * gamespeed
-                    for d in self.dinoArray:
-                        if pygame.sprite.collide_mask(d, p):
-                            d.isDead = True
-                            # print("I'm dead... My score: ", d.score)
-                            rankedBrains.append((d.score, d.brain))
-                            self.dinoArray.remove(d)
-                            if pygame.mixer.get_init() is not None:
-                                DinoGame.die_sound.play()
+                    remove_colididos(self.dinoArray, p, rankedBrains)
                     if pte is None:
                         pte = p
                     else:
@@ -686,6 +672,21 @@ def sensores(dino, cac, pte, gamespeed):
     else:
         ds = 0.0
     return np.array([[l], [nl], [na], [ds], [gamespeed / 20]])
+
+
+def remove_colididos(dinos, obstaculo, ranked):
+    """
+    Tira de `dinos` todos os que colidem com `obstaculo` e registra (score, rede)
+    de cada um em `ranked`. Itera sobre uma cópia: remover durante a iteração
+    pulava o dino seguinte.
+    """
+    for d in dinos[:]:
+        if pygame.sprite.collide_mask(d, obstaculo):
+            d.isDead = True
+            ranked.append((d.score, d.brain))
+            dinos.remove(d)
+            if pygame.mixer.get_init() is not None:
+                DinoGame.die_sound.play()
 
 
 class Dino:

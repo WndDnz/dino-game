@@ -207,3 +207,20 @@ def test_pulo_sem_mixer(jogo):
     assert dino.rect.bottom == int(0.98 * DinoGame.DinoGame.height)  # no chao
     dino.agir(np.array([[0.9], [0.1]]))
     assert dino.movement[1] == -dino.jumpSpeed
+
+
+def test_colisoes_mesmo_frame(jogo):
+    dinos = [DinoGame.Dino(44, 47) for _ in range(10)]
+    for i, d in enumerate(dinos):
+        d.score, d.brain = i, RedeNeural.RedeNeural(CFG)
+    redes = [d.brain for d in dinos]
+    cac = DinoGame.Cactus(4, 40, 40)
+    cac.rect.left = dinos[0].rect.left  # cacto em cima dos 10 dinos
+    no_ar = DinoGame.Dino(44, 47)  # este pulou: nao colide e deve continuar vivo
+    no_ar.rect.bottom, no_ar.brain = 20, RedeNeural.RedeNeural(CFG)
+    vivos, ranked = dinos + [no_ar], []
+    DinoGame.remove_colididos(vivos, cac, ranked)
+    assert vivos == [no_ar]
+    assert len(ranked) == 10
+    assert [score for score, _ in ranked] == list(range(10))
+    assert all(sum(r is rede for _, r in ranked) == 1 for rede in redes)

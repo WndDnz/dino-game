@@ -149,11 +149,11 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_mutacao_taxa_1_altera_todos`: todos os pesos e bias diferem do original
-- [ ] `test_mutacao_taxa_0_nao_altera`: rede idêntica ao original
-- [ ] `test_mutacao_delta_normal_0_05`: em 1000 genes ou mais com taxa 1.0, média dos deltas entre −0.1 e 0.1, desvio entre 0.4 e 0.6, e há deltas dos dois sinais
-- [ ] Gate check passes: `python -m pytest test_ga.py -v`
-- [ ] Test count: 5 tests pass
+- [x] `test_mutacao_taxa_1_altera_todos`: todos os pesos e bias diferem do original
+- [x] `test_mutacao_taxa_0_nao_altera`: rede idêntica ao original
+- [x] `test_mutacao_delta_normal_0_05`: em 1000 genes ou mais com taxa 1.0, média dos deltas entre −0.1 e 0.1, desvio entre 0.4 e 0.6, e há deltas dos dois sinais
+- [x] Gate check passes: `python -m pytest test_ga.py -v`
+- [x] Test count: 5 tests pass
 
 **Tests**: unit
 **Gate**: quick

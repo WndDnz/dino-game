@@ -34,3 +34,42 @@ def test_init_normal_0_1():
     assert 0.95 < pesos.std() < 1.05
     assert -0.1 < bias.mean() < 0.1
     assert 0.9 < bias.std() < 1.1
+
+
+def _ag(n=50, elite=0.1):
+    return AGMLP.RNA_AG(CFG, None, 0.1, n, 1, taxaMutacao=0.05, elite=elite)
+
+
+def _copia(rede):
+    return [a.copy() for a in rede.bias + rede.pesos]
+
+
+def test_mutacao_taxa_1_altera_todos():
+    rede = RedeNeural.RedeNeural(CFG)
+    antes = _copia(rede)
+    _ag().aplicaMutacao(rede, 1.0)
+    for a, d in zip(antes, rede.bias + rede.pesos):
+        assert np.all(a != d)
+
+
+def test_mutacao_taxa_0_nao_altera():
+    rede = RedeNeural.RedeNeural(CFG)
+    antes = _copia(rede)
+    _ag().aplicaMutacao(rede, 0.0)
+    for a, d in zip(antes, rede.bias + rede.pesos):
+        assert np.array_equal(a, d)
+
+
+def test_mutacao_delta_normal_0_05():
+    np.random.seed(1)
+    ag, deltas = _ag(), []
+    for _ in range(20):  # 20 redes x 94 genes = 1880 genes
+        rede = RedeNeural.RedeNeural(CFG)
+        antes = _copia(rede)
+        ag.aplicaMutacao(rede, 1.0)
+        deltas += [(d - a).ravel() for a, d in zip(antes, rede.bias + rede.pesos)]
+    deltas = np.concatenate(deltas)
+    assert deltas.size >= 1000
+    assert -0.1 < deltas.mean() < 0.1
+    assert 0.4 < deltas.std() < 0.6
+    assert (deltas > 0).any() and (deltas < 0).any()

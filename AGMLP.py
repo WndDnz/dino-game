@@ -225,24 +225,14 @@ class RNA_AG:
         filhos += [self.acasala(pool[i], pool[len(pais) - i - 1]) for i in range(tam)]
         return filhos
 
-    def aplicaMutacao(self, individuo, taxaMutacao):
+    def aplicaMutacao(self, individuo, taxaMutacao, sigma=0.5):
         """
-        Aplicamos a mutação, variando conforme a taxa, valores de cada cromossomo.
+        Mutação gaussiana: cada gene (peso ou bias) recebe + N(0, sigma) com
+        probabilidade taxaMutacao.
         """
-        camadas = individuo.ncamadas - 1
-        camadas = individuo.ncamadas - 1
-        for c in range(camadas):
-            for b in range(individuo.bias[c].shape[0]):
-                if random.random() < taxaMutacao:
-                    # v = np.array([random.random()])
-                    individuo.bias[c][b][0] *= np.random.random()
-                if random.random() < taxaMutacao:
-                    v = np.array([random.random()])
-                    individuo.bias[c][b] = v
-            for w in range(individuo.pesos[c].shape[0]):
-                if random.random() < taxaMutacao:
-                    ind = random.randint(0, individuo.pesos[c][w].shape[0] - 1)
-                    individuo.pesos[c][w][ind] *= np.random.random()
+        for genes in individuo.bias + individuo.pesos:
+            mascara = np.random.random(genes.shape) < taxaMutacao
+            genes += mascara * np.random.normal(0.0, sigma, genes.shape)
         return individuo
 
     def mutacaoPopulacao(self, populacao, taxaMutacao):

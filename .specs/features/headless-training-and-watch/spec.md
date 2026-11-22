@@ -91,6 +91,7 @@ O treino só roda com janela, desenhando 350 dinos e o HUD a cada frame, e o tem
 8. WHERE `--semente S` é informado, o jogo SHALL chamar `random.seed(S)` no início de cada partida.
 9. IF o arquivo indicado não existe THEN o jogo SHALL imprimir `Arquivo não encontrado: <caminho>` e encerrar com código de saída 1, sem abrir janela.
 10. IF o arquivo não contém uma `RedeNeural` de topologia `(5, 8, 4, 2)` THEN o jogo SHALL imprimir `Arquivo inválido: <caminho>` e encerrar com código de saída 1, sem abrir janela.
+11. IF o caminho indicado existe mas não abre como arquivo THEN o jogo SHALL imprimir `Arquivo inválido: <caminho>` e encerrar com código de saída 1, sem abrir janela. (Acrescentado na verificação: uma pasta dava traceback.)
 
 **Independent Test**: Treinar 2 gerações, rodar `python autodino.py --assistir` e ver um dino jogando sozinho, com a pontuação subindo, até colidir; ESPAÇO recomeça, ESC fecha.
 
@@ -175,6 +176,7 @@ O treino só roda com janela, desenhando 350 dinos e o HUD a cada frame, e o tem
 | WATCH-08 | P1: Assistir (critério 8) | Tasks | In Tasks |
 | WATCH-09 | P1: Assistir (critério 9) | Tasks | In Tasks |
 | WATCH-10 | P1: Assistir (critério 10) | Tasks | In Tasks |
+| WATCH-11 | P1: Assistir (critério 11, acrescentado na verificação) | Tasks | In Tasks |
 | WIN-01 | P1: Treino com janela (critério 1) | Tasks | In Tasks |
 | WIN-02 | P1: Treino com janela (critério 2) | Tasks | In Tasks |
 | TRACK-01 | P1: Pista única (critério 1) | Tasks | In Tasks |
@@ -186,7 +188,7 @@ O treino só roda com janela, desenhando 350 dinos e o HUD a cada frame, e o tem
 | HEAD-08 | Edge case 3 | Tasks | In Tasks |
 | CLI-03 | Edge case 4 (acrescentado na verificação) | Tasks | In Tasks |
 
-**Coverage:** 26 total, 26 mapped to tasks, 0 unmapped.
+**Coverage:** 28 total, 28 mapped to tasks, 0 unmapped.
 
 ---
 

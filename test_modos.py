@@ -923,3 +923,12 @@ def test_semente_fora_da_faixa_e_erro_de_uso(pasta, monkeypatch, capsys, valor):
     monkeypatch.setattr(DinoGame.DinoGame, "introscreen", lambda self: False)
     assert autodino.main(["--semente", "0"]) == 0 and autodino.main(["--semente", "4294967295"]) == 0
     assert [c["semente"] for c in chamadas] == [0, 4294967295]
+
+
+def test_assistir_caminho_que_nao_e_arquivo(pasta, monkeypatch, capsys):
+    janelas, partidas = _sem_janela_criada(monkeypatch), _espia_assistir(monkeypatch)
+    with pytest.raises(ValueError):
+        DinoGame.carrega_rede("sprites")  # uma pasta
+    assert autodino.main(["--assistir", "sprites"]) == 1
+    assert capsys.readouterr().out.splitlines() == ["Arquivo inválido: sprites"]
+    assert janelas == [] and partidas == []

@@ -366,6 +366,9 @@ Proof: run unit | test_modos.py::test_assistir_arquivo_inexistente PASSED
 **C18** - Arquivo que não é uma rede `(5, 8, 4, 2)`: `Arquivo inválido: <caminho>`, código 1, sem janela (WATCH-10, AC 10)
 Proof: run unit | test_modos.py::test_assistir_arquivo_invalido PASSED
 
+**C30** - Caminho que existe mas não abre como arquivo (uma pasta): `Arquivo inválido: <caminho>`, código 1, sem janela (WATCH-11, AC 11)
+Proof: run unit | test_modos.py::test_assistir_caminho_que_nao_e_arquivo PASSED
+
 **C19** - Sem opções: tela inicial e depois treino de 350 dinos por 30 gerações com janela (WIN-01, AC 1)
 Proof: run unit | test_modos.py::test_sem_opcoes_treina_350_por_30_com_janela PASSED
 

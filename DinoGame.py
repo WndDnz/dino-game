@@ -621,7 +621,13 @@ def carrega_rede(caminho):
     ValueError se não for uma rede de topologia (5, 8, 4, 2).
     O arquivo é pickle: abrir um arquivo de terceiros executa código.
     """
-    with open(caminho, "rb") as f:
+    try:
+        f = open(caminho, "rb")
+    except FileNotFoundError:
+        raise
+    except OSError as erro:  # existe mas não abre como arquivo: uma pasta, sem permissão
+        raise ValueError(caminho) from erro
+    with f:
         try:
             rede = pickle.load(f)
         except Exception as erro:  # pickle levanta tipos variados para arquivo corrompido

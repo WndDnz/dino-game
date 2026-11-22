@@ -175,3 +175,63 @@ def test_sensor_vale_1_quando_cactos_passaram(jogo):
     assert no_limite.rect.right == dino.rect.left
     assert _l(dino, [no_limite]) == pytest.approx((0 - 84) / 600)
     assert _l(dino, [_cacto(-1)]) == 1.0  # um pixel depois, passou
+
+
+class _Fim(Exception):
+    pass
+
+
+class _Relogio:
+    """No lugar de pygame.time.Clock: nao espera, so anota o FPS pedido."""
+
+    def __init__(self):
+        self.fps = []
+
+    def tick(self, fps=0):
+        self.fps.append(fps)
+
+
+def _grava_pista(monkeypatch, frames):
+    """Espiona Pista.passo: devolve o log [(frame, tipo, x, y)] dos obstaculos criados e
+    levanta _Fim quando a pista chega a `frames` frames."""
+    log, vistos = [], set()
+    passo = DinoGame.Pista.passo
+
+    def espia(self):
+        frame = self.counter
+        passo(self)
+        for o in (*self.cacti, *self.pteras):
+            if o not in vistos:
+                vistos.add(o)
+                log.append((frame, type(o).__name__, o.rect.x, o.rect.y))
+        if self.counter >= frames:
+            raise _Fim
+
+    monkeypatch.setattr(DinoGame.Pista, "passo", espia)
+    return log
+
+
+def _pista_sozinha(monkeypatch, semente, frames):
+    log = _grava_pista(monkeypatch, frames)
+    random.seed(semente)
+    pista = DinoGame.Pista()
+    with pytest.raises(_Fim):
+        while True:
+            pista.passo()
+    return list(log)
+
+
+def _sem_colisao(monkeypatch):
+    monkeypatch.setattr(pygame.sprite, "collide_mask", lambda a, b: None)
+
+
+def test_jogo_manual_usa_a_pista(jogo, monkeypatch):
+    esperado = _pista_sozinha(monkeypatch, 11, 1500)
+    assert len(esperado) > 10 and any(tipo == "Ptera" for _, tipo, _, _ in esperado)
+    log = _grava_pista(monkeypatch, 1500)
+    _sem_colisao(monkeypatch)
+    jogo.clock = _Relogio()
+    random.seed(11)
+    with pytest.raises(_Fim):
+        jogo.gameplay()
+    assert log == esperado

@@ -177,24 +177,13 @@ class DinoGame:
 
     def gameplay(self):
         DinoGame.FPS = 60
-        gamespeed = 4
         startMenu = False
         gameOver = False
         gameQuit = False
         self.playerDino = Dino(44, 47)
-        new_ground = Ground(-1 * gamespeed)
+        pista = Pista()
         scb = Scoreboard()
         highsc = Scoreboard(self.width * 0.78)
-        counter = 0
-
-        cacti = pygame.sprite.Group()
-        pteras = pygame.sprite.Group()
-        clouds = pygame.sprite.Group()
-        last_obstacle = pygame.sprite.Group()
-
-        Cactus.containers = cacti
-        Ptera.containers = pteras
-        Cloud.containers = clouds
 
         retbutton_image, retbutton_rect = self.load_image(
             "replay_button.png", 35, 31, -1
@@ -259,75 +248,24 @@ class DinoGame:
                         if event.type == pygame.KEYUP:
                             if event.key == pygame.K_DOWN:
                                 self.playerDino.isDucking = False
-                for c in cacti:
-                    c.movement[0] = -1 * gamespeed
-                    if pygame.sprite.collide_mask(self.playerDino, c):
+                for obstaculo in (*pista.cacti, *pista.pteras):
+                    if pygame.sprite.collide_mask(self.playerDino, obstaculo):
                         self.playerDino.isDead = True
                         if pygame.mixer.get_init() is not None:
                             DinoGame.die_sound.play()
 
-                for p in pteras:
-                    p.movement[0] = -1 * gamespeed
-                    if pygame.sprite.collide_mask(self.playerDino, p):
-                        self.playerDino.isDead = True
-                        if pygame.mixer.get_init() is not None:
-                            DinoGame.die_sound.play()
-
-                if len(cacti) < 2:
-                    if len(cacti) == 0:
-                        last_obstacle.empty()
-                        last_obstacle.add(Cactus(gamespeed, 40, 40))
-                    else:
-                        for last in last_obstacle:
-                            if (
-                                (
-                                last.rect.right < self.width * 0.7
-                               
-                                and random.randrange(0, 50) == 10
-                            )
-                            ):
-                                last_obstacle.empty()
-                                last_obstacle.add(Cactus(gamespeed, 40, 40))
-
-                if (
-                    (
-                    len(pteras) == 0
-                   
-                    and random.randrange(0, 200) == 10
-                   
-                    and counter > 700
-                )
-                ):
-                    for last in last_obstacle:
-                        if last.rect.right < self.width * 0.8:
-                            last_obstacle.empty()
-                            last_obstacle.add(Ptera(gamespeed, 46, 40))
-
-                if len(clouds) < 5 and random.randrange(0, 300) == 10:
-                    Cloud(
-                        
-                        self.width, random.randrange(self.height / 5, self.height / 2)
-                    
-                    )
-
+                pista.passo()
                 self.playerDino.update()
-                cacti.update()
-                pteras.update()
-                clouds.update()
-                new_ground.update()
                 scb.update(self.playerDino.score)
                 highsc.update(self.high_score)
 
                 if pygame.display.get_surface() is not None:
                     self.screen.fill(BG_COLOR)
-                    new_ground.draw(self.screen)
-                    clouds.draw(self.screen)
+                    pista.desenha(self.screen)
                     scb.draw(self.screen)
                     if self.high_score != 0:
                         highsc.draw(self.screen)
                         self.screen.blit(HI_image, HI_rect)
-                    cacti.draw(self.screen)
-                    pteras.draw(self.screen)
                     self.playerDino.draw(self.screen)
 
                     pygame.display.update()
@@ -337,12 +275,6 @@ class DinoGame:
                     gameOver = True
                     if self.playerDino.score > DinoGame.high_score:
                         DinoGame.high_score = self.playerDino.score
-
-                if counter % 700 == 699:
-                    new_ground.speed -= 1
-                    gamespeed += 1
-
-                counter = counter + 1
 
             if gameQuit:
                 break

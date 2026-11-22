@@ -168,9 +168,9 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_jogo_manual_usa_a_pista`: com a mesma semente e colisões desligadas, a sequência (frame, tipo, posição) dos obstáculos criados em 1500 frames de `gameplay` é igual à de uma `Pista` rodada sozinha
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 8 de `test_modos.py` passam
+- [x] `test_jogo_manual_usa_a_pista`: com a mesma semente e colisões desligadas, a sequência (frame, tipo, posição) dos obstáculos criados em 1500 frames de `gameplay` é igual à de uma `Pista` rodada sozinha
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 8 de `test_modos.py` passam
 
 **Tests**: integration
 **Gate**: full

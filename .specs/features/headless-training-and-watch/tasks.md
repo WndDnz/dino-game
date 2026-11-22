@@ -237,11 +237,11 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_carrega_rede_devolve_a_rede_salva`: pesos e bias iguais aos da rede gravada
-- [ ] `test_carrega_rede_arquivo_inexistente_levanta`: `FileNotFoundError`
-- [ ] `test_carrega_rede_arquivo_invalido_levanta`: `ValueError` para rede `(5, 4, 2)`, para um objeto que não é `RedeNeural` e para um arquivo que não é pickle
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 18 de `test_modos.py` passam
+- [x] `test_carrega_rede_devolve_a_rede_salva`: pesos e bias iguais aos da rede gravada
+- [x] `test_carrega_rede_arquivo_inexistente_levanta`: `FileNotFoundError`
+- [x] `test_carrega_rede_arquivo_invalido_levanta`: `ValueError` para rede `(5, 4, 2)`, para um objeto que não é `RedeNeural` e para um arquivo que não é pickle
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 18 de `test_modos.py` passam
 
 **Tests**: unit
 **Gate**: quick

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+import pickle
 import pygame
 import pygame.freetype
 import random
@@ -599,6 +600,22 @@ class Pista:
         self.clouds.draw(screen)
         self.cacti.draw(screen)
         self.pteras.draw(screen)
+
+
+def carrega_rede(caminho):
+    """
+    A RedeNeural salva em `caminho`. FileNotFoundError se o arquivo não existe;
+    ValueError se não for uma rede de topologia (5, 8, 4, 2).
+    O arquivo é pickle: abrir um arquivo de terceiros executa código.
+    """
+    with open(caminho, "rb") as f:
+        try:
+            rede = pickle.load(f)
+        except Exception as erro:  # pickle levanta tipos variados para arquivo corrompido
+            raise ValueError(caminho) from erro
+    if not isinstance(rede, RedeNeural.RedeNeural) or tuple(rede.tamanhos) != (5, 8, 4, 2):
+        raise ValueError(caminho)
+    return rede
 
 
 def cacto_a_frente(dino, cacti):

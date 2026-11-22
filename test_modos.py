@@ -389,3 +389,35 @@ def test_sem_janela_interrompido_mantem_melhor(jogo, monkeypatch, tmp_path, caps
     with open(tmp_path / "bestDino.din", "rb") as f:
         salva = pickle.load(f)
     assert all(np.array_equal(a, b) for a, b in zip(salva.pesos + salva.bias, melhor.pesos + melhor.bias))
+
+
+def _mesma_rede(a, b):
+    return all(np.array_equal(x, y) for x, y in zip(a.pesos + a.bias, b.pesos + b.bias))
+
+
+def test_carrega_rede_devolve_a_rede_salva(tmp_path):
+    rede = RedeNeural.RedeNeural(CFG)
+    caminho = str(tmp_path / "rede.din")
+    RedeNeural.RedeNeural.save_object(rede, caminho)
+    carregada = DinoGame.carrega_rede(caminho)
+    assert isinstance(carregada, RedeNeural.RedeNeural)
+    assert _mesma_rede(carregada, rede)
+
+
+def test_carrega_rede_arquivo_inexistente_levanta(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        DinoGame.carrega_rede(str(tmp_path / "nao_existe.din"))
+
+
+def test_carrega_rede_arquivo_invalido_levanta(tmp_path):
+    outra_topologia = str(tmp_path / "pequena.din")
+    RedeNeural.RedeNeural.save_object(RedeNeural.RedeNeural((5, 4, 2)), outra_topologia)
+    outro_objeto = str(tmp_path / "lista.din")
+    RedeNeural.RedeNeural.save_object([1, 2, 3], outro_objeto)
+    nao_pickle = tmp_path / "texto.din"
+    nao_pickle.write_text("isto nao e uma rede")
+    vazio = tmp_path / "vazio.din"
+    vazio.write_bytes(b"")
+    for caminho in (outra_topologia, outro_objeto, str(nao_pickle), str(vazio)):
+        with pytest.raises(ValueError):
+            DinoGame.carrega_rede(caminho)

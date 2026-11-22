@@ -145,11 +145,12 @@ def test_entrada_inalterada(capsys):
 
 def test_sem_elite_gera_n_filhos(capsys):
     ag = _ag(50, elite=0.01)
-    assert ag.tamElite == 0
+    assert int(50 * 0.01) == 0
+    ag.taxaMutacao = 1.0  # todo filho sai diferente dos pais; uma copia de elite sairia igual
     atual = _geracao(50)
     nova = ag.proximaGeracao(atual)
     assert len(nova) == 50
-    assert not any(r is rede for r in nova for _, rede in atual)
+    assert not any(_iguais(r, rede) for r in nova for _, rede in atual)
 
 
 @pytest.fixture

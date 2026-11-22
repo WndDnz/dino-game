@@ -354,6 +354,9 @@ Proof: run unit | test_modos.py::test_assistir_espaco_reinicia_com_a_mesma_rede 
 **C15** - ESC ou fechar a janela encerra com código 0 (WATCH-07, AC 7)
 Proof: run unit | test_modos.py::test_assistir_esc_encerra_com_codigo_0 PASSED
 
+**C28** - O processo `autodino.py --assistir` sai com código 0 quando o usuário aperta ESC ou fecha a janela (WATCH-07, AC 7)
+Proof: run unit | test_modos.py::test_assistir_processo_sai_com_codigo_0[pygame.event.Event(pygame.QUIT)] PASSED
+
 **C16** - Com `--semente S`, cada partida começa com `random.seed(S)` (WATCH-08, AC 8)
 Proof: run unit | test_modos.py::test_assistir_semente_por_partida PASSED
 

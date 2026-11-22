@@ -892,3 +892,18 @@ def test_sem_janela_com_assistir_e_erro(pasta, monkeypatch, capsys):
         assert saida.value.code == 2
         assert "usage:" in capsys.readouterr().err
     assert chamadas == [] and partidas == []
+
+
+@pytest.mark.parametrize("evento", ["pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)", "pygame.event.Event(pygame.QUIT)"])
+def test_assistir_processo_sai_com_codigo_0(pasta, evento):
+    RedeNeural.RedeNeural.save_object(_rede_fixa(pula=False), "rede.din")
+    codigo = (
+        "import os, sys; os.environ['SDL_VIDEODRIVER'] = 'dummy'; os.environ['SDL_AUDIODRIVER'] = 'dummy'; "
+        f"sys.path.insert(0, {REPO!r}); import pygame, autodino, DinoGame; "
+        "passo = DinoGame.Pista.passo; "
+        f"DinoGame.Pista.passo = lambda self: (self.counter == 10 and pygame.event.post({evento}), passo(self))[1]; "
+        "sys.exit(autodino.main(['--assistir', 'rede.din']))"
+    )
+    p = _processo(pasta, ["-c", codigo])
+    assert p.returncode == 0, p.stderr
+    assert "Traceback" not in p.stderr

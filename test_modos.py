@@ -2,6 +2,7 @@
 
 import os
 import random
+import time
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 os.environ["SDL_AUDIODRIVER"] = "dummy"
@@ -235,3 +236,77 @@ def test_jogo_manual_usa_a_pista(jogo, monkeypatch):
     with pytest.raises(_Fim):
         jogo.gameplay()
     assert log == esperado
+
+
+def _redes(n, semente=0):
+    np.random.seed(semente)
+    return [RedeNeural.RedeNeural(CFG) for _ in range(n)]
+
+
+def test_roda_geracao_devolve_um_par_por_dino(jogo):
+    redes = _redes(10)
+    random.seed(1)
+    ranked = jogo.roda_geracao(redes, janela=False)
+    assert len(ranked) == 10
+    assert all(sum(r is rede for _, r in ranked) == 1 for rede in redes)
+    assert all(isinstance(score, int) and score > 0 for score, _ in ranked)
+    assert jogo.dinoArray == []
+
+
+def _cores(tela, area):
+    return {tuple(tela.get_at((x, y)))[:3] for x in range(area.left, area.right) for y in range(area.top, area.bottom)}
+
+
+def test_treino_com_janela_desenha_dinos_e_hud(jogo, monkeypatch):
+    DinoGame.DinoGame.train.currentBest = 123
+    SENTINELA = (1, 2, 3)
+    # sem janela: a tela nao e tocada
+    _grava_pista(monkeypatch, 30)
+    jogo.screen.fill(SENTINELA)
+    with pytest.raises(_Fim):
+        jogo.roda_geracao(_redes(5), janela=False)
+    assert _cores(jogo.screen, jogo.screen.get_rect()) == {SENTINELA}
+    # com janela: fundo, dino no lugar dele e HUD em vermelho e azul
+    jogo.clock = _Relogio()
+    jogo.screen.fill(SENTINELA)
+    with pytest.raises(_Fim):
+        jogo.roda_geracao(_redes(5), janela=True)
+    tela = jogo.screen.get_rect()
+    todas = _cores(jogo.screen, tela)
+    assert SENTINELA not in todas and DinoGame.BG_COLOR in todas
+    no_chao = [d for d in jogo.dinoArray if not d.isJumping and not d.isDucking]
+    assert no_chao, "ao menos um dino em pe no chao para conferir o desenho"
+    assert _cores(jogo.screen, no_chao[0].rect.clip(tela)) != {DinoGame.BG_COLOR}
+    hud = pygame.Rect(0, 0, tela.width, 34)  # as duas linhas de texto de cada lado
+    assert (255, 0, 0) in _cores(jogo.screen, hud)  # vivos e melhor da geracao anterior
+    assert (0, 0, 255) in _cores(jogo.screen, hud)  # sensores e pontuacao
+    assert len(jogo.clock.fps) == 29  # um limite de FPS por frame completo; o 30o foi interrompido no meio
+
+
+def _ms_por_frame(jogo, monkeypatch, janela, frames=120):
+    """Mediana do tempo entre passos da pista com 350 dinos vivos (o 1o cacto so chega no frame ~139)."""
+    instantes = []
+    passo = DinoGame.Pista.passo
+
+    def espia(self):
+        instantes.append(time.perf_counter())
+        passo(self)
+        if self.counter >= frames:
+            assert len(jogo.dinoArray) == 350
+            raise _Fim
+
+    monkeypatch.setattr(DinoGame.Pista, "passo", espia)
+    random.seed(0)
+    with pytest.raises(_Fim):
+        jogo.roda_geracao(_redes(350), janela=janela)
+    monkeypatch.setattr(DinoGame.Pista, "passo", passo)
+    return float(np.median(np.diff(instantes))) * 1000
+
+
+def test_sem_janela_metade_do_tempo(jogo, monkeypatch):
+    jogo.clock = _Relogio()
+    DinoGame.DinoGame.train.currentBest = 123
+    com = np.median([_ms_por_frame(jogo, monkeypatch, True) for _ in range(3)])
+    sem = np.median([_ms_por_frame(jogo, monkeypatch, False) for _ in range(3)])
+    print(f"com janela {com:.2f} ms/frame, sem janela {sem:.2f} ms/frame, razao {com / sem:.1f}")
+    assert sem <= com / 2

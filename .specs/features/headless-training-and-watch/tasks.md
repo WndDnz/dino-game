@@ -189,11 +189,11 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_roda_geracao_devolve_um_par_por_dino`: 10 redes, sem janela, devolve 10 pares, cada rede uma vez
-- [ ] `test_treino_com_janela_desenha_dinos_e_hud`: com janela (driver dummy), a tela tem pixels do dino na posição dele e pixels vermelhos e azuis do HUD; sem janela, a tela não é tocada
-- [ ] `test_sem_janela_metade_do_tempo`: com 350 dinos mantidos vivos por 150 frames, o tempo sem janela é no máximo 1/2 do tempo com janela (mediana de 3 medições)
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 11 de `test_modos.py` passam
+- [x] `test_roda_geracao_devolve_um_par_por_dino`: 10 redes, sem janela, devolve 10 pares, cada rede uma vez
+- [x] `test_treino_com_janela_desenha_dinos_e_hud`: com janela (driver dummy), a tela tem pixels do dino na posição dele e pixels vermelhos e azuis do HUD; sem janela, a tela não é tocada
+- [x] `test_sem_janela_metade_do_tempo`: com 350 dinos mantidos vivos por 150 frames, o tempo sem janela é no máximo 1/2 do tempo com janela (mediana de 3 medições)
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 11 de `test_modos.py` passam
 
 **Tests**: integration
 **Gate**: full

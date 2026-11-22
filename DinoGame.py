@@ -312,6 +312,112 @@ class DinoGame:
         pygame.quit()
         quit()
 
+    def roda_geracao(self, redes, janela=True):
+        """
+        Simula uma geração na Pista até todos os dinos morrerem e devolve a lista
+        [(score, rede)]. Com `janela`, trata eventos, desenha os dinos e o HUD e
+        limita o FPS; devolve None se o usuário fechou. Sem `janela`, só simula.
+        """
+        self.dinoArray.clear()
+        for rede in redes:
+            dino = Dino(44, 47)
+            dino.brain = rede
+            self.dinoArray.append(dino)
+        indice = {id(d): i for i, d in enumerate(self.dinoArray)}
+        W, B = RedeNeural.RedeNeural.empilha(redes)
+        ranked = []
+        pista = Pista()
+        ft_font = pygame.freetype.SysFont("Input", 12) if janela else None
+        cac = pte = None
+        senses = (0, 0, 0, 0, 0)
+
+        while self.dinoArray:
+            if janela and not self._eventos_treino():
+                return None
+
+            for obstaculo in (*pista.cacti, *pista.pteras):
+                remove_colididos(self.dinoArray, obstaculo, ranked)
+
+            if self.dinoArray:
+                # todos os dinos têm a mesma borda esquerda: o cacto à frente é um só
+                cac = cacto_a_frente(self.dinoArray[0], pista.cacti)
+                pte = min(pista.pteras, key=lambda p: p.rect.left, default=None)
+                entradas = np.stack(
+                    [sensores(d, cac, pte, pista.gamespeed) for d in self.dinoArray]
+                )
+                vivos = [indice[id(d)] for d in self.dinoArray]
+                acoes = RedeNeural.RedeNeural.feed_forward_lote(
+                    [w[vivos] for w in W], [b[vivos] for b in B], entradas
+                )
+                for dino, acao in zip(self.dinoArray, acoes):
+                    dino.agir(acao)
+                senses = entradas[-1].ravel()
+
+            pista.passo()
+            for dino in self.dinoArray:
+                dino.update()
+
+            if janela:
+                self._desenha_treino(pista, ft_font, len(redes), senses, cac or pte)
+                self.clock.tick(self.FPS)
+        return ranked
+
+    def _eventos_treino(self):
+        """Eventos do treino com janela. Devolve False se o usuário pediu para sair."""
+        if pygame.display.get_surface() is None:
+            print("Couldn't load display surface")
+            return False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            if event.type == pygame.KEYDOWN:
+                if event.key in (pygame.K_ESCAPE, pygame.K_q):
+                    return False
+                if event.key == pygame.K_RIGHT:
+                    DinoGame.accel += 1
+                    DinoGame.FPS *= DinoGame.accel
+                if event.key == pygame.K_LEFT:
+                    DinoGame.accel -= 1
+                    DinoGame.FPS *= DinoGame.accel
+        return True
+
+    def _desenha_treino(self, pista, ft_font, nIndividuals, senses, ha_obstaculo):
+        """Pista, dinos vivos e HUD: vivos, melhor da geração anterior, sensores e pontuação."""
+        l, nl, na, ds, s = senses
+        tela = self.screen.get_rect()
+
+        alive = f"Alive: {len(self.dinoArray)}/{nIndividuals}"
+        alive_rect = ft_font.get_rect(alive)
+        alive_rect.topright = tela.topright
+        alive_rect.move_ip(-2, 2)
+
+        best = f"Best fitness (prev gen): {DinoGame.train.currentBest}"
+        best_rect = ft_font.get_rect(best)
+        best_rect.topright = alive_rect.bottomright
+        best_rect.move_ip(0, 2)
+
+        sens = f"Senses: l: {l:.2f} nl: {nl:.2f} na: {na:.2f} d: {ds:.2f} s: {s}"
+        sens_rect = ft_font.get_rect(sens)
+        sens_rect.topleft = tela.topleft
+        sens_rect.move_ip(2, 2)
+
+        scr = f"Current Score: {pista.counter // 7}"
+        scr_rect = ft_font.get_rect(scr)
+        scr_rect.topleft = sens_rect.bottomleft
+        scr_rect.move_ip(0, 2)
+
+        self.screen.fill(BG_COLOR)
+        pista.desenha(self.screen)
+        for d in self.dinoArray:
+            d.draw(self.screen)
+        ft_font.render_to(self.screen, alive_rect.topleft, alive, (255, 0, 0))
+        if ha_obstaculo:
+            ft_font.render_to(self.screen, sens_rect.topleft, sens, (0, 0, 255))
+        if DinoGame.train.currentBest is not None:
+            ft_font.render_to(self.screen, best_rect.topleft, best, (255, 0, 0))
+        ft_font.render_to(self.screen, scr_rect.topleft, scr, (0, 0, 255))
+        pygame.display.update()
+
     def train(
         self,
         nIndividuals=20,

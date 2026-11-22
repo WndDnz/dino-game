@@ -391,7 +391,7 @@ Proof: run unit | test_ga.py::test_treino_interrompido_mantem_melhor PASSED
 ## Handoff
 
 **Settled mid-build:** 2026-11-22 - `graphify-out/` vai para o `.gitignore`, não para o commit de base (usuário: "2. .gitignore"). Execução inline, sem sub-agentes: oferta feita junto com o plano ("executo as 11 tarefas nesta sessão, sem sub-agentes"), usuário: "1. Aprova."
-**Dispatched:** Verifier (sub-agente independente) em `HEAD` 29bd2d1, 2026-11-22 - aguardando retorno
+**Dispatched:** Verifier (sub-agente independente) em `HEAD` 29bd2d1, 2026-11-22 - returned: FAIL, 5 achados. 4 fechados por afd3b92, ca0f22c, 285d3e9, b613ccd. Aberto: meta de 70 redes reativas em 350 não atingida (medido: ~8); decisão do usuário.
 **Walked:** none - a feature não tem tela nova
 
 ---

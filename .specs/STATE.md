@@ -46,11 +46,11 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 
 ## Handoff
 
-- **Feature**: `.specs/features/ga-training-fixes/` - spec aprovada em 2026-11-22; `tasks.md` em rascunho, sem aprovação
-- **Phase / Task**: Tasks - aguardando aprovação do usuário
-- **Completed**: none
+- **Feature**: `.specs/features/ga-training-fixes/` - spec e tasks aprovadas; 11/11 tarefas commitadas
+- **Phase / Task**: Execute - verificação; 1 achado do Verifier aberto
+- **Completed**: T1-T11; achados 2-5 do Verifier fechados (afd3b92, ca0f22c, 285d3e9, b613ccd)
 - **In-progress** (file:line): none
-- **Next step**: Usuário aprova `tasks.md`; então Execute a partir de T1.
-- **Blockers**: none (git safe.directory configurado e skill tlc-spec-driven 4.1.0 instalada em 2026-11-22; `validate_spec.py` e `validate_tasks.py` passam)
-- **Uncommitted files**: `AGMLP.py`, `DinoGame.py`, `RedeNeural.py`, `autodino.py`, `teste.py` (correções pendentes do usuário, viram o commit de T1); `.specs/`; `graphify-out/`
-- **Branch**: master
+- **Next step**: Usuário decide o achado 1 (meta de 70 redes reativas em 350 não atingida; medido ~8 com `normal(0, 1)`, ~45 com pesos `normal(0, 4)` e bias `normal(0, 1)`). Depois: fechar o achado em `verification.md`, `check_proofs.py`, `validate_verification.py`, lições.
+- **Blockers**: decisão do usuário sobre o achado 1
+- **Uncommitted files**: none
+- **Branch**: master (commits locais, sem push)

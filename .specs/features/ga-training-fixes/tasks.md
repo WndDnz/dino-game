@@ -129,9 +129,9 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_init_normal_0_1`: com semente fixa, 350 redes `(5,8,4,2)` têm média dos pesos entre −0.05 e 0.05 e desvio entre 0.95 e 1.05; o mesmo para os bias com tolerância 0.1
-- [ ] Gate check passes: `python -m pytest test_ga.py -v`
-- [ ] Test count: 2 tests pass
+- [x] `test_init_normal_0_1`: com semente fixa, 350 redes `(5,8,4,2)` têm média dos pesos entre −0.05 e 0.05 e desvio entre 0.95 e 1.05; o mesmo para os bias com tolerância 0.1
+- [x] Gate check passes: `python -m pytest test_ga.py -v`
+- [x] Test count: 2 tests pass
 
 **Tests**: unit
 **Gate**: quick

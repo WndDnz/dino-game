@@ -317,8 +317,11 @@ T9 → T10 → T11
 
 ## Checks
 
-**C1** - Pesos e bias novos seguem normal de média 0 e desvio 1 (INIT-01, AC 1)
-Proof: run unit | test_ga.py::test_init_normal_0_1 PASSED
+**C1** - Pesos novos seguem normal de média 0 e desvio 4; bias, média 0 e desvio 1 (INIT-02, AC 7; substitui INIT-01)
+Proof: run unit | test_ga.py::test_init_pesos_dp4_bias_dp1 PASSED
+
+**C24** - Com semente fixa, pelo menos 35 de 350 redes iniciais mudam a decisão de pular quando `l` vai de 1.0 a 0.0 (INIT-03, AC 8)
+Proof: run unit | test_ga.py::test_populacao_inicial_reativa PASSED
 
 **C2** - `l`, `nl`, `ds` saem divididos por 600, `na` por 150 e `s` por 20 (SENS-01, AC 2)
 Proof: run unit | test_ga.py::test_sensores_normalizados PASSED

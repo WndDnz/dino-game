@@ -29,14 +29,28 @@ def _genes(redes, attr):
     return np.concatenate([a.ravel() for r in redes for a in getattr(r, attr)])
 
 
-def test_init_normal_0_1():
+def test_init_pesos_dp4_bias_dp1():
     np.random.seed(0)
     redes = [RedeNeural.RedeNeural(CFG) for _ in range(350)]
     pesos, bias = _genes(redes, "pesos"), _genes(redes, "bias")
-    assert -0.05 < pesos.mean() < 0.05
-    assert 0.95 < pesos.std() < 1.05
+    assert -0.2 < pesos.mean() < 0.2
+    assert 3.8 < pesos.std() < 4.2
     assert -0.1 < bias.mean() < 0.1
     assert 0.9 < bias.std() < 1.1
+
+
+def test_populacao_inicial_reativa():
+    np.random.seed(0)
+    reativas = 0
+    for _ in range(350):
+        rede = RedeNeural.RedeNeural(CFG)
+        # cacto vindo da borda (l = 1.0) ate o dino (l = 0.0), sem ptera, velocidade 4
+        pula = [
+            rede.feedForward(np.array([[l], [1.0], [0.0], [0.0], [0.2]]))[0][0] > 0.5
+            for l in np.linspace(1.0, 0.0, 201)
+        ]
+        reativas += any(pula) and not all(pula)
+    assert reativas >= 35
 
 
 def _ag(n=50, elite=0.1):

@@ -8,7 +8,7 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 
 ## Goals
 
-- [ ] A população inicial tem redes que reagem aos sensores: pelo menos 20% das 350 redes mudam a saída "pular" conforme a distância ao cacto varia.
+- [ ] A população inicial tem redes que reagem aos sensores: pelo menos 35 das 350 redes mudam a decisão de pular conforme a distância ao cacto varia. (Meta original de 20% trocada em 2026-11-22 depois da medição do Verifier - usuário: "Aprovo, pode prosseguir.")
 - [ ] Cada geração tem exatamente N indivíduos, com os `tamElite` melhores preservados sem alteração.
 - [ ] O fitness de cada dino depende só da rede dele, não do áudio nem da ordem da lista.
 - [ ] A lógica do AG e da rede roda em teste automatizado sem abrir janela.
@@ -33,6 +33,7 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
 | Inicialização dos pesos e bias | `np.random.normal(0, 1)` | `normal(-10, 10)` é média −10 e desvio 10; gera 85% de pesos negativos e 94% de redes que nunca pulam | y - usuário: "Pode reescrever a spec." (em resposta à recomendação de incluir inicialização e normalização) |
+| Inicialização revista | Pesos `np.random.normal(0, 4)`, bias `np.random.normal(0, 1)`; meta de redes reativas 35 em 350 | Medição de 2026-11-22: `normal(0, 1)` dá ~8 redes reativas em 350; pesos com desvio 4 dão ~45. Em um treino real de 100 dinos e 12 gerações, a média da população foi de 26 a 145 com desvio 4 e ficou entre 21 e 45 com desvio 1 | y - usuário: "Aprovo, pode prosseguir." |
 | Normalização dos sensores | Distâncias `l`, `nl`, `ds` divididas por `DinoGame.width`; altura `na` por `DinoGame.height`; velocidade `s` dividida por 20 | Sensores em pixels saturam a sigmoide e anulam a influência da velocidade | y - mesma resposta |
 | `.din` antigos | Deixam de ser carregáveis com sentido; nenhum código de migração | Mudou o significado das entradas (AD-005) | y - mesma resposta |
 | Valor do sensor sem obstáculo | `l = 1.0` e `nl = 1.0` (obstáculo "na borda da tela"); `na = 0.0`; `ds = 0.0` | Hoje vale 0, igual a "obstáculo colado no dino" | n |
@@ -58,12 +59,14 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 
 **Acceptance Criteria**:
 
-1. WHEN uma `RedeNeural` é criada THEN a rede SHALL sortear cada peso e cada bias de uma distribuição normal de média 0 e desvio padrão 1.
+1. WHEN uma `RedeNeural` é criada THEN a rede SHALL sortear cada peso e cada bias de uma distribuição normal de média 0 e desvio padrão 1. (Substituído pelo critério 7 em 2026-11-22 - usuário: "Aprovo, pode prosseguir.")
 2. WHEN `train` monta o vetor de sensores THEN o treino SHALL entregar `l`, `nl` e `ds` divididos por `DinoGame.width`, `na` dividido por `DinoGame.height` e `s` dividido por 20.
 3. IF não há cacto na tela THEN o treino SHALL entregar `l = 1.0`.
 4. IF não há ptera na tela THEN o treino SHALL entregar `nl = 1.0`, `na = 0.0` e `ds = 0.0`.
 5. WHEN a saída de uma ação é maior que 0.5 THEN o treino SHALL disparar essa ação.
 6. WHEN o treino calcula os sensores de um dino THEN o treino SHALL medir as distâncias a partir do `rect` desse mesmo dino.
+7. WHEN uma `RedeNeural` é criada THEN a rede SHALL sortear cada peso de uma normal de média 0 e desvio padrão 4 e cada bias de uma normal de média 0 e desvio padrão 1.
+8. WHEN 350 redes `(5, 8, 4, 2)` são criadas com semente fixa THEN pelo menos 35 delas SHALL mudar a decisão de pular (saída "pular" cruza 0.5) quando `l` varia de 1.0 a 0.0 com `nl = 1.0`, `na = 0.0`, `ds = 0.0` e `s = 0.2`.
 
 **Independent Test**: Criar 350 redes com semente fixa, variar `l` de 1.0 a 0.0 e contar quantas mudam a saída "pular"; conferir média e desvio dos pesos.
 
@@ -133,7 +136,9 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| INIT-01 | P1: População inicial reativa (critério 1) | Execute | Implementing |
+| INIT-01 | P1: População inicial reativa (critério 1) | - | Superseded by INIT-02 |
+| INIT-02 | P1: População inicial reativa (critério 7) | Execute | Implementing |
+| INIT-03 | P1: População inicial reativa (critério 8) | Execute | Implementing |
 | SENS-01 | P1: População inicial reativa (critério 2) | Execute | Implementing |
 | SENS-02 | P1: População inicial reativa (critério 3) | Execute | Implementing |
 | SENS-03 | P1: População inicial reativa (critério 4) | Execute | Implementing |
@@ -153,7 +158,7 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 | LOG-03 | P2: Treino reproduzível (critério 3) | Execute | Implementing |
 | LOG-04 | P2: Treino reproduzível (critério 4) - acrescentado na verificação: população, crossover e mutação usam `np.random`, que o treino não semeava | Execute | Implementing |
 
-**Coverage:** 19 total, 19 mapped to tasks, 0 unmapped.
+**Coverage:** 21 total, 20 mapped to tasks, 1 superseded (INIT-01), 0 unmapped.
 
 ---
 
@@ -174,6 +179,6 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 
 ## Success Criteria
 
-- [ ] Com semente fixa, pelo menos 70 das 350 redes iniciais mudam a saída "pular" quando `l` vai de 1.0 a 0.0.
+- [ ] Com semente fixa, pelo menos 35 das 350 redes iniciais mudam a decisão de pular quando `l` vai de 1.0 a 0.0.
 - [ ] A rede de maior score de cada geração reaparece com pesos e bias idênticos na geração seguinte.
 - [ ] Os testes dos 18 requisitos rodam sem janela, em menos de 10 s.

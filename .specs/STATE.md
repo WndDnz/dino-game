@@ -42,6 +42,14 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 - **Trade-off**: Os `.din` salvos até aqui (`bestDino.din`, `bestDino_02_11_2024_1339.din`, `bestDino_100_100_261220.din`) carregam mas não jogam: foram treinados com entradas em pixels.
 - **Scope**: `DinoGame.train`, `Dino.getAction`, `RedeNeural.__init__`, arquivos `*.din`
 - **Date**: 2026-11-22
+- **Status**: superseded by AD-006
+
+### AD-006
+- **Decision**: O contrato da rede é o de AD-005 com uma troca: pesos iniciados em `normal(0, 4)` e bias em `normal(0, 1)`. Entrada `(5,1)` normalizada = [`l`/largura, `nl`/largura, `na`/altura, `ds`/largura, `s`/20], com `l = nl = 1.0` e `na = ds = 0.0` quando falta o obstáculo; saída `(2,1)` = [pular, abaixar] com limiar 0.5; topologia `(5, 8, 4, 2)` sigmoide.
+- **Reason**: Com `normal(0, 1)` só ~8 de 350 redes iniciais mudam a decisão de pular conforme o cacto se aproxima; com pesos de desvio 4 são ~45. Em um treino real (100 dinos, 12 gerações) a média da população foi de 26 a 145 com desvio 4 e ficou entre 21 e 45 com desvio 1. Opção A apresentada ao usuário, resposta: "Aprovo, pode prosseguir."
+- **Trade-off**: Pesos maiores saturam mais a sigmoide; a evidência de treino é uma execução por configuração. Redes salvas com AD-005 continuam válidas: o contrato de entrada e saída não mudou.
+- **Scope**: `RedeNeural.__init__`, `DinoGame.train`, `Dino.agir`, arquivos `*.din`
+- **Date**: 2026-11-22
 - **Status**: active
 
 ## Handoff

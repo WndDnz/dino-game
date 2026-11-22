@@ -390,6 +390,7 @@ class DinoGame:
             DinoGame.train.currentGeneration = 1
             DinoGame.train.currentBest = None
             DinoGame.train.recorde = None
+            np.random.seed(semente_base)  # população inicial, crossover e mutação
             if os.path.exists(os.path.join(saida, "fitness.csv")):
                 os.remove(os.path.join(saida, "fitness.csv"))
         # pista reproduzível: mesma semente, mesma sequência de obstáculos

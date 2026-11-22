@@ -115,6 +115,7 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 1. WHEN `train` inicia a geração `g` THEN o treino SHALL chamar `random.seed(semente_base + g)` antes de criar o primeiro obstáculo.
 2. WHEN uma geração termina THEN o treino SHALL acrescentar a `fitness.csv` uma linha `geracao,melhor,media` com os scores daquela geração.
 3. WHEN uma geração termina com um score maior que todos os anteriores do treino THEN o treino SHALL salvar essa rede em `bestDino.din`.
+4. WHEN `train` inicia um treino THEN o treino SHALL chamar `np.random.seed(semente_base)` antes de criar a população inicial.
 
 **Independent Test**: Rodar 2 gerações com N = 10 em modo dummy duas vezes com a mesma semente e comparar os dois `fitness.csv`.
 
@@ -150,8 +151,9 @@ O treino por algoritmo genético (`DinoGame.train` + `AGMLP.RNA_AG` + `RedeNeura
 | LOG-01 | P2: Treino reproduzível (critério 1) | Execute | Implementing |
 | LOG-02 | P2: Treino reproduzível (critério 2) | Execute | Implementing |
 | LOG-03 | P2: Treino reproduzível (critério 3) | Execute | Implementing |
+| LOG-04 | P2: Treino reproduzível (critério 4) - acrescentado na verificação: população, crossover e mutação usam `np.random`, que o treino não semeava | Execute | Implementing |
 
-**Coverage:** 18 total, 18 mapped to tasks, 0 unmapped.
+**Coverage:** 19 total, 19 mapped to tasks, 0 unmapped.
 
 ---
 

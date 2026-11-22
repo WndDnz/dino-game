@@ -368,6 +368,9 @@ Proof: run unit | test_ga.py::test_pulo_sem_mixer PASSED
 **C16** - Mesma semente, mesmo `fitness.csv` em dois treinos (LOG-01, AC 1)
 Proof: run unit | test_ga.py::test_semente_por_geracao PASSED
 
+**C23** - Mesma `semente_base`, mesma população inicial, qualquer que seja o estado anterior do numpy; outra `semente_base`, outra população (LOG-04, AC 4)
+Proof: run unit | test_ga.py::test_treino_semeia_numpy PASSED
+
 **C17** - Cada geração acrescenta uma linha `geracao,melhor,media` (LOG-02, AC 2)
 Proof: run unit | test_ga.py::test_csv_linha_por_geracao PASSED
 

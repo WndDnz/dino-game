@@ -287,7 +287,6 @@ def _treina(jogo, monkeypatch, saida, geracoes, semente_base=0):
 
     monkeypatch.setattr(DinoGame.DinoGame, "FPS", 0)
     monkeypatch.setattr(DinoGame.DinoGame, "disp_gameOver_msg", fim)
-    np.random.seed(0)
     with pytest.raises(_FimDoTreino):
         jogo.train(nIndividuals=10, nGenerations=geracoes, semente_base=semente_base, saida=str(saida))
 
@@ -306,6 +305,7 @@ def test_semente_por_geracao(jogo, monkeypatch, tmp_path, capsys):
     csvs = []
     for nome in ("a", "b"):
         (tmp_path / nome).mkdir()
+        np.random.seed(len(csvs) + 1)  # estado do numpy diferente antes de cada treino
         _treina(jogo, monkeypatch, tmp_path / nome, geracoes=2, semente_base=7)
         csvs.append((tmp_path / nome / "fitness.csv").read_text())
     # o primeiro obstaculo da geracao g nasce com o random recem-semeado em semente_base + g
@@ -316,6 +316,25 @@ def test_semente_por_geracao(jogo, monkeypatch, tmp_path, capsys):
     # mesma semente, mesmo treino
     assert len(csvs[0].splitlines()) == 3
     assert csvs[0] == csvs[1]
+
+
+def test_treino_semeia_numpy(jogo, monkeypatch, tmp_path):
+    populacoes = []
+    inicia = AGMLP.RNA_AG.iniciaPopulacao
+
+    def captura(self, *args):
+        populacoes.append(inicia(self, *args))
+        raise _FimDoTreino  # so interessa a populacao inicial
+
+    monkeypatch.setattr(AGMLP.RNA_AG, "iniciaPopulacao", captura)
+    for semente_numpy, semente_base in ((1, 7), (2, 7), (3, 8)):
+        np.random.seed(semente_numpy)  # o treino nao pode depender do estado anterior do numpy
+        with pytest.raises(_FimDoTreino):
+            jogo.train(nIndividuals=10, nGenerations=1, semente_base=semente_base, saida=str(tmp_path))
+    a, b, c = populacoes
+    assert len(a) == 10
+    assert all(_iguais(x, y) for x, y in zip(a, b))  # mesma semente_base, mesma populacao
+    assert not any(_iguais(x, y) for x, y in zip(a, c))  # outra semente_base, outra populacao
 
 
 def test_treino_interrompido_mantem_melhor(jogo, monkeypatch, tmp_path, capsys):

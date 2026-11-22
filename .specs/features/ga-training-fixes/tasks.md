@@ -216,12 +216,12 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_sensores_normalizados`: com cacto e ptera em posições conhecidas, `l`, `nl`, `ds` = pixels / 600, `na` = pixels / 150, `s` = velocidade / 20
-- [ ] `test_sensor_sem_cacto`: `l` = 1.0
-- [ ] `test_sensor_sem_ptera`: `nl` = 1.0, `na` = 0.0, `ds` = 0.0
-- [ ] `test_sensores_do_proprio_dino`: dois dinos com `rect.right` diferentes recebem `l` diferentes para o mesmo cacto
-- [ ] Gate check passes: `python -m pytest test_ga.py -v`
-- [ ] Test count: 15 tests pass
+- [x] `test_sensores_normalizados`: com cacto e ptera em posições conhecidas, `l`, `nl`, `ds` = pixels / 600, `na` = pixels / 150, `s` = velocidade / 20
+- [x] `test_sensor_sem_cacto`: `l` = 1.0
+- [x] `test_sensor_sem_ptera`: `nl` = 1.0, `na` = 0.0, `ds` = 0.0
+- [x] `test_sensores_do_proprio_dino`: dois dinos com `rect.right` diferentes recebem `l` diferentes para o mesmo cacto
+- [x] Gate check passes: `python -m pytest test_ga.py -v`
+- [x] Test count: 15 tests pass
 
 **Tests**: unit
 **Gate**: quick

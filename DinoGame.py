@@ -491,53 +491,21 @@ class DinoGame:
                     else:
                         if p.rect.left < pte.rect.left:
                             pte = p
-                res = None
-                if cac is not None or pte is not None:
-                    l = cac.rect.left - dino.rect.right if cac else 0
-                    # if cac is not None:
-                    #     l = (cac.rect.left - dino.rect.right)
-                    # else:
-                    #     l = 632
-
-                    # if pte is not None:
-                    nl = pte.rect.left - dino.rect.right if pte else 0
-                    na = pte.rect.bottom if pte is not None else 0
-                    # else:
-                    #     nl = 632
-                    #     na =  110
-                    if pte and cac:
-                        ds = cac.rect.right - pte.rect.left
+                for dino in self.dinoArray:
+                    senses = sensores(dino, cac, pte, gamespeed)
+                    l, nl, na, ds, s = senses.ravel()  # mostrados no HUD
+                    action = dino.getAction(senses)
+                    if action[1][0] > 0.99:
+                        dino.isDucking = True
                     else:
-                        ds = 0
-                    s = gamespeed
-                    actions = []
-                    # with concurrent.futures.ThreadPoolExecutor(
-                    #     max_workers=20
-                    # ) as executor:
-                    #     for dino in self.dinoArray:
-                    #         actions.append(
-                    #             executor.submit(
-                    #                 dino.getAction,
-                    #                 np.array([[l], [nl], [na], [ds], [s]]),
-                    #             )
-                    #         )
-                    # for dino, activation in zip(self.dinoArray, actions):
-                    #     # activation = dino.getAction(np.array([[l], [nl], [na], [s]]))
-                    #     # print(f"Activation: {activation}")
-                    #     action = activation.result()
-                    for dino in self.dinoArray:
-                        action = dino.getAction(np.array([[l], [nl], [na], [ds], [s]]))
-                        if action[1][0] > 0.99:
-                            dino.isDucking = True
-                        else:
-                            dino.isDucking = False
+                        dino.isDucking = False
 
-                        if action[0][0] > 0.99:
-                            if not dino.isJumping:
-                                dino.isJumping = True
-                                if pygame.mixer.get_init() is not None:
-                                    DinoGame.jump_sound.play()
-                                    dino.movement[1] = -1 * dino.jumpSpeed
+                    if action[0][0] > 0.99:
+                        if not dino.isJumping:
+                            dino.isJumping = True
+                            if pygame.mixer.get_init() is not None:
+                                DinoGame.jump_sound.play()
+                                dino.movement[1] = -1 * dino.jumpSpeed
 
                 if len(cacti) < 1:
                     if len(cacti) == 0:
@@ -712,6 +680,23 @@ class DinoGame:
                 self.gameplay()
             else:
                 self.gameplay()
+
+
+def sensores(dino, cac, pte, gamespeed):
+    """
+    Entrada (5,1) da rede, normalizada (AD-005): distância ao cacto, distância ao
+    ptera, altura do ptera, distância cacto->ptera e velocidade. Distâncias medidas
+    a partir do próprio dino; sem obstáculo, a distância vale 1.0 (borda da tela).
+    """
+    w, h = DinoGame.width, DinoGame.height
+    l = (cac.rect.left - dino.rect.right) / w if cac is not None else 1.0
+    nl = (pte.rect.left - dino.rect.right) / w if pte is not None else 1.0
+    na = pte.rect.bottom / h if pte is not None else 0.0
+    if cac is not None and pte is not None:
+        ds = (cac.rect.right - pte.rect.left) / w
+    else:
+        ds = 0.0
+    return np.array([[l], [nl], [na], [ds], [gamespeed / 20]])
 
 
 class Dino:

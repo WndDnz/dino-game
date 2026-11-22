@@ -8,6 +8,7 @@ os.environ["SDL_AUDIODRIVER"] = "dummy"
 
 import numpy as np  # noqa: E402
 import pygame  # noqa: E402
+import pytest  # noqa: E402
 
 import AGMLP  # noqa: E402
 import DinoGame  # noqa: E402
@@ -137,3 +138,54 @@ def test_sem_elite_gera_n_filhos(capsys):
     nova = ag.proximaGeracao(atual)
     assert len(nova) == 50
     assert not any(r is rede for r in nova for _, rede in atual)
+
+
+@pytest.fixture
+def jogo():
+    """Tela dummy e grupos de sprites, como train() monta."""
+    j = DinoGame.DinoGame()
+    DinoGame.Cactus.containers = pygame.sprite.Group()
+    DinoGame.Ptera.containers = pygame.sprite.Group()
+    return j
+
+
+def _cena():
+    """Dino com a borda direita em x=84, cacto de 384 a 424, ptera a partir de 444 com base em y=90."""
+    dino = DinoGame.Dino(44, 47)
+    dino.rect.right = 84
+    cac = DinoGame.Cactus(4, 40, 40)
+    cac.rect.left = 384
+    pte = DinoGame.Ptera(4, 40, 40)
+    pte.rect.left, pte.rect.bottom = 444, 90
+    return dino, cac, pte
+
+
+def test_sensores_normalizados(jogo):
+    dino, cac, pte = _cena()
+    assert cac.rect.right == 424
+    s = DinoGame.sensores(dino, cac, pte, 8)
+    assert s.shape == (5, 1)
+    assert s.ravel() == pytest.approx(
+        [(384 - 84) / 600, (444 - 84) / 600, 90 / 150, (424 - 444) / 600, 8 / 20]
+    )
+
+
+def test_sensor_sem_cacto(jogo):
+    dino, _, pte = _cena()
+    assert DinoGame.sensores(dino, None, pte, 4)[0][0] == 1.0
+
+
+def test_sensor_sem_ptera(jogo):
+    dino, cac, _ = _cena()
+    s = DinoGame.sensores(dino, cac, None, 4).ravel()
+    assert (s[1], s[2], s[3]) == (1.0, 0.0, 0.0)
+
+
+def test_sensores_do_proprio_dino(jogo):
+    dino, cac, pte = _cena()
+    outro = DinoGame.Dino(44, 47)
+    outro.rect.right = 99  # 15 px mais a frente, como um dino abaixado
+    l1 = DinoGame.sensores(dino, cac, pte, 4)[0][0]
+    l2 = DinoGame.sensores(outro, cac, pte, 4)[0][0]
+    assert l1 == pytest.approx(300 / 600)
+    assert l2 == pytest.approx(285 / 600)

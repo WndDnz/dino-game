@@ -212,13 +212,13 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_mesmo_csv_com_e_sem_janela`: N=10, 3 gerações, mesma semente: `fitness.csv` idênticos
-- [ ] `test_imprime_linha_por_geracao`: 2 gerações sem janela imprimem 2 linhas no formato, com os valores do `fitness.csv`
-- [ ] `test_pilha_nao_cresce_entre_geracoes`: a profundidade da pilha na criação do primeiro obstáculo é igual nas gerações 1, 2 e 3
-- [ ] `test_sem_janela_interrompido_mantem_melhor`: `KeyboardInterrupt` na geração 2 de 3 deixa `bestDino.din` com a melhor rede da geração 1
-- [ ] Os 25 testes de `test_ga.py` continuam passando sem alteração
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 15 de `test_modos.py` passam
+- [x] `test_mesmo_csv_com_e_sem_janela`: N=10, 3 gerações, mesma semente: `fitness.csv` idênticos
+- [x] `test_imprime_linha_por_geracao`: 2 gerações sem janela imprimem 2 linhas no formato, com os valores do `fitness.csv`
+- [x] `test_pilha_nao_cresce_entre_geracoes`: a profundidade da pilha na criação do primeiro obstáculo é igual nas gerações 1, 2 e 3
+- [x] `test_sem_janela_interrompido_mantem_melhor`: `KeyboardInterrupt` na geração 2 de 3 deixa `bestDino.din` com a melhor rede da geração 1
+- [x] Os 25 testes de `test_ga.py` continuam passando sem alteração
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 15 de `test_modos.py` passam
 
 **Tests**: integration
 **Gate**: full

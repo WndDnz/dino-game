@@ -1,6 +1,8 @@
 """Testes da spec headless-training-and-watch. Rodam sem janela: python -m pytest test_modos.py -v"""
 
+import inspect
 import os
+import pickle
 import random
 import time
 
@@ -310,3 +312,80 @@ def test_sem_janela_metade_do_tempo(jogo, monkeypatch):
     sem = np.median([_ms_por_frame(jogo, monkeypatch, False) for _ in range(3)])
     print(f"com janela {com:.2f} ms/frame, sem janela {sem:.2f} ms/frame, razao {com / sem:.1f}")
     assert sem <= com / 2
+
+
+def _treina(jogo, monkeypatch, saida, janela, geracoes=3, n=10, semente=4):
+    """train() ate o fim. Com janela, o fim e a tela de fim de treino."""
+    def fim(*args):
+        raise _Fim
+
+    monkeypatch.setattr(DinoGame.DinoGame, "disp_gameOver_msg", fim)
+    jogo.clock = _Relogio()
+    saida.mkdir()
+    if janela:
+        with pytest.raises(_Fim):
+            jogo.train(nIndividuals=n, nGenerations=geracoes, semente_base=semente, saida=str(saida))
+    else:
+        assert jogo.train(n, geracoes, semente_base=semente, saida=str(saida), janela=False) is None
+    return (saida / "fitness.csv").read_text()
+
+
+def test_mesmo_csv_com_e_sem_janela(jogo, monkeypatch, tmp_path, capsys):
+    com = _treina(jogo, monkeypatch, tmp_path / "com", janela=True)
+    sem = _treina(jogo, monkeypatch, tmp_path / "sem", janela=False)
+    assert len(com.splitlines()) == 4  # cabecalho + 3 geracoes
+    assert sem == com
+    outra = _treina(jogo, monkeypatch, tmp_path / "outra", janela=False, semente=5)
+    assert outra != com  # a comparacao nao e trivial: outra semente, outro treino
+
+
+def test_imprime_linha_por_geracao(jogo, monkeypatch, tmp_path, capsys):
+    csv = _treina(jogo, monkeypatch, tmp_path / "t", janela=False, geracoes=2)
+    linhas = [l for l in capsys.readouterr().out.splitlines() if l.startswith("Geração")]
+    esperadas = []
+    for dados in csv.splitlines()[1:]:
+        g, melhor, media = dados.split(",")
+        esperadas.append(f"Geração {g}: melhor={melhor} media={media}")
+    assert len(esperadas) == 2
+    assert linhas == esperadas
+
+
+def test_pilha_nao_cresce_entre_geracoes(jogo, monkeypatch, tmp_path, capsys):
+    profundidade = {}
+    cacto_init = DinoGame.Cactus.__init__
+
+    def espia(self, *args, **kwargs):
+        g = DinoGame.DinoGame.train.currentGeneration
+        profundidade.setdefault(g, len(inspect.stack()))  # no primeiro obstaculo de cada geracao
+        cacto_init(self, *args, **kwargs)
+
+    monkeypatch.setattr(DinoGame.Cactus, "__init__", espia)
+    _treina(jogo, monkeypatch, tmp_path / "t", janela=True, geracoes=3)
+    assert sorted(profundidade) == [1, 2, 3]
+    assert profundidade[1] == profundidade[2] == profundidade[3]
+
+
+def test_sem_janela_interrompido_mantem_melhor(jogo, monkeypatch, tmp_path, capsys):
+    registra = DinoGame.registra_geracao
+    geracoes = []
+
+    def anota(ranked, *args):
+        geracoes.append(list(ranked))
+        return registra(ranked, *args)
+
+    passo = DinoGame.Pista.passo
+
+    def ctrl_c_na_geracao_2(self):
+        if DinoGame.DinoGame.train.currentGeneration == 2 and self.counter == 20:
+            raise KeyboardInterrupt
+        passo(self)
+
+    monkeypatch.setattr(DinoGame, "registra_geracao", anota)
+    monkeypatch.setattr(DinoGame.Pista, "passo", ctrl_c_na_geracao_2)
+    with pytest.raises(KeyboardInterrupt):
+        jogo.train(10, 3, semente_base=4, saida=str(tmp_path), janela=False)
+    assert len(geracoes) == 1
+    melhor = max(geracoes[0], key=lambda par: par[0])[1]
+    with open(tmp_path / "bestDino.din", "rb") as f:
+        salva = pickle.load(f)
+    assert all(np.array_equal(a, b) for a, b in zip(salva.pesos + salva.bias, melhor.pesos + melhor.bias))

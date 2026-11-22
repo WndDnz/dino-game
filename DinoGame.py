@@ -422,28 +422,21 @@ class DinoGame:
         self,
         nIndividuals=20,
         nGenerations=100,
-        population=None,
         semente_base=0,
         saida=".",
+        janela=True,
     ):
-        if population is None:  # início de um treino: zera o estado e o registro
-            DinoGame.train.currentGeneration = 1
-            DinoGame.train.currentBest = None
-            DinoGame.train.recorde = None
-            np.random.seed(semente_base)  # população inicial, crossover e mutação
-            if os.path.exists(os.path.join(saida, "fitness.csv")):
-                os.remove(os.path.join(saida, "fitness.csv"))
-        # pista reproduzível: mesma semente, mesma sequência de obstáculos
-        random.seed(semente_base + DinoGame.train.currentGeneration)
-        self.FPS *= 1
-        gamespeed = 4
-        startMenu = False
-        gameOver = False
-        gameQuit = False
-        l = a = nl = na = ds = s = 0
-        self.dinoArray.clear()
-        for i in range(nIndividuals):
-            self.dinoArray.append(Dino(44, 47))
+        """
+        Treina `nIndividuals` redes por `nGenerations` gerações. Com `janela`, mostra
+        o treino e, ao fim, a tela de fim de treino. Sem `janela`, imprime uma linha
+        por geração e retorna depois da última.
+        """
+        DinoGame.train.currentGeneration = 1
+        DinoGame.train.currentBest = None
+        DinoGame.train.recorde = None
+        np.random.seed(semente_base)  # população inicial, crossover e mutação
+        if os.path.exists(os.path.join(saida, "fitness.csv")):
+            os.remove(os.path.join(saida, "fitness.csv"))
         ag = AGMLP.RNA_AG(
             (5, 8, 4, 2),
             None,
@@ -453,259 +446,55 @@ class DinoGame:
             taxaMutacao=0.05,
             elite=0.1,
         )
-        if population is None:
-            brains = ag.iniciaPopulacao()
-        else:
-            brains = population
-        for dino, brain in zip(self.dinoArray, brains):
-            dino.brain = brain
-        rankedBrains = []
+        redes = ag.iniciaPopulacao()
 
-        new_ground = Ground(-1 * gamespeed)
-        counter = 0
+        for geracao in range(1, nGenerations + 1):
+            DinoGame.train.currentGeneration = geracao
+            # pista reproduzível: mesma semente, mesma sequência de obstáculos
+            random.seed(semente_base + geracao)
+            if janela:
+                print(f"Starting generation {geracao}.")
+            ranked = self.roda_geracao(redes, janela)
+            if ranked is None:  # o usuário fechou a janela
+                pygame.quit()
+                quit()
+            DinoGame.train.recorde = registra_geracao(
+                ranked, geracao, DinoGame.train.recorde, saida
+            )
+            melhor = max(score for score, _ in ranked)
+            DinoGame.train.currentBest = melhor
+            if not janela:
+                media = sum(score for score, _ in ranked) / len(ranked)
+                print(f"Geração {geracao}: melhor={melhor} media={media}")
+            if geracao < nGenerations:
+                redes = ag.proximaGeracao(ranked)
 
-        ft_font = pygame.freetype.SysFont("Input", 12)
-
-        cacti = pygame.sprite.Group()
-        pteras = pygame.sprite.Group()
-        clouds = pygame.sprite.Group()
-        last_obstacle = pygame.sprite.Group()
-
-        Cactus.containers = cacti
-        Ptera.containers = pteras
-        Cloud.containers = clouds
-
-        retbutton_image, retbutton_rect = self.load_image(
-            "replay_button.png", 35, 31, -1
-        )
-        gameover_image, gameover_rect = self.load_image("game_over.png", 190, 11, -1)
-
-        temp_images, temp_rect = self.load_sprite_sheet(
-            "numbers.png", 12, 1, 11, int(11 * 6 / 5), -1
-        )
-
-        print(f"Starting generation {DinoGame.train.currentGeneration}.")
-
-        while not gameQuit:
-            while startMenu:
-                pass
-            while not gameOver and not gameQuit:
-                if pygame.display.get_surface() is None:
-                    print("Couldn't load display surface")
-                    gameQuit = True
-                    gameOver = True
-                else:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            gameQuit = True
-                            gameOver = False
-                        if event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_ESCAPE:
-                                gameQuit = True
-                                gameOver = False
-                            if event.key == pygame.K_q:
-                                gameQuit = True
-                                gameOver = True
-                            if event.key == pygame.K_RIGHT:
-                                DinoGame.accel += 1
-                                DinoGame.FPS *= DinoGame.accel
-                            if event.key == pygame.K_LEFT:
-                                DinoGame.accel -= 1
-                                DinoGame.FPS *= DinoGame.accel
-
-                cac = None
-                pte = None
-                for c in cacti:
-                    c.movement[0] = -1 * gamespeed
-                    remove_colididos(self.dinoArray, c, rankedBrains)
-
-                    if cac is None:
-                        cac = c
-                    else:
-                        if c.rect.left >= 65:
-                            cac = c
-
-                for p in pteras:
-                    p.movement[0] = -1 * gamespeed
-                    remove_colididos(self.dinoArray, p, rankedBrains)
-                    if pte is None:
-                        pte = p
-                    else:
-                        if p.rect.left < pte.rect.left:
-                            pte = p
-                for dino in self.dinoArray:
-                    senses = sensores(dino, cac, pte, gamespeed)
-                    l, nl, na, ds, s = senses.ravel()  # mostrados no HUD
-                    dino.agir(dino.getAction(senses))
-
-                if len(cacti) < 1:
-                    if len(cacti) == 0:
-                        nearest = None
-                        last_obstacle.empty()
-                        last_obstacle.add(Cactus(gamespeed, 40, 40))
-                    else:
-                        for last in last_obstacle:
-                            if (
-                                (
-                                last.rect.right < self.width * 0.7
-                               
-                                and random.randrange(0, 50) == 10
-                            )
-                            ):
-                                last_obstacle.empty()
-                                last_obstacle.add(Cactus(gamespeed, 40, 40))
-
-                if (
-                    len(pteras) == 0
-                    and random.randrange(0, 200) == 10
-                    and counter > 600
-                    and True
-                ):
-                    for last in last_obstacle:
-                        if last.rect.right < self.width * 0.8:
-                            last_obstacle.empty()
-                            p = Ptera(gamespeed, 40, 40)
-                            if len(cacti) == 0:
-                                for c in cacti:
-                                    if not pygame.sprite.collide_mask(p, c):
-                                        last_obstacle.add(p)
-                            else:
-                                last_obstacle.add(p)
-
-                if len(clouds) < 5 and random.randrange(0, 300) == 10:
-                    Cloud(
-                        self.width, random.randrange(self.height // 5, self.height // 2)
-                    )
-                    Cloud(
-                        self.width, random.randrange(self.height // 5, self.height // 2)
-                    )
-
-                for d in self.dinoArray:
-                    d.update()
-
-                cacti.update()
-                pteras.update()
-                clouds.update()
-                new_ground.update()
-
-                alive = f"Alive: {len(self.dinoArray)}/{nIndividuals}"
-                alive = f"Alive: {len(self.dinoArray)}/{nIndividuals}"
-                alive_rect = ft_font.get_rect(alive)
-                alive_rect.topright = self.screen.get_rect().topright
-                alive_rect.move_ip(-2, 2)
-
-                best = f"Best fitness (prev gen): {DinoGame.train.currentBest}"
-                best = f"Best fitness (prev gen): {DinoGame.train.currentBest}"
-                best_rect = ft_font.get_rect(best)
-                best_rect.topright = alive_rect.bottomright
-                best_rect.move_ip(0, 2)
-
-                sens = (
-                    f"Senses: l: {l:.2f} nl: {nl:.2f} na: {na:.2f} d: {ds:.2f} s: {s}"
-                )
-                sens_rect = ft_font.get_rect(sens)
-                sens_rect.topleft = self.screen.get_rect().topleft
-                sens_rect.move_ip(2, 2)
-
-                scr = f"Current Score: {counter//7}"
-                scr_rect = ft_font.get_rect(scr)
-                scr_rect.topleft = sens_rect.bottomleft
-                scr_rect.move_ip(0, 2)
-
-                if pygame.display.get_surface() is not None:
-                    self.screen.fill(BG_COLOR)
-                    new_ground.draw(self.screen)
-                    clouds.draw(self.screen)
-                    cacti.draw(self.screen)
-                    pteras.draw(self.screen)
-                    for d in self.dinoArray:
-                        d.draw(self.screen)
-                    ft_font.render_to(
-                        self.screen, alive_rect.topleft, alive, (255, 0, 0)
-                    )
-                    if cac is not None or pte is not None:
-                        ft_font.render_to(
-                            self.screen, sens_rect.topleft, sens, (0, 0, 255)
-                        )
-                    if DinoGame.train.currentBest is not None:
-                        ft_font.render_to(
-                            self.screen, best_rect.topleft, best, (255, 0, 0)
-                        )
-                    ft_font.render_to(self.screen, scr_rect.topleft, scr, (0,0,255))
-                    pygame.display.update()
-                    # if self.dinoArray:
-                    #     print(
-                    #         f"Activation: {self.dinoArray[0].getAction(np.array([[l], [nl], [na], [s]]))}"
-                    #     )
-                self.clock.tick(self.FPS)
-
-                if not self.dinoArray:
-                    DinoGame.train.recorde = registra_geracao(
-                        rankedBrains,
-                        DinoGame.train.currentGeneration,
-                        DinoGame.train.recorde,
-                        saida,
-                    )
-                    DinoGame.train.currentGeneration += 1
-                    rank = ag.ranquearIndividuos(rankedBrains)
-                    if DinoGame.train.currentGeneration > nGenerations:
-                        gameOver = True
-                    else:
-                        DinoGame.train.currentBest = rank[0][1]
-                        newPopulation = ag.proximaGeracao(rankedBrains)
-                        self.train(
-                            nIndividuals=nIndividuals,
-                            nGenerations=nGenerations,
-                            population=newPopulation,
-                            semente_base=semente_base,
-                            saida=saida,
-                        )
-
-                if counter % 700 == 699:
-                    new_ground.speed -= 1
-                    gamespeed += 1
-
-                counter = counter + 1
-
-            if gameQuit:
-                break
-
-            while gameOver:
-                if pygame.display.get_surface() is None:
-                    print("Couldn't load display surface")
-                    gameQuit = True
-                    gameOver = False
-                else:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            gameQuit = True
-                            gameOver = False
-                        if event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_ESCAPE:
-                                gameQuit = True
-                                gameOver = False
-
-                            if (
-                                event.key == pygame.K_RETURN
-                                or event.key == pygame.K_SPACE
-                            ):
-                                gameOver = False
-                                # TODO Check if want to run again, save population
-                                DinoGame.train.currentGeneration = 1
-                                self.train(
-                                    nIndividuals=nIndividuals,
-                                    nGenerations=nGenerations,
-                                    semente_base=semente_base,
-                                    saida=saida,
-                                )
-
-                if pygame.display.get_surface() is not None:
-                    self.disp_gameOver_msg(retbutton_image, gameover_image)
-                    pygame.display.update()
-                self.clock.tick(self.FPS)
-
+        if not janela:
+            return
+        if self._fim_do_treino():
+            return self.train(nIndividuals, nGenerations, semente_base, saida, janela)
         pygame.quit()
         quit()
+
+    def _fim_do_treino(self):
+        """Tela de fim do treino com janela. Devolve True se o usuário pediu outro treino."""
+        retbutton_image, _ = self.load_image("replay_button.png", 35, 31, -1)
+        gameover_image, _ = self.load_image("game_over.png", 190, 11, -1)
+        while True:
+            if pygame.display.get_surface() is None:
+                print("Couldn't load display surface")
+                return False
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return False
+                    if event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                        return True
+            self.disp_gameOver_msg(retbutton_image, gameover_image)
+            pygame.display.update()
+            self.clock.tick(self.FPS)
 
     def start(self, nIndividuals=None, nGenerations=None, train=False, auto=False):
         isGameQuit = self.introscreen()

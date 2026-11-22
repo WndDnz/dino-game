@@ -690,6 +690,90 @@ def folha(sheetname, nx, ny, scalex, scaley):
     return imagens, [pygame.mask.from_surface(imagem) for imagem in imagens]
 
 
+class Pista:
+    """
+    Obstáculos, nuvens, chão, velocidade e contador de frames. É a mesma pista para
+    o jogo manual, o treino e o modo assistir (AD-007): até 2 cactos na tela, ptera
+    depois de 700 frames, velocidade +1 a cada 700 frames, e todo obstáculo novo
+    nasce a pelo menos DIST_MIN px dos que já estão na tela.
+    """
+
+    DIST_MIN = 160
+
+    def __init__(self):
+        self.gamespeed = 4
+        self.counter = 0
+        self.ground = Ground(-1 * self.gamespeed)
+        self.cacti = pygame.sprite.Group()
+        self.pteras = pygame.sprite.Group()
+        self.clouds = pygame.sprite.Group()
+        self.last_obstacle = pygame.sprite.Group()
+        Cactus.containers = self.cacti
+        Ptera.containers = self.pteras
+        Cloud.containers = self.clouds
+
+    def _cabe(self, largura):
+        """Um obstáculo de `largura` px nasce em width + largura: cabe se fica longe de todos."""
+        esquerda = DinoGame.width + largura
+        return all(
+            esquerda - o.rect.right >= self.DIST_MIN
+            for o in (*self.cacti, *self.pteras)
+        )
+
+    def passo(self):
+        """Um frame: cria obstáculos e nuvens, move tudo e acelera a cada 700 frames."""
+        for o in (*self.cacti, *self.pteras):
+            o.movement[0] = -1 * self.gamespeed
+
+        if len(self.cacti) < 2:
+            if len(self.cacti) == 0:
+                # sem a checagem, o cacto nascia em cima de um ptera recém-criado
+                if self._cabe(40):
+                    self.last_obstacle.empty()
+                    self.last_obstacle.add(Cactus(self.gamespeed, 40, 40))
+            else:
+                for last in self.last_obstacle:
+                    if (
+                        last.rect.right < DinoGame.width * 0.7
+                        and random.randrange(0, 50) == 10
+                        and self._cabe(40)
+                    ):
+                        self.last_obstacle.empty()
+                        self.last_obstacle.add(Cactus(self.gamespeed, 40, 40))
+
+        if (
+            len(self.pteras) == 0
+            and random.randrange(0, 200) == 10
+            and self.counter > 700
+        ):
+            for last in self.last_obstacle:
+                if last.rect.right < DinoGame.width * 0.8 and self._cabe(46):
+                    self.last_obstacle.empty()
+                    self.last_obstacle.add(Ptera(self.gamespeed, 46, 40))
+
+        if len(self.clouds) < 5 and random.randrange(0, 300) == 10:
+            Cloud(
+                DinoGame.width,
+                random.randrange(DinoGame.height // 5, DinoGame.height // 2),
+            )
+
+        self.cacti.update()
+        self.pteras.update()
+        self.clouds.update()
+        self.ground.update()
+
+        if self.counter % 700 == 699:
+            self.ground.speed -= 1
+            self.gamespeed += 1
+        self.counter += 1
+
+    def desenha(self, screen):
+        self.ground.draw(screen)
+        self.clouds.draw(screen)
+        self.cacti.draw(screen)
+        self.pteras.draw(screen)
+
+
 def sensores(dino, cac, pte, gamespeed):
     """
     Entrada (5,1) da rede, normalizada (AD-005): distância ao cacto, distância ao

@@ -124,10 +124,10 @@ T7 → T8 → T9 → T10
 
 **Done when**:
 
-- [ ] `test_obstaculo_novo_a_160_px`: em 20 sementes x 5000 frames, todo obstáculo criado tem a borda esquerda a 160 px ou mais da borda direita de cada obstáculo presente
-- [ ] `test_pista_regras_do_jogo_manual`: nas mesmas pistas, nunca mais de 2 cactos na tela, nenhum ptera antes do frame 700, todo ptera com 46x40, velocidade 4 no início e +1 a cada 700 frames
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
-- [ ] Test count: 25 testes de `test_ga.py` + 5 de `test_modos.py` passam
+- [x] `test_obstaculo_novo_a_160_px`: em 20 sementes x 5000 frames, todo obstáculo criado tem a borda esquerda a 160 px ou mais da borda direita de cada obstáculo presente
+- [x] `test_pista_regras_do_jogo_manual`: nas mesmas pistas, nunca mais de 2 cactos na tela, nenhum ptera antes do frame 700, todo ptera com 46x40, velocidade 4 no início e +1 a cada 700 frames
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py -v`
+- [x] Test count: 25 testes de `test_ga.py` + 5 de `test_modos.py` passam
 
 **Tests**: unit
 **Gate**: quick

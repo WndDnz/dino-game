@@ -1,6 +1,7 @@
 """Testes da spec headless-training-and-watch. Rodam sem janela: python -m pytest test_modos.py -v"""
 
 import os
+import random
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 os.environ["SDL_AUDIODRIVER"] = "dummy"
@@ -88,3 +89,56 @@ def test_lote_igual_ao_individual():
     )
     for i, saida in zip(vivos, parte):
         assert np.allclose(saida, redes[i].feedForward(entradas[i]), rtol=0, atol=1e-12)
+
+
+def _percorre(semente, frames):
+    """Roda uma Pista. Devolve (pista, novos), com novos = [(frame, obstaculo, outros na tela)].
+
+    Cada obstaculo novo ganha `.distancias`: da borda esquerda dele a borda direita de cada
+    outro, medidas no frame da criacao. Cada frame entra em `pista.historico` como
+    (cactos na tela, velocidade, contador).
+    """
+    random.seed(semente)
+    pista = DinoGame.Pista()
+    pista.historico = []
+    novos, antes = [], set()
+    for _ in range(frames):
+        frame = pista.counter
+        pista.passo()
+        agora = set(pista.cacti) | set(pista.pteras)
+        for o in agora - antes:
+            outros = [x for x in agora if x is not o]
+            o.distancias = [o.rect.left - x.rect.right for x in outros]
+            novos.append((frame, o, outros))
+        antes = agora
+        pista.historico.append((len(pista.cacti), pista.gamespeed, pista.counter))
+    return pista, novos
+
+
+def test_obstaculo_novo_a_160_px(jogo):
+    cactos = pteras = cacto_com_ptera_na_tela = 0
+    for semente in range(20):
+        pista, novos = _percorre(semente, 5000)
+        for frame, o, outros in novos:
+            assert all(d >= 160 for d in o.distancias), (semente, frame, o.distancias)
+            if isinstance(o, DinoGame.Ptera):
+                pteras += 1
+            else:
+                cactos += 1
+                cacto_com_ptera_na_tela += any(isinstance(x, DinoGame.Ptera) for x in outros)
+    # o teste so vale se as situacoes de risco aconteceram
+    assert cactos > 500 and pteras > 20 and cacto_com_ptera_na_tela > 5
+
+
+def test_pista_regras_do_jogo_manual(jogo):
+    for semente in range(20):
+        pista, novos = _percorre(semente, 5000)
+        assert max(n for n, _, _ in pista.historico) == 2  # ate 2 cactos, nunca 3
+        for cactos, velocidade, contador in pista.historico:
+            assert velocidade == 4 + contador // 700  # 4 no inicio, +1 a cada 700 frames
+        for frame, o, _ in novos:
+            if isinstance(o, DinoGame.Ptera):
+                assert frame > 700
+                assert o.rect.size == (46, 40)
+            else:
+                assert o.rect.size == (40, 40)

@@ -1,13 +1,14 @@
 # ga-training-fixes proofs
 
-**HEAD**: b613ccd
+**HEAD**: dc163f3
 **Tree**: clean
 **Shell**: C:/Program Files/Git\bin\bash.exe
-**Result**: 24 pass, 0 fail
+**Result**: 25 pass, 0 fail
 
 | Check | Proof | Result |
 | --- | --- | --- |
-| C1 | `run unit / test_ga.py::test_init_normal_0_1 PASSED` | pass |
+| C1 | `run unit / test_ga.py::test_init_pesos_dp4_bias_dp1 PASSED` | pass |
+| C24 | `run unit / test_ga.py::test_populacao_inicial_reativa PASSED` | pass |
 | C2 | `run unit / test_ga.py::test_sensores_normalizados PASSED` | pass |
 | C3 | `run unit / test_ga.py::test_sensor_sem_cacto PASSED` | pass |
 | C4 | `run unit / test_ga.py::test_sensor_sem_ptera PASSED` | pass |
@@ -37,19 +38,19 @@
 `Run unit` - exit 0
 
 ```
-test_ga.py::test_sem_elite_gera_n_filhos PASSED                          [ 50%]
-test_ga.py::test_sensores_normalizados PASSED                            [ 54%]
-test_ga.py::test_sensor_sem_cacto PASSED                                 [ 58%]
-test_ga.py::test_sensor_sem_ptera PASSED                                 [ 62%]
-test_ga.py::test_sensores_do_proprio_dino PASSED                         [ 66%]
-test_ga.py::test_limiar_05 PASSED                                        [ 70%]
-test_ga.py::test_pulo_sem_mixer PASSED                                   [ 75%]
-test_ga.py::test_colisoes_mesmo_frame PASSED                             [ 79%]
-test_ga.py::test_csv_linha_por_geracao PASSED                            [ 83%]
-test_ga.py::test_salva_melhor_de_todos PASSED                            [ 87%]
-test_ga.py::test_semente_por_geracao PASSED                              [ 91%]
-test_ga.py::test_treino_semeia_numpy PASSED                              [ 95%]
+test_ga.py::test_sem_elite_gera_n_filhos PASSED                          [ 52%]
+test_ga.py::test_sensores_normalizados PASSED                            [ 56%]
+test_ga.py::test_sensor_sem_cacto PASSED                                 [ 60%]
+test_ga.py::test_sensor_sem_ptera PASSED                                 [ 64%]
+test_ga.py::test_sensores_do_proprio_dino PASSED                         [ 68%]
+test_ga.py::test_limiar_05 PASSED                                        [ 72%]
+test_ga.py::test_pulo_sem_mixer PASSED                                   [ 76%]
+test_ga.py::test_colisoes_mesmo_frame PASSED                             [ 80%]
+test_ga.py::test_csv_linha_por_geracao PASSED                            [ 84%]
+test_ga.py::test_salva_melhor_de_todos PASSED                            [ 88%]
+test_ga.py::test_semente_por_geracao PASSED                              [ 92%]
+test_ga.py::test_treino_semeia_numpy PASSED                              [ 96%]
 test_ga.py::test_treino_interrompido_mantem_melhor PASSED                [100%]
 
-============================= 24 passed in 6.25s ==============================
+============================= 25 passed in 7.17s ==============================
 ```

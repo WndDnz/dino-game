@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 6,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "ac_gap::give every numeric goal in the spec its own check and measure the number before writing it",
+      "text": "Give every numeric goal in the spec its own check, and measure the number before writing it",
+      "signal": "ac_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "ga-training-fixes"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/ga-training-fixes/verification.md finding 1 / C24 (spec)"
+      ],
+      "created": "2026-11-22T22:17:13Z",
+      "last_seen": "2026-11-22T22:17:13Z"
+    },
+    {
+      "id": "L-002",
+      "key": "weak_test::a reproducibility test must not seed the random generators itself the code under test does the seeding",
+      "text": "A reproducibility test must not seed the random generators itself; the code under test does the seeding",
+      "signal": "weak_test",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "ga-training-fixes"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/ga-training-fixes/verification.md finding 2 / C16 (tests)"
+      ],
+      "created": "2026-11-22T22:17:14Z",
+      "last_seen": "2026-11-22T22:17:14Z"
+    },
+    {
+      "id": "L-003",
+      "key": "weak_test::compare objects by value not identity when the code under test returns copies",
+      "text": "Compare objects by value, not identity, when the code under test returns copies",
+      "signal": "weak_test",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "ga-training-fixes"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/ga-training-fixes/verification.md finding 3 / C19 (tests)"
+      ],
+      "created": "2026-11-22T22:17:14Z",
+      "last_seen": "2026-11-22T22:17:14Z"
+    },
+    {
+      "id": "L-004",
+      "key": "weak_test::test a strict bound at the bound itself not only on both sides of it",
+      "text": "Test a strict bound at the bound itself, not only on both sides of it",
+      "signal": "weak_test",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "ga-training-fixes"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/ga-training-fixes/verification.md finding 4 / C5 (tests)"
+      ],
+      "created": "2026-11-22T22:17:14Z",
+      "last_seen": "2026-11-22T22:17:14Z"
+    },
+    {
+      "id": "L-005",
+      "key": "ac_gap::derive sizes from the collection received not from constructor configuration and test with the two differing",
+      "text": "Derive sizes from the collection received, not from constructor configuration, and test with the two differing",
+      "signal": "ac_gap",
+      "scope": "ag",
+      "status": "candidate",
+      "features": [
+        "ga-training-fixes"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/ga-training-fixes/verification.md finding 5 / C22 (ag)"
+      ],
+      "created": "2026-11-22T22:17:14Z",
+      "last_seen": "2026-11-22T22:17:14Z"
+    }
+  ]
+}

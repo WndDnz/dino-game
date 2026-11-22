@@ -494,18 +494,7 @@ class DinoGame:
                 for dino in self.dinoArray:
                     senses = sensores(dino, cac, pte, gamespeed)
                     l, nl, na, ds, s = senses.ravel()  # mostrados no HUD
-                    action = dino.getAction(senses)
-                    if action[1][0] > 0.99:
-                        dino.isDucking = True
-                    else:
-                        dino.isDucking = False
-
-                    if action[0][0] > 0.99:
-                        if not dino.isJumping:
-                            dino.isJumping = True
-                            if pygame.mixer.get_init() is not None:
-                                DinoGame.jump_sound.play()
-                                dino.movement[1] = -1 * dino.jumpSpeed
+                    dino.agir(dino.getAction(senses))
 
                 if len(cacti) < 1:
                     if len(cacti) == 0:
@@ -730,6 +719,15 @@ class Dino:
                 return self.brain.feedForward(senses)
         else:
             return None
+
+    def agir(self, action):
+        """Aplica a saída (2,1) da rede, [pular, abaixar]: dispara acima de 0.5."""
+        self.isDucking = bool(action[1][0] > 0.5)
+        if action[0][0] > 0.5 and not self.isJumping:
+            self.isJumping = True
+            self.movement[1] = -1 * self.jumpSpeed
+            if pygame.mixer.get_init() is not None:
+                DinoGame.jump_sound.play()
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)

@@ -239,10 +239,10 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `test_limiar_05`: ação `[0.51, 0.49]` faz pular e não abaixar; `[0.49, 0.51]` faz abaixar e não pular
-- [ ] `test_pulo_sem_mixer`: depois de `pygame.mixer.quit()`, dino no chão com ação de pulo fica com `movement[1] == -jumpSpeed`
-- [ ] Gate check passes: `python -m pytest test_ga.py -v`
-- [ ] Test count: 17 tests pass
+- [x] `test_limiar_05`: ação `[0.51, 0.49]` faz pular e não abaixar; `[0.49, 0.51]` faz abaixar e não pular
+- [x] `test_pulo_sem_mixer`: depois de `pygame.mixer.quit()`, dino no chão com ação de pulo fica com `movement[1] == -jumpSpeed`
+- [x] Gate check passes: `python -m pytest test_ga.py -v`
+- [x] Test count: 17 tests pass
 
 **Tests**: unit
 **Gate**: quick

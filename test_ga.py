@@ -189,3 +189,21 @@ def test_sensores_do_proprio_dino(jogo):
     l2 = DinoGame.sensores(outro, cac, pte, 4)[0][0]
     assert l1 == pytest.approx(300 / 600)
     assert l2 == pytest.approx(285 / 600)
+
+
+def test_limiar_05(jogo):
+    pula = DinoGame.Dino(44, 47)
+    pula.agir(np.array([[0.51], [0.49]]))
+    assert pula.isJumping is True and pula.isDucking is False
+    abaixa = DinoGame.Dino(44, 47)
+    abaixa.agir(np.array([[0.49], [0.51]]))
+    assert abaixa.isJumping is False and abaixa.isDucking is True
+
+
+def test_pulo_sem_mixer(jogo):
+    pygame.mixer.quit()
+    assert pygame.mixer.get_init() is None
+    dino = DinoGame.Dino(44, 47)
+    assert dino.rect.bottom == int(0.98 * DinoGame.DinoGame.height)  # no chao
+    dino.agir(np.array([[0.9], [0.1]]))
+    assert dino.movement[1] == -dino.jumpSpeed

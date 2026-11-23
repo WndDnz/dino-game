@@ -812,7 +812,8 @@ def _espia_assistir(monkeypatch):
 
 def test_assistir_carrega_o_arquivo_indicado(pasta, monkeypatch):
     padrao, outra = _redes(2, semente=8)
-    RedeNeural.RedeNeural.save_object(padrao, "bestDino.din")
+    (pasta / "treinos" / "20261123-090000_s0").mkdir(parents=True)  # sem caminho: o treino mais recente (AD-008)
+    RedeNeural.RedeNeural.save_object(padrao, str(pasta / "treinos" / "20261123-090000_s0" / "bestDino.din"))
     RedeNeural.RedeNeural.save_object(outra, "outro.din")
     partidas = _espia_assistir(monkeypatch)
     assert autodino.main(["--assistir", "outro.din"]) == 0
@@ -834,8 +835,8 @@ def test_assistir_arquivo_inexistente(pasta, monkeypatch, capsys):
     janelas, partidas = _sem_janela_criada(monkeypatch), _espia_assistir(monkeypatch)
     assert autodino.main(["--assistir", "nao_existe.din"]) == 1
     assert capsys.readouterr().out.splitlines() == ["Arquivo não encontrado: nao_existe.din"]
-    assert autodino.main(["--assistir"]) == 1  # o padrao bestDino.din tambem nao existe aqui
-    assert capsys.readouterr().out.splitlines() == ["Arquivo não encontrado: bestDino.din"]
+    assert autodino.main(["--assistir"]) == 1  # sem caminho e sem treinos/ (AD-008)
+    assert capsys.readouterr().out.splitlines() == ["Nenhum treino encontrado em: treinos"]
     assert janelas == [] and partidas == []
 
 

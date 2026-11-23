@@ -253,11 +253,11 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_assistir_sem_arquivo_usa_o_treino_mais_recente`: com três pastas em `treinos/`, joga com a rede da de nome mais recente; uma pasta mais nova sem `bestDino.din` é ignorada; um `bestDino.din` na pasta atual não é usado
-- [ ] `test_assistir_sem_nenhum_treino`: sem `treinos/` ou com ela vazia, imprime a mensagem, devolve 1 e não abre janela
-- [ ] `test_modos.py` `test_assistir_carrega_o_arquivo_indicado` e `test_assistir_arquivo_inexistente`: os casos "sem caminho" passam a esperar o comportamento novo (mudança de WATCH-02 aprovada pelo usuário na spec)
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 20 de `test_registro.py` passam
+- [x] `test_assistir_sem_arquivo_usa_o_treino_mais_recente`: com três pastas em `treinos/`, joga com a rede da de nome mais recente; uma pasta mais nova sem `bestDino.din` é ignorada; um `bestDino.din` na pasta atual não é usado
+- [x] `test_assistir_sem_nenhum_treino`: sem `treinos/` ou com ela vazia, imprime a mensagem, devolve 1 e não abre janela
+- [x] `test_modos.py` `test_assistir_carrega_o_arquivo_indicado` e `test_assistir_arquivo_inexistente`: os casos "sem caminho" passam a esperar o comportamento novo (mudança de WATCH-02 aprovada pelo usuário na spec)
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 20 de `test_registro.py` passam
 
 **Tests**: integration
 **Gate**: full

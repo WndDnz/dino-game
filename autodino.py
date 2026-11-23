@@ -31,6 +31,17 @@ def _pasta_do_treino(semente):
     return caminho
 
 
+def _rede_mais_recente(raiz="treinos"):
+    """bestDino.din da pasta de treino mais recente em `raiz` (os nomes começam pela data), ou None."""
+    if not os.path.isdir(raiz):
+        return None
+    for nome in sorted(os.listdir(raiz), reverse=True):
+        caminho = os.path.join(raiz, nome, "bestDino.din")
+        if os.path.isfile(caminho):
+            return caminho
+    return None
+
+
 def main(argv=None):
     """Interpreta as opções, roda o modo pedido e devolve o código de saída."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -41,9 +52,9 @@ def main(argv=None):
     modo.add_argument(
         "--assistir",
         nargs="?",
-        const="bestDino.din",
+        const="",
         metavar="ARQUIVO",
-        help="mostra a rede salva jogando (padrão: bestDino.din)",
+        help="mostra a rede salva jogando (padrão: a do treino mais recente em treinos/)",
     )
     parser.add_argument("--individuos", type=_um_ou_mais, default=350)
     parser.add_argument("--geracoes", type=_um_ou_mais, default=30)
@@ -66,6 +77,11 @@ def main(argv=None):
     import DinoGame
 
     if args.assistir is not None:
+        if args.assistir == "":
+            args.assistir = _rede_mais_recente()
+            if args.assistir is None:
+                print("Nenhum treino encontrado em: treinos")
+                return 1
         try:
             rede = DinoGame.carrega_rede(args.assistir)
         except FileNotFoundError:

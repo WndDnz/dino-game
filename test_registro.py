@@ -378,3 +378,43 @@ def test_mesmo_segundo_ganha_sufixo(pasta, monkeypatch, capsys):
     for _ in range(3):
         assert autodino.main(["--sem-janela", "--semente", "4"]) == 0
     assert _treinos(pasta) == ["20261123-101500_s4", "20261123-101500_s4-2", "20261123-101500_s4-3"]
+
+
+def _espia_assistir(monkeypatch):
+    partidas = []
+    monkeypatch.setattr(
+        DinoGame.DinoGame, "gameplay", lambda self, rede=None, semente=None: partidas.append(rede)
+    )
+    return partidas
+
+
+def _mesma_rede(a, b):
+    return all(np.array_equal(x, y) for x, y in zip(a.pesos + a.bias, b.pesos + b.bias))
+
+
+def test_assistir_sem_arquivo_usa_o_treino_mais_recente(pasta, monkeypatch):
+    np.random.seed(9)
+    antiga, recente, meio, da_raiz = (RedeNeural.RedeNeural(CFG) for _ in range(4))
+    for nome, rede in (("20261120-080000_s0", antiga), ("20261123-090000_s3", recente), ("20261121-100000_s1", meio)):
+        (pasta / "treinos" / nome).mkdir(parents=True)
+        RedeNeural.RedeNeural.save_object(rede, str(pasta / "treinos" / nome / "bestDino.din"))
+    (pasta / "treinos" / "20261123-120000_s5").mkdir()  # mais nova, mas sem rede: ignorada
+    RedeNeural.RedeNeural.save_object(da_raiz, "bestDino.din")  # a raiz nao e mais usada
+    partidas = _espia_assistir(monkeypatch)
+    assert autodino.main(["--assistir"]) == 0
+    assert _mesma_rede(partidas[0], recente)
+    assert not any(_mesma_rede(partidas[0], r) for r in (antiga, meio, da_raiz))
+
+
+@pytest.mark.parametrize("cria_pasta", [False, True])
+def test_assistir_sem_nenhum_treino(pasta, monkeypatch, capsys, cria_pasta):
+    if cria_pasta:
+        (pasta / "treinos" / "20261123-090000_s3").mkdir(parents=True)  # treino sem bestDino.din
+    RedeNeural.RedeNeural.save_object(RedeNeural.RedeNeural(CFG), "bestDino.din")
+    janelas = []
+    set_mode = pygame.display.set_mode
+    monkeypatch.setattr(pygame.display, "set_mode", lambda *a, **k: janelas.append(a) or set_mode(*a, **k))
+    partidas = _espia_assistir(monkeypatch)
+    assert autodino.main(["--assistir"]) == 1
+    assert capsys.readouterr().out.splitlines() == ["Nenhum treino encontrado em: treinos"]
+    assert janelas == [] and partidas == []

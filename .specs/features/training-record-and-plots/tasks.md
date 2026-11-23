@@ -115,9 +115,9 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_hiperparametros_do_ag_sao_as_constantes`: as constantes valem 0.5, 3 e 0.1; trocar `TORNEIO` para 1 faz o torneio devolver indivíduos sorteados sem preferência pelo melhor; com `SIGMA_MUTACAO` 2.0 o desvio dos deltas da mutação fica entre 1.8 e 2.2; com `ALPHA_BLX` 0.0 todo gene do filho fica entre os dos pais
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 2 de `test_registro.py` passam
+- [x] `test_hiperparametros_do_ag_sao_as_constantes`: as constantes valem 0.5, 3 e 0.1; trocar `TORNEIO` para 1 faz o torneio devolver indivíduos sorteados sem preferência pelo melhor; com `SIGMA_MUTACAO` 2.0 o desvio dos deltas da mutação fica entre 1.8 e 2.2; com `ALPHA_BLX` 0.0 todo gene do filho fica entre os dos pais
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 2 de `test_registro.py` passam
 
 **Tests**: unit
 **Gate**: quick

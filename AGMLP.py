@@ -10,6 +10,11 @@ A classe RNA_AG usa um algoritmo genético para treinar uma RNA do tipo feed-for
 """
 
 
+SIGMA_MUTACAO = 0.5  # desvio do ruído gaussiano somado a um gene mutado
+TORNEIO = 3  # indivíduos sorteados por torneio
+ALPHA_BLX = 0.1  # alcance do crossover BLX-alpha além do segmento entre os pais
+
+
 def diversidade(redes):
     """Média, sobre os genes, do desvio padrão de cada gene entre as redes; 0 se todas são iguais."""
     genes = np.stack(
@@ -69,12 +74,12 @@ class RNA_AG:
         fitness = {key: specimen[0] for (key, specimen) in enumerate(populacao)}
         return sorted(fitness.items(), key=operator.itemgetter(1), reverse=True)
 
-    def selecao(self, popRanqueada, n, k=3):
+    def selecao(self, popRanqueada, n, k=None):
         """
         Seleção por torneio: cada um dos n pais é o de maior aptidão entre k indivíduos
         sorteados. Retornamos uma lista com os índices dos vencedores.
         """
-        k = min(k, len(popRanqueada))
+        k = min(TORNEIO if k is None else k, len(popRanqueada))
         return [
             max(random.sample(popRanqueada, k), key=operator.itemgetter(1))[0]
             for i in range(n)
@@ -92,7 +97,7 @@ class RNA_AG:
 
         filho = RedeNeural.RedeNeural(self.configRede)
 
-        alpha = 0.1
+        alpha = ALPHA_BLX
         beta = np.random.uniform(-alpha, 1 + alpha)
         for i in range(pai1.ncamadas - 1):
             # shapeOrig = b1[i].shape
@@ -199,11 +204,12 @@ class RNA_AG:
             filho.pesos[i] = pesosfilho
         return filho
 
-    def aplicaMutacao(self, individuo, taxaMutacao, sigma=0.5):
+    def aplicaMutacao(self, individuo, taxaMutacao, sigma=None):
         """
         Mutação gaussiana: cada gene (peso ou bias) recebe + N(0, sigma) com
         probabilidade taxaMutacao.
         """
+        sigma = SIGMA_MUTACAO if sigma is None else sigma
         for genes in individuo.bias + individuo.pesos:
             mascara = np.random.random(genes.shape) < taxaMutacao
             genes += mascara * np.random.normal(0.0, sigma, genes.shape)

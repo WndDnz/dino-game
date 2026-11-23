@@ -1,6 +1,6 @@
 # training-record-and-plots proofs
 
-**HEAD**: fa62a76
+**HEAD**: b8e032f
 **Tree**: dirty - bestDino.din, fitness.csv
 **Shell**: C:/Program Files/Git\bin\bash.exe
 **Result**: 31 pass, 0 fail
@@ -58,5 +58,5 @@ test_registro.py::test_mostrar_abre_os_graficos PASSED                   [ 98%]
 test_registro.py::test_novo_treino_na_tela_de_fim_vai_para_outra_pasta PASSED [ 99%]
 test_registro.py::test_treinos_simultaneos_nao_dividem_pasta PASSED      [100%]
 
-============================ 104 passed in 36.85s =============================
+============================ 104 passed in 37.89s =============================
 ```

@@ -394,17 +394,31 @@ def _mesma_rede(a, b):
 
 
 def test_assistir_sem_arquivo_usa_o_treino_mais_recente(pasta, monkeypatch):
-    np.random.seed(9)
-    antiga, recente, meio, da_raiz = (RedeNeural.RedeNeural(CFG) for _ in range(4))
-    for nome, rede in (("20261120-080000_s0", antiga), ("20261123-090000_s3", recente), ("20261121-100000_s1", meio)):
-        (pasta / "treinos" / nome).mkdir(parents=True)
-        RedeNeural.RedeNeural.save_object(rede, str(pasta / "treinos" / nome / "bestDino.din"))
-    (pasta / "treinos" / "20261123-120000_s5").mkdir()  # mais nova, mas sem rede: ignorada
-    RedeNeural.RedeNeural.save_object(da_raiz, "bestDino.din")  # a raiz nao e mais usada
+    """Mais recente = a rede gravada por ultimo, nao o maior nome de pasta."""
     partidas = _espia_assistir(monkeypatch)
-    assert autodino.main(["--assistir"]) == 0
-    assert _mesma_rede(partidas[0], recente)
-    assert not any(_mesma_rede(partidas[0], r) for r in (antiga, meio, da_raiz))
+    RedeNeural.RedeNeural.save_object(RedeNeural.RedeNeural(CFG), "bestDino.din")  # a raiz nao e mais usada
+    casos = [
+        # (pasta, segundos de modificacao do bestDino.din); a de maior tempo deve ganhar
+        [("20261120-080000_s0", 1000), ("20261123-090000_s3", 3000), ("20261121-100000_s1", 2000)],
+        [("20261123-090000_s3", 2000), ("experimento", 3000)],  # --saida dentro de treinos/
+        [("20261123-101500_s4-9", 2000), ("20261123-101500_s4-11", 3000)],  # sufixo de 2 digitos
+        [("20261123-101500_s9", 2000), ("20261123-101500_s10", 3000)],  # sementes no mesmo segundo
+    ]
+    for i, caso in enumerate(casos):
+        raiz = pasta / "treinos"
+        if raiz.exists():
+            shutil.rmtree(raiz)
+        redes = {}
+        for nome, tempo in caso:
+            (raiz / nome).mkdir(parents=True)
+            redes[nome] = RedeNeural.RedeNeural(CFG)
+            arquivo = raiz / nome / "bestDino.din"
+            RedeNeural.RedeNeural.save_object(redes[nome], str(arquivo))
+            os.utime(arquivo, (tempo, tempo))
+        (raiz / "zzz_sem_rede").mkdir()  # pasta sem rede: ignorada
+        assert autodino.main(["--assistir"]) == 0
+        esperada = max(caso, key=lambda c: c[1])[0]
+        assert _mesma_rede(partidas[i], redes[esperada]), (i, esperada)
 
 
 @pytest.mark.parametrize("cria_pasta", [False, True])

@@ -40,14 +40,12 @@ def _pasta_do_treino(semente):
 
 
 def _rede_mais_recente(raiz="treinos"):
-    """bestDino.din da pasta de treino mais recente em `raiz` (os nomes começam pela data), ou None."""
+    """O bestDino.din gravado por último entre as pastas de `raiz`, ou None."""
     if not os.path.isdir(raiz):
         return None
-    for nome in sorted(os.listdir(raiz), reverse=True):
-        caminho = os.path.join(raiz, nome, "bestDino.din")
-        if os.path.isfile(caminho):
-            return caminho
-    return None
+    redes = [os.path.join(raiz, nome, "bestDino.din") for nome in os.listdir(raiz)]
+    redes = [r for r in redes if os.path.isfile(r)]
+    return max(redes, key=os.path.getmtime, default=None)
 
 
 def main(argv=None):

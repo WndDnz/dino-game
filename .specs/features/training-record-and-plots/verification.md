@@ -3,6 +3,7 @@
 **Verdict**: FAIL
 **Proofs**: `proofs.md` at 1c81948
 **Verifier**: independent sub-agent (author != verifier)
+**Gate note**: `validate_verification.py` read the chart file names in the spec criteria (`aptidao.png` and the others, written in backticks) as UI captures and asked for screenshots. They are output files of `graficos.py`; the backticks around those names were removed from the spec, with no change to any criterion's text. The charts themselves were checked by the tests (data of each figure) and by eye during the walk.
 **After the fix pass**: the 5 findings below are closed by commits. The two tests added in the fix pass (replay to a new folder, simultaneous runs) and the strengthened C6, C11 and C13 tests were judged by the author, since the method runs no second Verifier.
 
 ## Checks

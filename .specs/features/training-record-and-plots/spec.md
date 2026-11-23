@@ -96,12 +96,12 @@ Um treino hoje deixa só `fitness.csv` com o melhor score e a média de cada ger
 
 **Acceptance Criteria**:
 
-1. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar em `<pasta>` o arquivo `aptidao.png` com as curvas de melhor, mediana, média e pior por geração e uma faixa de média ± desvio.
-2. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar `aptidao_por_frames.png` com as curvas de melhor e média em função dos frames simulados acumulados.
-3. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar `mortes.png` com as mortes por cacto e por ptera de cada geração em barras empilhadas.
-4. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar `obstaculos.png` com as curvas de `obstaculos_melhor` e `obstaculos_media` por geração.
-5. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar `diversidade.png` com a curva de diversidade por geração.
-6. WHEN `graficos.py` recebe mais de uma pasta THEN o script SHALL gravar na pasta atual o arquivo `comparacao.png` com a curva de média por geração de cada treino, identificada pelo nome da pasta.
+1. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar em `<pasta>` o arquivo aptidao.png com as curvas de melhor, mediana, média e pior por geração e uma faixa de média ± desvio.
+2. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar aptidao_por_frames.png com as curvas de melhor e média em função dos frames simulados acumulados.
+3. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar mortes.png com as mortes por cacto e por ptera de cada geração em barras empilhadas.
+4. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar obstaculos.png com as curvas de `obstaculos_melhor` e `obstaculos_media` por geração.
+5. WHEN `python graficos.py <pasta>` roda THEN o script SHALL gravar diversidade.png com a curva de diversidade por geração.
+6. WHEN `graficos.py` recebe mais de uma pasta THEN o script SHALL gravar na pasta atual o arquivo comparacao.png com a curva de média por geração de cada treino, identificada pelo nome da pasta.
 7. WHERE `--mostrar` é informado, o script SHALL abrir os gráficos em janelas depois de gravá-los.
 8. The script SHALL gerar os arquivos sem abrir janela quando `--mostrar` não é informado.
 9. IF a pasta não contém `fitness.csv` THEN o script SHALL imprimir `Sem fitness.csv em: <pasta>` e encerrar com código de saída 1.

@@ -102,13 +102,13 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `test_populacao_corre_em_cada_pista_de_treino`: com sementes (8, 9, 10), `roda_geracao` é chamada 3 vezes, cada uma com as 4 redes e com `random` recém-semeado em 8, 9 e 10
-- [ ] `test_fitness_e_a_media_das_pistas`: com scores por pista fixados em (10, 20, 60) e (30, 30, 30) para duas redes, os fitness são 30.0 e 30.0; com (10, 20, 61), 30.333...; conferido também contra a pista real, rodando cada pista em separado
-- [ ] `test_frames_e_mortes_somam_as_pistas`: `frames`, `mortes_cacto` e `mortes_ptera` são a soma dos valores de cada pista rodada em separado
-- [ ] `test_obstaculos_media_por_pista`: um dino que venceu 2, 4 e 9 obstáculos nas 3 pistas tem 5.0 em `obstaculos`, na posição dele na população
-- [ ] `test_empate_no_melhor_e_reproduzivel`: com duas redes idênticas na população, `max` sobre o resultado devolve a de menor índice em duas execuções seguidas
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
-- [ ] Test count: os 105 testes anteriores + 5 de `test_pistas.py` passam (110)
+- [x] `test_populacao_corre_em_cada_pista_de_treino`: com sementes (8, 9, 10), `roda_geracao` é chamada 3 vezes, cada uma com as 4 redes e com `random` recém-semeado em 8, 9 e 10
+- [x] `test_fitness_e_a_media_das_pistas`: com scores por pista fixados em (10, 20, 60) e (30, 30, 30) para duas redes, os fitness são 30.0 e 30.0; com (10, 20, 61), 30.333...; conferido também contra a pista real, rodando cada pista em separado
+- [x] `test_frames_e_mortes_somam_as_pistas`: `frames`, `mortes_cacto` e `mortes_ptera` são a soma dos valores de cada pista rodada em separado
+- [x] `test_obstaculos_media_por_pista`: um dino que venceu 2, 4 e 9 obstáculos nas 3 pistas tem 5.0 em `obstaculos`, na posição dele na população
+- [x] `test_empate_no_melhor_e_reproduzivel`: com duas redes idênticas na população, `max` sobre o resultado devolve a de menor índice em duas execuções seguidas
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
+- [x] Test count: os 105 testes anteriores + 5 de `test_pistas.py` passam (110)
 
 **Tests**: integration
 **Gate**: full

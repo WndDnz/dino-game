@@ -416,6 +416,31 @@ class DinoGame:
         self.dinoArray.clear()
         return ranked
 
+    def avalia(self, redes, sementes, janela=True):
+        """
+        Roda `redes` em uma pista por semente e devolve [(fitness, rede)] na ordem de
+        `redes`, com fitness = média dos scores (AD-009). Deixa em self.estatisticas a
+        soma de frames e mortes e, em "obstaculos", a média por pista de cada rede.
+        Devolve None se o usuário fechou a janela.
+        """
+        indice = {id(rede): i for i, rede in enumerate(redes)}
+        scores = np.zeros(len(redes))
+        vencidos = np.zeros(len(redes))
+        total = {"frames": 0, "mortes_cacto": 0, "mortes_ptera": 0}
+        for semente in sementes:
+            random.seed(semente)  # pista reproduzível: mesma semente, mesmos obstáculos
+            ranked = self.roda_geracao(redes, janela)
+            if ranked is None:
+                return None
+            for (score, rede), obstaculos in zip(ranked, self.estatisticas["obstaculos"]):
+                scores[indice[id(rede)]] += score
+                vencidos[indice[id(rede)]] += obstaculos
+            for chave in total:
+                total[chave] += self.estatisticas[chave]
+        n = len(sementes)
+        self.estatisticas = {**total, "obstaculos": [float(v) for v in vencidos / n]}
+        return [(float(s), rede) for s, rede in zip(scores / n, redes)]
+
     def _eventos_treino(self):
         """Eventos do treino com janela. Devolve False se o usuário pediu para sair."""
         if pygame.display.get_surface() is None:

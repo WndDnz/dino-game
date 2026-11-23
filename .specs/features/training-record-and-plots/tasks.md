@@ -183,10 +183,10 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_versao_do_codigo_vem_do_git`: o commit é igual à saída de `git rev-parse --short HEAD` do repositório, e `alteracoes_locais` é booleano
-- [ ] `test_versao_sem_git`: com o comando git indisponível, devolve `(None, False)` sem levantar erro
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 10 de `test_registro.py` passam
+- [x] `test_versao_do_codigo_vem_do_git`: o commit é igual à saída de `git rev-parse --short HEAD` do repositório, e `alteracoes_locais` é booleano
+- [x] `test_versao_sem_git`: com o comando git indisponível, devolve `(None, False)` sem levantar erro
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 10 de `test_registro.py` passam
 
 **Tests**: unit
 **Gate**: quick

@@ -2,6 +2,7 @@
 
 import os
 import random
+import subprocess
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 os.environ["SDL_AUDIODRIVER"] = "dummy"
@@ -206,3 +207,27 @@ def test_diversidade_no_csv(tmp_path):
     copias = [redes[0]] * 3
     DinoGame.registra_geracao([(1, r) for r in copias], 2, 4, str(tmp_path))
     assert float(_linhas(tmp_path)[1]["diversidade"]) == pytest.approx(0.0, abs=1e-12)  # ruido de ponto flutuante do std
+
+
+def test_versao_do_codigo_vem_do_git():
+    repo = os.path.dirname(os.path.abspath(DinoGame.__file__))
+    esperado = subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"], cwd=repo, capture_output=True, text=True
+    ).stdout.strip()
+    sujo = bool(subprocess.run(["git", "status", "--porcelain"], cwd=repo, capture_output=True, text=True).stdout.strip())
+    assert len(esperado) >= 7
+    assert DinoGame.versao_do_codigo() == (esperado, sujo)
+
+
+def test_versao_sem_git(monkeypatch):
+    def sem_git(*args, **kwargs):
+        raise FileNotFoundError("git")
+
+    monkeypatch.setattr(subprocess, "run", sem_git)
+    assert DinoGame.versao_do_codigo() == (None, False)
+
+    def git_falha(*args, **kwargs):
+        return subprocess.CompletedProcess(args, 128, stdout="", stderr="fatal: not a git repository")
+
+    monkeypatch.setattr(subprocess, "run", git_falha)
+    assert DinoGame.versao_do_codigo() == (None, False)

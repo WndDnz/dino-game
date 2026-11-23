@@ -2,6 +2,7 @@
 
 import os
 import pickle
+import subprocess
 import pygame
 import pygame.freetype
 import random
@@ -696,6 +697,23 @@ def remove_colididos(dinos, obstaculo, ranked):
             dinos.remove(d)
             if pygame.mixer.get_init() is not None:
                 DinoGame.die_sound.play()
+
+
+def versao_do_codigo():
+    """(commit curto, há alterações locais) do repositório deste arquivo; (None, False) sem git."""
+    repo = os.path.dirname(os.path.abspath(__file__))
+    try:
+        commit = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"], cwd=repo, capture_output=True, text=True
+        )
+        status = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=repo, capture_output=True, text=True
+        )
+    except OSError:
+        return None, False
+    if commit.returncode != 0 or status.returncode != 0:
+        return None, False
+    return commit.stdout.strip(), bool(status.stdout.strip())
 
 
 COLUNAS = (

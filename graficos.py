@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Gráficos de um ou mais treinos a partir do fitness.csv de cada pasta.
 
-Uso: python graficos.py <pasta>
+Uso: python graficos.py <pasta> [<pasta> ...] [--mostrar]
 """
 
 import argparse
@@ -80,6 +80,15 @@ def diversidade(d):
     return fig
 
 
+def comparacao(treinos):
+    """`treinos`: lista de (nome, dados). Uma curva de média por treino."""
+    fig, ax = _figura("Comparação entre treinos: média por geração", "score")
+    for nome, d in treinos:
+        ax.plot(d["geracao"], d["media"], label=nome)
+    ax.legend()
+    return fig
+
+
 # arquivo -> (função, colunas que ela precisa)
 GRAFICOS = {
     "aptidao.png": (aptidao, {"geracao", "melhor", "media"}),
@@ -94,11 +103,13 @@ def main(argv=None):
     """Grava os gráficos e devolve o código de saída."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("pastas", nargs="+", metavar="PASTA")
+    parser.add_argument("--mostrar", action="store_true", help="abre os gráficos depois de gravá-los")
     args = parser.parse_args(argv)
 
     import matplotlib
 
-    matplotlib.use("Agg")  # só grava arquivos, nenhuma janela
+    if not args.mostrar:
+        matplotlib.use("Agg")  # só grava arquivos, nenhuma janela
     import matplotlib.pyplot as plt
 
     treinos = []
@@ -118,8 +129,17 @@ def main(argv=None):
                 continue
             fig = grafico(dados)
             fig.savefig(os.path.join(pasta, arquivo), dpi=120, bbox_inches="tight")
+            if not args.mostrar:
+                plt.close(fig)
+
+    if len(treinos) > 1:
+        fig = comparacao(treinos)
+        fig.savefig("comparacao.png", dpi=120, bbox_inches="tight")
+        if not args.mostrar:
             plt.close(fig)
 
+    if args.mostrar:
+        plt.show()
     return 0
 
 

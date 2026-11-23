@@ -554,3 +554,41 @@ def test_csv_antigo_pula_graficos(tmp_path, monkeypatch, capsys):
         f"Gráfico pulado, faltam colunas: {nome}"
         for nome in ("aptidao_por_frames.png", "mortes.png", "obstaculos.png", "diversidade.png")
     ]
+
+
+def test_comparacao_entre_treinos(tmp_path, monkeypatch):
+    salvas = _figuras(monkeypatch)
+    monkeypatch.chdir(tmp_path)
+    outro = [(g, m * 2, med * 2, *resto) for g, m, med, *resto in FITNESS]
+    a = _fitness(tmp_path / "treinos" / "20261123-090000_s1")
+    b = _fitness(tmp_path / "treinos" / "20261123-100000_s2", linhas=outro)
+    assert graficos.main([str(a), str(b)]) == 0
+    assert (tmp_path / "comparacao.png").stat().st_size > 0
+    assert _curvas(salvas["comparacao.png"]) == {
+        "20261123-090000_s1": ([1.0, 2.0, 3.0], _col(2)),
+        "20261123-100000_s2": ([1.0, 2.0, 3.0], [m * 2 for m in _col(2)]),
+    }
+    for pasta in (a, b):  # os graficos de cada treino tambem sao gravados
+        assert sorted(p.name for p in pasta.glob("*.png")) == sorted(graficos.GRAFICOS)
+    # com uma pasta so, nao ha comparacao
+    (tmp_path / "comparacao.png").unlink()
+    assert graficos.main([str(a)]) == 0
+    assert not (tmp_path / "comparacao.png").exists()
+
+
+def test_mostrar_abre_os_graficos(tmp_path, monkeypatch):
+    import matplotlib
+    import matplotlib.pyplot as plt
+
+    pasta = _fitness(tmp_path / "t")
+    existiam = []
+
+    def show(*a, **k):
+        existiam.append(sorted(p.name for p in pasta.glob("*.png")))
+
+    monkeypatch.setattr(matplotlib, "use", lambda *a, **k: None)  # nao troca de backend no teste
+    monkeypatch.setattr(plt, "show", show)
+    assert graficos.main([str(pasta), "--mostrar"]) == 0
+    assert existiam == [sorted(graficos.GRAFICOS)]  # uma chamada, depois de gravar os arquivos
+    assert len(plt.get_fignums()) == len(graficos.GRAFICOS)  # as figuras ficaram abertas para mostrar
+    plt.close("all")

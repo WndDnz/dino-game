@@ -325,10 +325,10 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_comparacao_entre_treinos`: com duas pastas, `comparacao.png` é gravado na pasta atual com uma curva de média por treino, rotulada com o nome da pasta, e os cinco gráficos de cada pasta também são gravados; com uma pasta só, `comparacao.png` não é criado
-- [ ] `test_mostrar_abre_os_graficos`: com `--mostrar`, `plt.show` é chamado uma vez, depois de os arquivos existirem
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 31 de `test_registro.py` passam
+- [x] `test_comparacao_entre_treinos`: com duas pastas, `comparacao.png` é gravado na pasta atual com uma curva de média por treino, rotulada com o nome da pasta, e os cinco gráficos de cada pasta também são gravados; com uma pasta só, `comparacao.png` não é criado
+- [x] `test_mostrar_abre_os_graficos`: com `--mostrar`, `plt.show` é chamado uma vez, depois de os arquivos existirem
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 31 de `test_registro.py` passam
 
 **Tests**: unit
 **Gate**: quick

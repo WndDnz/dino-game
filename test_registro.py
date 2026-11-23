@@ -1,5 +1,7 @@
 """Testes da spec training-record-and-plots. Rodam sem janela: python -m pytest test_registro.py -v"""
 
+import datetime
+import json
 import os
 import random
 import subprocess
@@ -231,3 +233,84 @@ def test_versao_sem_git(monkeypatch):
 
     monkeypatch.setattr(subprocess, "run", git_falha)
     assert DinoGame.versao_do_codigo() == (None, False)
+
+
+class _Fim(Exception):
+    pass
+
+
+def _json(caminho):
+    with open(caminho, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def test_config_json_antes_da_primeira_geracao(jogo, monkeypatch, tmp_path, capsys):
+    vistos = []
+    roda = DinoGame.DinoGame.roda_geracao
+
+    def espia(self, redes, janela=True):
+        if not vistos:
+            arquivo = tmp_path / "config.json"
+            vistos.append(_json(arquivo) if arquivo.exists() else None)
+        return roda(self, redes, janela)
+
+    monkeypatch.setattr(DinoGame.DinoGame, "roda_geracao", espia)
+    jogo.train(10, 2, semente_base=4, saida=str(tmp_path), janela=False)
+    config = vistos[0]
+    assert config is not None, "config.json nao existia quando a primeira geracao comecou"
+    commit, sujo = DinoGame.versao_do_codigo()
+    inicio = config.pop("inicio")
+    assert config == {
+        "individuos": 10, "geracoes": 2, "semente": 4, "janela": False, "topologia": [5, 8, 4, 2],
+        "taxa_mutacao": 0.05, "sigma_mutacao": 0.5, "elite": 0.1, "torneio": 3, "alpha_blx": 0.1,
+        "commit": commit, "alteracoes_locais": sujo,
+    }
+    assert datetime.datetime.fromisoformat(inicio).year >= 2026
+
+
+def test_resumo_json_no_fim(jogo, tmp_path, capsys):
+    jogo.train(10, 3, semente_base=4, saida=str(tmp_path), janela=False)
+    resumo = _json(tmp_path / "resumo.json")
+    linhas = _linhas(tmp_path)
+    melhor = max(linhas, key=lambda l: int(l["melhor"]))  # max devolve o primeiro em caso de empate
+    assert set(resumo) == {"geracoes_concluidas", "melhor_score", "geracao_do_melhor", "frames_total", "segundos_total"}
+    assert resumo["geracoes_concluidas"] == 3 == len(linhas)
+    assert resumo["melhor_score"] == int(melhor["melhor"])
+    assert resumo["geracao_do_melhor"] == int(melhor["geracao"])
+    assert resumo["frames_total"] == sum(int(l["frames"]) for l in linhas)
+    assert isinstance(resumo["segundos_total"], float) and resumo["segundos_total"] > 0
+
+
+def test_treino_interrompido_sem_resumo(jogo, monkeypatch, tmp_path, capsys):
+    passo = DinoGame.Pista.passo
+
+    def ctrl_c_na_geracao_2(self):
+        if DinoGame.DinoGame.train.currentGeneration == 2 and self.counter == 20:
+            raise KeyboardInterrupt
+        passo(self)
+
+    monkeypatch.setattr(DinoGame.Pista, "passo", ctrl_c_na_geracao_2)
+    with pytest.raises(KeyboardInterrupt):
+        jogo.train(10, 3, semente_base=4, saida=str(tmp_path), janela=False)
+    assert sorted(os.listdir(tmp_path)) == ["bestDino.din", "config.json", "fitness.csv"]
+    assert len(_linhas(tmp_path)) == 1
+
+
+def test_csv_completo_igual_com_e_sem_janela(jogo, monkeypatch, tmp_path, capsys):
+    def fim(*args):
+        raise _Fim
+
+    monkeypatch.setattr(DinoGame.DinoGame, "disp_gameOver_msg", fim)
+    (tmp_path / "com").mkdir()
+    (tmp_path / "sem").mkdir()
+    with pytest.raises(_Fim):
+        jogo.train(10, 3, semente_base=6, saida=str(tmp_path / "com"))
+    jogo.train(10, 3, semente_base=6, saida=str(tmp_path / "sem"), janela=False)
+    com = (tmp_path / "com" / "fitness.csv").read_text()
+    assert com == (tmp_path / "sem" / "fitness.csv").read_text()
+    linhas = _linhas(tmp_path / "com")
+    assert len(linhas) == 3 and list(linhas[0]) == CABECALHO.split(",")
+    for l in linhas:
+        assert int(l["mortes_cacto"]) + int(l["mortes_ptera"]) == 10
+        assert float(l["pior"]) <= float(l["mediana"]) <= float(l["melhor"])
+        assert int(l["frames"]) > 0

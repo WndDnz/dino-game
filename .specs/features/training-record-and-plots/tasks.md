@@ -205,12 +205,12 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_config_json_antes_da_primeira_geracao`: `config.json` existe quando a primeira geração começa e tem as 13 chaves com os valores do treino (`individuos` 10, `geracoes` 2, `semente` 4, `janela` false, `topologia` [5, 8, 4, 2], `taxa_mutacao` 0.05, `sigma_mutacao` 0.5, `elite` 0.1, `torneio` 3, `alpha_blx` 0.1, `commit`, `alteracoes_locais`, `inicio` em formato ISO)
-- [ ] `test_resumo_json_no_fim`: `geracoes_concluidas` 3, `melhor_score` e `geracao_do_melhor` batem com o `fitness.csv`, `frames_total` é a soma da coluna `frames`, `segundos_total` é um número maior que 0
-- [ ] `test_treino_interrompido_sem_resumo`: interrompido na geração 2 de 3, a pasta tem `config.json`, `fitness.csv` com 1 linha de dados e `bestDino.din`, e não tem `resumo.json`
-- [ ] `test_csv_completo_igual_com_e_sem_janela`: N=10, 3 gerações, mesma semente: os dois `fitness.csv` de 12 colunas são idênticos, com `mortes_cacto + mortes_ptera` = 10 e `pior <= mediana <= melhor` em toda linha
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 14 de `test_registro.py` passam
+- [x] `test_config_json_antes_da_primeira_geracao`: `config.json` existe quando a primeira geração começa e tem as 13 chaves com os valores do treino (`individuos` 10, `geracoes` 2, `semente` 4, `janela` false, `topologia` [5, 8, 4, 2], `taxa_mutacao` 0.05, `sigma_mutacao` 0.5, `elite` 0.1, `torneio` 3, `alpha_blx` 0.1, `commit`, `alteracoes_locais`, `inicio` em formato ISO)
+- [x] `test_resumo_json_no_fim`: `geracoes_concluidas` 3, `melhor_score` e `geracao_do_melhor` batem com o `fitness.csv`, `frames_total` é a soma da coluna `frames`, `segundos_total` é um número maior que 0
+- [x] `test_treino_interrompido_sem_resumo`: interrompido na geração 2 de 3, a pasta tem `config.json`, `fitness.csv` com 1 linha de dados e `bestDino.din`, e não tem `resumo.json`
+- [x] `test_csv_completo_igual_com_e_sem_janela`: N=10, 3 gerações, mesma semente: os dois `fitness.csv` de 12 colunas são idênticos, com `mortes_cacto + mortes_ptera` = 10 e `pior <= mediana <= melhor` em toda linha
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 14 de `test_registro.py` passam
 
 **Tests**: integration
 **Gate**: full

@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import datetime
+import json
 import os
 import pickle
 import subprocess
@@ -12,6 +14,7 @@ import AGMLP
 import math
 import concurrent.futures
 import functools
+import time
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -19,6 +22,11 @@ BG_COLOR = (235, 235, 235)
 
 pygame.mixer.pre_init(44100, -16, 2, 2048)  # fix audio delay
 pygame.init()
+
+
+TOPOLOGIA = (5, 8, 4, 2)
+TAXA_MUTACAO = 0.05
+ELITE = 0.1
 
 
 class DinoGame:
@@ -475,14 +483,35 @@ class DinoGame:
         np.random.seed(semente_base)  # população inicial, crossover e mutação
         if os.path.exists(os.path.join(saida, "fitness.csv")):
             os.remove(os.path.join(saida, "fitness.csv"))
+        commit, alteracoes = versao_do_codigo()
+        config = {
+            "individuos": nIndividuals,
+            "geracoes": nGenerations,
+            "semente": semente_base,
+            "janela": janela,
+            "topologia": list(TOPOLOGIA),
+            "taxa_mutacao": TAXA_MUTACAO,
+            "sigma_mutacao": AGMLP.SIGMA_MUTACAO,
+            "elite": ELITE,
+            "torneio": AGMLP.TORNEIO,
+            "alpha_blx": AGMLP.ALPHA_BLX,
+            "commit": commit,
+            "alteracoes_locais": alteracoes,
+            "inicio": datetime.datetime.now().isoformat(timespec="seconds"),
+        }
+        with open(os.path.join(saida, "config.json"), "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2)
+        inicio = time.perf_counter()
+        frames_total = 0
+        geracao_do_melhor = None
         ag = AGMLP.RNA_AG(
-            (5, 8, 4, 2),
+            TOPOLOGIA,
             None,
             0.1,
             nIndividuals,
             nGenerations,
-            taxaMutacao=0.05,
-            elite=0.1,
+            taxaMutacao=TAXA_MUTACAO,
+            elite=ELITE,
         )
         redes = ag.iniciaPopulacao()
 
@@ -496,9 +525,13 @@ class DinoGame:
             if ranked is None:  # o usuário fechou a janela
                 pygame.quit()
                 quit()
+            recorde_antes = DinoGame.train.recorde
             DinoGame.train.recorde = registra_geracao(
                 ranked, geracao, DinoGame.train.recorde, saida, self.estatisticas
             )
+            if DinoGame.train.recorde != recorde_antes:
+                geracao_do_melhor = geracao
+            frames_total += self.estatisticas["frames"]
             melhor = max(score for score, _ in ranked)
             DinoGame.train.currentBest = melhor
             if not janela:
@@ -506,6 +539,16 @@ class DinoGame:
                 print(f"Geração {geracao}: melhor={melhor} media={media}")
             if geracao < nGenerations:
                 redes = ag.proximaGeracao(ranked)
+
+        resumo = {
+            "geracoes_concluidas": nGenerations,
+            "melhor_score": DinoGame.train.recorde,
+            "geracao_do_melhor": geracao_do_melhor,
+            "frames_total": frames_total,
+            "segundos_total": time.perf_counter() - inicio,
+        }
+        with open(os.path.join(saida, "resumo.json"), "w", encoding="utf-8") as f:
+            json.dump(resumo, f, indent=2)
 
         if not janela:
             return

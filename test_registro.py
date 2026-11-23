@@ -144,6 +144,25 @@ def test_obstaculos_vencidos_por_dino(jogo, monkeypatch):
     assert vencidos >= 3
     assert len(ranked) == 4
     assert jogo.estatisticas["obstaculos"] == [vencidos] * 4
+    # populacao aleatoria: cada dino morre num frame diferente e tem sua propria contagem
+    monkeypatch.undo()
+    passos = _espia_passos(monkeypatch)
+    mortes = {}  # id da rede -> numero de passos ja dados quando ela morreu
+    remove = DinoGame.remove_colididos
+
+    def anota(dinos, obstaculo, ranked):
+        antes = len(ranked)
+        remove(dinos, obstaculo, ranked)
+        for _, rede in ranked[antes:]:
+            mortes[id(rede)] = len(passos)
+
+    monkeypatch.setattr(DinoGame, "remove_colididos", anota)
+    random.seed(2024)
+    np.random.seed(2024)
+    ranked = jogo.roda_geracao([RedeNeural.RedeNeural(CFG) for _ in range(120)], janela=False)
+    esperado = [len(set().union(*passos[: mortes[id(rede)]])) for _, rede in ranked]
+    assert jogo.estatisticas["obstaculos"] == esperado
+    assert len(set(esperado)) >= 2  # contagens diferentes entre os dinos
     # com colisao normal, redes que nunca pulam morrem no primeiro cacto: 0 obstaculos
     monkeypatch.undo()
     random.seed(5)
@@ -210,9 +229,12 @@ def test_diversidade_no_csv(tmp_path):
     redes = [RedeNeural.RedeNeural(CFG) for _ in range(5)]
     DinoGame.registra_geracao([(i, r) for i, r in enumerate(redes)], 1, None, str(tmp_path))
     assert float(_linhas(tmp_path)[0]["diversidade"]) == pytest.approx(AGMLP.diversidade(redes))
+    # valor calculado a mao: genes 0, 2 e 4 -> desvio populacional sqrt(8/3) em todo gene
+    DinoGame.registra_geracao([(1, _rede(v)) for v in (0.0, 2.0, 4.0)], 3, 4, str(tmp_path))
+    assert float(_linhas(tmp_path)[-1]["diversidade"]) == pytest.approx((8 / 3) ** 0.5)
     copias = [redes[0]] * 3
     DinoGame.registra_geracao([(1, r) for r in copias], 2, 4, str(tmp_path))
-    assert float(_linhas(tmp_path)[1]["diversidade"]) == pytest.approx(0.0, abs=1e-12)  # ruido de ponto flutuante do std
+    assert float(_linhas(tmp_path)[-1]["diversidade"]) == pytest.approx(0.0, abs=1e-12)  # ruido de ponto flutuante do std
 
 
 def test_versao_do_codigo_vem_do_git():

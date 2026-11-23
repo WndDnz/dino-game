@@ -24,6 +24,9 @@ pygame.mixer.pre_init(44100, -16, 2, 2048)  # fix audio delay
 pygame.init()
 
 
+PISTAS = 5  # pistas de treino por geração (AD-009)
+SEMENTES_TESTE = range(900001, 900021)  # pistas de teste: nunca entram na seleção
+LIMITE_FRAMES = 14000  # teto de uma partida: score 2000
 TOPOLOGIA = (5, 8, 4, 2)
 TAXA_MUTACAO = 0.05
 ELITE = 0.1
@@ -337,9 +340,10 @@ class DinoGame:
 
     def roda_geracao(self, redes, janela=True):
         """
-        Simula uma geração na Pista até todos os dinos morrerem e devolve a lista
-        [(score, rede)]. Com `janela`, trata eventos, desenha os dinos e o HUD e
-        limita o FPS; devolve None se o usuário fechou. Sem `janela`, só simula.
+        Simula uma geração na Pista até todos os dinos morrerem, ou até o frame
+        LIMITE_FRAMES, e devolve a lista [(score, rede)]. Com `janela`, trata eventos,
+        desenha os dinos e o HUD e limita o FPS; devolve None se o usuário fechou.
+        Sem `janela`, só simula.
         """
         self.dinoArray.clear()
         for rede in redes:
@@ -362,7 +366,7 @@ class DinoGame:
         vencidos = {id(d): 0 for d in self.dinoArray}
         ja_passaram = set()
 
-        while self.dinoArray:
+        while self.dinoArray and stats["frames"] < LIMITE_FRAMES:
             if janela and not self._eventos_treino():
                 return None
 
@@ -406,6 +410,10 @@ class DinoGame:
             if janela:
                 self._desenha_treino(pista, ft_font, len(redes), senses, cac or pte)
                 self.clock.tick(self.FPS)
+        for dino in self.dinoArray:  # vivos no teto: ficam com o score que tinham
+            ranked.append((dino.score, dino.brain))
+            stats["obstaculos"].append(vencidos[id(dino)])
+        self.dinoArray.clear()
         return ranked
 
     def _eventos_treino(self):

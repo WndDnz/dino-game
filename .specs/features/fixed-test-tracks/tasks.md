@@ -81,9 +81,9 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `test_teto_de_frames`: com `LIMITE_FRAMES` trocado para 70 e uma pista sem obstáculos, a partida dura 70 frames, os 3 dinos voltam em `ranked` com score 10 e `mortes_cacto + mortes_ptera` é 0; com o teto em 71 dura 71 frames; um dino que morre antes do teto mantém o score da morte
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
-- [ ] Test count: os 104 testes anteriores + 1 de `test_pistas.py` passam (105)
+- [x] `test_teto_de_frames`: com `LIMITE_FRAMES` trocado para 70 e uma pista sem obstáculos, a partida dura 70 frames, os 3 dinos voltam em `ranked` com score 10 e `mortes_cacto + mortes_ptera` é 0; com o teto em 71 dura 71 frames; um dino que morre antes do teto mantém o score da morte
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
+- [x] Test count: os 104 testes anteriores + 1 de `test_pistas.py` passam (105)
 
 **Tests**: integration
 **Gate**: full

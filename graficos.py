@@ -84,10 +84,13 @@ def diversidade(d):
 
 
 def comparacao(treinos):
-    """`treinos`: lista de (nome, dados). Uma curva de média por treino."""
-    fig, ax = _figura("Comparação entre treinos: média por geração", "score")
+    """`treinos`: lista de (nome, dados). Uma curva por treino: o score de teste, que é
+    medido nas mesmas pistas em todo treino (AD-009), ou a média se algum não o tem."""
+    com_teste = all("teste" in d for _, d in treinos)
+    coluna, nome_da_curva = ("teste", "score de teste") if com_teste else ("media", "média")
+    fig, ax = _figura(f"Comparação entre treinos: {nome_da_curva} por geração", nome_da_curva)
     for nome, d in treinos:
-        ax.plot(d["geracao"], d["media"], label=nome)
+        ax.plot(d["geracao"], d[coluna], label=nome)
     ax.legend()
     return fig
 

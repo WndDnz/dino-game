@@ -582,3 +582,32 @@ def test_aptidao_sem_coluna_teste(tmp_path, monkeypatch, capsys):
     assert set(_curvas(salvas["aptidao.png"])) == {"melhor", "mediana", "média", "pior"}
     assert capsys.readouterr().out == ""  # nenhum aviso
     assert sorted(p.name for p in pasta.glob("*.png")) == sorted(graficos.GRAFICOS)  # nada pulado
+
+
+def _compara(tmp_path, monkeypatch, colunas_do_segundo):
+    salvas = _figuras(monkeypatch)
+    monkeypatch.chdir(tmp_path)
+    outro = [(g, m, med * 2, *meio, teste + 100) for g, m, med, *meio, teste in FITNESS]
+    a = _fitness(tmp_path / "treinos" / "20261123-090000_s1")
+    b = _fitness(tmp_path / "treinos" / "20261123-100000_s2", linhas=outro, colunas=colunas_do_segundo)
+    assert graficos.main([str(a), str(b)]) == 0
+    assert (tmp_path / "comparacao.png").stat().st_size > 0
+    return salvas["comparacao.png"]
+
+
+def test_comparacao_usa_teste(tmp_path, monkeypatch):
+    fig = _compara(tmp_path, monkeypatch, colunas_do_segundo=13)
+    assert _curvas(fig) == {
+        "20261123-090000_s1": ([1.0, 2.0, 3.0], [31.5, 77.25, 64.0]),
+        "20261123-100000_s2": ([1.0, 2.0, 3.0], [131.5, 177.25, 164.0]),
+    }
+    assert fig.axes[0].get_ylabel() == "score de teste"
+
+
+def test_comparacao_sem_teste_usa_media(tmp_path, monkeypatch):
+    fig = _compara(tmp_path, monkeypatch, colunas_do_segundo=12)
+    assert _curvas(fig) == {
+        "20261123-090000_s1": ([1.0, 2.0, 3.0], [20.0, 35.0, 60.0]),
+        "20261123-100000_s2": ([1.0, 2.0, 3.0], [40.0, 70.0, 120.0]),
+    }
+    assert fig.axes[0].get_ylabel() == "média"

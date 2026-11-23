@@ -227,10 +227,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `test_comparacao_usa_teste`: com duas pastas no formato novo, cada curva de comparacao.png tem os valores de `teste` do treino
-- [ ] `test_comparacao_sem_teste_usa_media`: com uma pasta nova e uma de 12 colunas, as duas curvas têm os valores de `media`
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
-- [ ] Test count: os 128 testes anteriores + 2 de `test_pistas.py` passam (130)
+- [x] `test_comparacao_usa_teste`: com duas pastas no formato novo, cada curva de comparacao.png tem os valores de `teste` do treino
+- [x] `test_comparacao_sem_teste_usa_media`: com uma pasta nova e uma de 12 colunas, as duas curvas têm os valores de `media`
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
+- [x] Test count: os 128 testes anteriores + 2 de `test_pistas.py` passam (130)
 
 **Tests**: unit
 **Gate**: quick

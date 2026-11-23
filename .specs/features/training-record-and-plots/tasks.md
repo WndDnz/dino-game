@@ -136,11 +136,11 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_frames_da_geracao`: `estatisticas['frames']` é o número de passos da pista naquela geração
-- [ ] `test_obstaculos_vencidos_por_dino`: com colisão só contra ptera e redes iguais, cada dino tem em `obstaculos` o número de cactos cuja borda direita passou da borda esquerda dele antes da morte, contado de forma independente pelo teste; um dino que morre no primeiro cacto tem 0
-- [ ] `test_mortes_por_tipo_de_obstaculo`: redes que nunca pulam morrem todas em cacto (`mortes_cacto` = N, `mortes_ptera` = 0); com colisão só contra ptera, o inverso; em uma geração de redes aleatórias as duas somam N
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 5 de `test_registro.py` passam
+- [x] `test_frames_da_geracao`: `estatisticas['frames']` é o número de passos da pista naquela geração
+- [x] `test_obstaculos_vencidos_por_dino`: com colisão só contra ptera e redes iguais, cada dino tem em `obstaculos` o número de cactos cuja borda direita passou da borda esquerda dele antes da morte, contado de forma independente pelo teste; um dino que morre no primeiro cacto tem 0
+- [x] `test_mortes_por_tipo_de_obstaculo`: redes que nunca pulam morrem todas em cacto (`mortes_cacto` = N, `mortes_ptera` = 0); com colisão só contra ptera, o inverso; em uma geração de redes aleatórias as duas somam N
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 5 de `test_registro.py` passam
 
 **Tests**: integration
 **Gate**: full

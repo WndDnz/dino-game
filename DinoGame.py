@@ -344,13 +344,26 @@ class DinoGame:
         ft_font = pygame.freetype.SysFont("Input", 12) if janela else None
         cac = pte = None
         senses = (0, 0, 0, 0, 0)
+        stats = self.estatisticas = {
+            "frames": 0,
+            "obstaculos": [],  # um valor por dino, na ordem de `ranked`
+            "mortes_cacto": 0,
+            "mortes_ptera": 0,
+        }
+        vencidos = {id(d): 0 for d in self.dinoArray}
+        ja_passaram = set()
 
         while self.dinoArray:
             if janela and not self._eventos_treino():
                 return None
 
             for obstaculo in (*pista.cacti, *pista.pteras):
+                vivos_antes = list(self.dinoArray)
                 remove_colididos(self.dinoArray, obstaculo, ranked)
+                mortos = [d for d in vivos_antes if d not in self.dinoArray]
+                stats["obstaculos"] += [vencidos[id(d)] for d in mortos]
+                chave = "mortes_ptera" if isinstance(obstaculo, Ptera) else "mortes_cacto"
+                stats[chave] += len(mortos)
 
             if self.dinoArray:
                 # todos os dinos têm a mesma borda esquerda: o cacto à frente é um só
@@ -368,8 +381,18 @@ class DinoGame:
                 senses = entradas[-1].ravel()
 
             pista.passo()
+            stats["frames"] += 1
             for dino in self.dinoArray:
                 dino.update()
+            # obstáculo vencido: a borda direita passou da borda esquerda do dino vivo.
+            # ponytail: todos os dinos têm a mesma borda esquerda, então a conta é uma só
+            if self.dinoArray:
+                borda = self.dinoArray[0].rect.left
+                for o in (*pista.cacti, *pista.pteras):
+                    if id(o) not in ja_passaram and o.rect.right < borda:
+                        ja_passaram.add(id(o))
+                        for dino in self.dinoArray:
+                            vencidos[id(dino)] += 1
 
             if janela:
                 self._desenha_treino(pista, ft_font, len(redes), senses, cac or pte)

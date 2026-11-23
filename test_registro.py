@@ -8,9 +8,11 @@ os.environ["SDL_AUDIODRIVER"] = "dummy"
 os.environ["MPLBACKEND"] = "Agg"
 
 import numpy as np  # noqa: E402
+import pygame  # noqa: E402
 import pytest  # noqa: E402
 
 import AGMLP  # noqa: E402
+import DinoGame  # noqa: E402
 import RedeNeural  # noqa: E402
 
 CFG = (5, 8, 4, 2)
@@ -69,3 +71,91 @@ def test_hiperparametros_do_ag_sao_as_constantes(monkeypatch):
         f = ag.acasala(p1, p2)
         for a, b, c in zip(p1.pesos + p1.bias, p2.pesos + p2.bias, f.pesos + f.bias):
             assert np.all(c >= np.minimum(a, b) - 1e-12) and np.all(c <= np.maximum(a, b) + 1e-12)
+
+
+@pytest.fixture
+def jogo():
+    """Tela dummy, sem som, relogio que nao espera."""
+    pygame.init()
+    pygame.mixer.quit()
+    j = DinoGame.DinoGame()
+
+    class _Relogio:
+        def tick(self, fps=0):
+            pass
+
+    j.clock = _Relogio()
+    return j
+
+
+def _rede_fixa(pula):
+    """Pesos zero: a saida so depende do bias da ultima camada."""
+    rede = RedeNeural.RedeNeural(CFG)
+    for a in rede.pesos + rede.bias:
+        a[:] = 0.0
+    rede.bias[-1][:] = [[10.0 if pula else -10.0], [-10.0]]
+    return rede
+
+
+def _espia_passos(monkeypatch):
+    """Grava, depois de cada passo da pista, os ids dos obstaculos com a borda direita antes de x=40
+    (a borda esquerda dos dinos). Devolve a lista de conjuntos, uma por passo."""
+    passos = []
+    passo = DinoGame.Pista.passo
+
+    def espia(self):
+        passo(self)
+        passos.append({id(o) for o in (*self.cacti, *self.pteras) if o.rect.right < 40})
+
+    monkeypatch.setattr(DinoGame.Pista, "passo", espia)
+    return passos
+
+
+def _so_ptera_colide(monkeypatch):
+    colide = pygame.sprite.collide_mask
+    monkeypatch.setattr(
+        pygame.sprite, "collide_mask", lambda a, b: colide(a, b) if isinstance(b, DinoGame.Ptera) else None
+    )
+
+
+def test_frames_da_geracao(jogo, monkeypatch):
+    passos = _espia_passos(monkeypatch)
+    random.seed(3)
+    np.random.seed(3)
+    jogo.roda_geracao([RedeNeural.RedeNeural(CFG) for _ in range(10)], janela=False)
+    assert jogo.estatisticas["frames"] == len(passos) > 100
+
+
+def test_obstaculos_vencidos_por_dino(jogo, monkeypatch):
+    assert DinoGame.Dino(44, 47).rect.left == 40
+    # redes iguais que nunca pulam e so morrem em ptera: atravessam os cactos e vencem cada um
+    _so_ptera_colide(monkeypatch)
+    passos = _espia_passos(monkeypatch)
+    random.seed(5)
+    ranked = jogo.roda_geracao([_rede_fixa(pula=False) for _ in range(4)], janela=False)
+    vencidos = len(set().union(*passos))  # obstaculos que passaram enquanto havia dino vivo
+    assert vencidos >= 3
+    assert len(ranked) == 4
+    assert jogo.estatisticas["obstaculos"] == [vencidos] * 4
+    # com colisao normal, redes que nunca pulam morrem no primeiro cacto: 0 obstaculos
+    monkeypatch.undo()
+    random.seed(5)
+    jogo.roda_geracao([_rede_fixa(pula=False) for _ in range(4)], janela=False)
+    assert jogo.estatisticas["obstaculos"] == [0, 0, 0, 0]
+
+
+def test_mortes_por_tipo_de_obstaculo(jogo, monkeypatch):
+    random.seed(7)
+    jogo.roda_geracao([_rede_fixa(pula=False) for _ in range(6)], janela=False)
+    assert (jogo.estatisticas["mortes_cacto"], jogo.estatisticas["mortes_ptera"]) == (6, 0)
+    _so_ptera_colide(monkeypatch)
+    random.seed(7)
+    jogo.roda_geracao([_rede_fixa(pula=False) for _ in range(6)], janela=False)
+    assert (jogo.estatisticas["mortes_cacto"], jogo.estatisticas["mortes_ptera"]) == (0, 6)
+    monkeypatch.undo()
+    random.seed(8)
+    np.random.seed(8)
+    jogo.roda_geracao([RedeNeural.RedeNeural(CFG) for _ in range(40)], janela=False)
+    e = jogo.estatisticas
+    assert e["mortes_cacto"] + e["mortes_ptera"] == 40
+    assert len(e["obstaculos"]) == 40

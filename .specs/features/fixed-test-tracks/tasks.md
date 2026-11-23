@@ -249,10 +249,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] README cita `--pistas`, as 13 colunas, as pistas de teste e `simula_pista.py`, e o comando de testes inclui `test_pistas.py`
-- [ ] `simula_pista.py` versionado e compilando no Build
-- [ ] Gate check passes: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py graficos.py simula_pista.py; python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
-- [ ] Test count: os 130 testes passam
+- [x] README cita `--pistas`, as 13 colunas, as pistas de teste e `simula_pista.py`, e o comando de testes inclui `test_pistas.py`
+- [x] `simula_pista.py` versionado e compilando no Build
+- [x] Gate check passes: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py graficos.py simula_pista.py; python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
+- [x] Test count: os 130 testes passam
 
 **Tests**: none
 **Gate**: build

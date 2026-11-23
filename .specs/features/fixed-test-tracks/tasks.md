@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: none - fase Design pulada; as decisões de estrutura estão em "Design inline" abaixo
-**Status**: In Progress
+**Status**: Done
 **Approved**: 2026-11-23 - user: "Aprovado, pode aplicar."
 **Build**: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py graficos.py simula_pista.py`
 **Run unit**: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
@@ -347,7 +347,11 @@ Proof: run unit | test_pistas.py::test_empate_no_melhor_e_reproduzivel PASSED
 
 **Settled mid-build:** 2026-11-23 - execução inline, sem sub-agentes de lote (8 tarefas, um lote); informado com o plano, usuário: "Aprovado, pode aplicar."
 **Dispatched:** none
-**Walked:** none
+**Walked:** 2026-11-23, em `2c60db7`, numa pasta temporária com cópia de `sprites/`. A feature não tem tela nova; a caminhada foi pelos comandos do README.
+- `python autodino.py --sem-janela --individuos 30 --geracoes 4 --semente 7 --pistas 3 --saida a` terminou em 3 s e imprimiu `Geração <g>: melhor=... media=... teste=...`. O `fitness.csv` tem as 13 colunas; em toda linha `mortes_cacto + mortes_ptera` é 90 (30 dinos x 3 pistas) e `melhor` não caiu entre gerações (29,67 nas quatro). `config.json` traz `pistas` 3, `pistas_teste` 20 e `limite_frames` 14000; `resumo.json` traz `teste_do_melhor` 31,6, o `teste` da geração 1, a do recorde.
+- O mesmo comando com `--semente 8` e sem `--pistas` (pasta `b`) subiu de 21,0 para 122,4 na geração 4, com `teste` de 21,0 para 128,7.
+- `python graficos.py a b` gravou os cinco PNG em cada pasta e `comparacao.png` com o título "score de teste por geração"; `aptidao.png` mostra a curva `teste` tracejada junto das outras.
+- `python autodino.py --sem-janela --pistas 0` respondeu `argument --pistas: deve ser 1 ou mais` com código 2.
 
 ---
 

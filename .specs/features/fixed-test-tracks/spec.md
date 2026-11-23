@@ -139,34 +139,34 @@ Cada geração corre em uma pista só, diferente da anterior, e o fitness de um 
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| FIT-01 | P1: Fitness (critério 1) | - | Pending |
-| FIT-02 | P1: Fitness (critério 2) | - | Pending |
-| FIT-03 | P1: Fitness (critério 3) | - | Pending |
-| FIT-04 | P1: Fitness (critério 4) | - | Pending |
-| FIT-05 | P1: Fitness (critério 5) | - | Pending |
-| FIT-06 | P1: Fitness (critério 6) | - | Pending |
-| FIT-07 | P1: Fitness (critério 7) | - | Pending |
-| FIT-08 | P1: Fitness (critério 8) | - | Pending |
-| FIT-09 | P1: Fitness (critério 9) | - | Pending |
-| FIT-10 | P1: Fitness (critério 10) | - | Pending |
-| FIT-11 | P1: Fitness (critério 11) | - | Pending |
-| TST-01 | P1: Teste (critério 1) | - | Pending |
-| TST-02 | P1: Teste (critério 2) | - | Pending |
-| TST-03 | P1: Teste (critério 3) | - | Pending |
-| TST-04 | P1: Teste (critério 4) | - | Pending |
-| TST-05 | P1: Teste (critério 5) | - | Pending |
-| TST-06 | P1: Teste (critério 6) | - | Pending |
-| TST-07 | P1: Teste (critério 7) | - | Pending |
-| TST-08 | P1: Teste (critério 8) | - | Pending |
-| PLOT-12 | P2: Gráficos (critério 1) | - | Pending |
-| PLOT-13 | P2: Gráficos (critério 2) | - | Pending |
-| PLOT-14 | P2: Gráficos (critério 3) | - | Pending |
-| PLOT-15 | P2: Gráficos (critério 4) | - | Pending |
-| FIT-12 | Edge case 1 | - | Pending |
-| FIT-13 | Edge case 2 | - | Pending |
-| TST-09 | Edge case 3 | - | Pending |
+| FIT-01 | P1: Fitness (critério 1) | Execute | Implementing |
+| FIT-02 | P1: Fitness (critério 2) | Execute | Implementing |
+| FIT-03 | P1: Fitness (critério 3) | Execute | Implementing |
+| FIT-04 | P1: Fitness (critério 4) | Execute | Implementing |
+| FIT-05 | P1: Fitness (critério 5) | Execute | Implementing |
+| FIT-06 | P1: Fitness (critério 6) | Execute | Implementing |
+| FIT-07 | P1: Fitness (critério 7) | Execute | Implementing |
+| FIT-08 | P1: Fitness (critério 8) | Execute | Implementing |
+| FIT-09 | P1: Fitness (critério 9) | Execute | Implementing |
+| FIT-10 | P1: Fitness (critério 10) | Execute | Implementing |
+| FIT-11 | P1: Fitness (critério 11) | Execute | Implementing |
+| TST-01 | P1: Teste (critério 1) | Execute | Implementing |
+| TST-02 | P1: Teste (critério 2) | Execute | Implementing |
+| TST-03 | P1: Teste (critério 3) | Execute | Implementing |
+| TST-04 | P1: Teste (critério 4) | Execute | Implementing |
+| TST-05 | P1: Teste (critério 5) | Execute | Implementing |
+| TST-06 | P1: Teste (critério 6) | Execute | Implementing |
+| TST-07 | P1: Teste (critério 7) | Execute | Implementing |
+| TST-08 | P1: Teste (critério 8) | Execute | Implementing |
+| PLOT-12 | P2: Gráficos (critério 1) | Execute | Implementing |
+| PLOT-13 | P2: Gráficos (critério 2) | Execute | Implementing |
+| PLOT-14 | P2: Gráficos (critério 3) | Execute | Implementing |
+| PLOT-15 | P2: Gráficos (critério 4) | Execute | Implementing |
+| FIT-12 | Edge case 1 | Execute | Implementing |
+| FIT-13 | Edge case 2 | Execute | Implementing |
+| TST-09 | Edge case 3 | Execute | Implementing |
 
-**Coverage:** 26 total, 0 mapped to tasks, 26 unmapped.
+**Coverage:** 26 total, 26 mapped to tasks, 0 unmapped.
 
 ---
 

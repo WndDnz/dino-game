@@ -301,12 +301,12 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_grafico_de_mortes`: barras empilhadas; a base é `mortes_cacto` e o topo de cada barra é `mortes_cacto + mortes_ptera`
-- [ ] `test_grafico_de_obstaculos`: curvas `melhor` e `média` com os valores de `obstaculos_melhor` e `obstaculos_media`
-- [ ] `test_grafico_de_diversidade`: uma curva com os valores de `diversidade`
-- [ ] `test_csv_antigo_pula_graficos`: com um CSV de 3 colunas, grava só `aptidao.png` (curvas `melhor` e `média`) e imprime `Gráfico pulado, faltam colunas: <arquivo>` para os outros quatro, devolvendo 0
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 29 de `test_registro.py` passam
+- [x] `test_grafico_de_mortes`: barras empilhadas; a base é `mortes_cacto` e o topo de cada barra é `mortes_cacto + mortes_ptera`
+- [x] `test_grafico_de_obstaculos`: curvas `melhor` e `média` com os valores de `obstaculos_melhor` e `obstaculos_media`
+- [x] `test_grafico_de_diversidade`: uma curva com os valores de `diversidade`
+- [x] `test_csv_antigo_pula_graficos`: com um CSV de 3 colunas, grava só `aptidao.png` (curvas `melhor` e `média`) e imprime `Gráfico pulado, faltam colunas: <arquivo>` para os outros quatro, devolvendo 0
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 29 de `test_registro.py` passam
 
 **Tests**: unit
 **Gate**: quick

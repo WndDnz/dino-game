@@ -511,3 +511,46 @@ def test_csv_sem_geracoes(tmp_path, capsys):
     assert graficos.main([str(pasta)]) == 1
     assert capsys.readouterr().out.splitlines() == [f"Sem gerações em: {pasta}"]
     assert not (pasta / "aptidao.png").exists()
+
+
+def test_grafico_de_mortes(tmp_path, monkeypatch):
+    salvas = _figuras(monkeypatch)
+    pasta = _fitness(tmp_path / "t")
+    assert graficos.main([str(pasta)]) == 0
+    assert (pasta / "mortes.png").stat().st_size > 0
+    cacto, ptera = salvas["mortes.png"].axes[0].containers
+    assert cacto.get_label() == "cacto" and ptera.get_label() == "ptera"
+    assert [b.get_x() + b.get_width() / 2 for b in cacto] == [1.0, 2.0, 3.0]
+    assert [b.get_y() for b in cacto] == [0.0, 0.0, 0.0]
+    assert [b.get_height() for b in cacto] == _col(9)
+    # empilhadas: a barra de ptera comeca no topo da de cacto
+    assert [b.get_y() for b in ptera] == _col(9)
+    assert [b.get_y() + b.get_height() for b in ptera] == [c + p for c, p in zip(_col(9), _col(10))]
+
+
+def test_grafico_de_obstaculos(tmp_path, monkeypatch):
+    salvas = _figuras(monkeypatch)
+    pasta = _fitness(tmp_path / "t")
+    assert graficos.main([str(pasta)]) == 0
+    assert (pasta / "obstaculos.png").stat().st_size > 0
+    assert _curvas(salvas["obstaculos.png"]) == {"melhor": ([1.0, 2.0, 3.0], _col(7)), "média": ([1.0, 2.0, 3.0], _col(8))}
+
+
+def test_grafico_de_diversidade(tmp_path, monkeypatch):
+    salvas = _figuras(monkeypatch)
+    pasta = _fitness(tmp_path / "t")
+    assert graficos.main([str(pasta)]) == 0
+    assert (pasta / "diversidade.png").stat().st_size > 0
+    assert _curvas(salvas["diversidade.png"]) == {"diversidade": ([1.0, 2.0, 3.0], _col(11))}
+
+
+def test_csv_antigo_pula_graficos(tmp_path, monkeypatch, capsys):
+    salvas = _figuras(monkeypatch)
+    pasta = _fitness(tmp_path / "t", linhas=[(1, 50, 20.0), (2, 90, 35.0)], cabecalho="geracao,melhor,media")
+    assert graficos.main([str(pasta)]) == 0
+    assert sorted(p.name for p in pasta.glob("*.png")) == ["aptidao.png"]
+    assert set(_curvas(salvas["aptidao.png"])) == {"melhor", "média"}
+    assert capsys.readouterr().out.splitlines() == [
+        f"Gráfico pulado, faltam colunas: {nome}"
+        for nome in ("aptidao_por_frames.png", "mortes.png", "obstaculos.png", "diversidade.png")
+    ]

@@ -58,10 +58,35 @@ def aptidao_por_frames(d):
     return fig
 
 
+def mortes(d):
+    fig, ax = _figura("Mortes por tipo de obstáculo", "dinos")
+    ax.bar(d["geracao"], d["mortes_cacto"], label="cacto")
+    ax.bar(d["geracao"], d["mortes_ptera"], bottom=d["mortes_cacto"], label="ptera")
+    ax.legend()
+    return fig
+
+
+def obstaculos(d):
+    fig, ax = _figura("Obstáculos vencidos", "obstáculos")
+    ax.plot(d["geracao"], d["obstaculos_melhor"], label="melhor")
+    ax.plot(d["geracao"], d["obstaculos_media"], label="média")
+    ax.legend()
+    return fig
+
+
+def diversidade(d):
+    fig, ax = _figura("Diversidade da população", "média do desvio por gene")
+    ax.plot(d["geracao"], d["diversidade"], label="diversidade")
+    return fig
+
+
 # arquivo -> (função, colunas que ela precisa)
 GRAFICOS = {
     "aptidao.png": (aptidao, {"geracao", "melhor", "media"}),
     "aptidao_por_frames.png": (aptidao_por_frames, {"melhor", "media", "frames"}),
+    "mortes.png": (mortes, {"geracao", "mortes_cacto", "mortes_ptera"}),
+    "obstaculos.png": (obstaculos, {"geracao", "obstaculos_melhor", "obstaculos_media"}),
+    "diversidade.png": (diversidade, {"geracao", "diversidade"}),
 }
 
 

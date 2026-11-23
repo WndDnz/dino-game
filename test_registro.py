@@ -670,7 +670,7 @@ def test_treinos_simultaneos_nao_dividem_pasta(pasta, monkeypatch, capsys):
     monkeypatch.setattr(autodino.time, "strftime", lambda formato, *a: "20261123-101500")
     usadas = []
 
-    def train(self, n, g, semente, saida, janela=True):
+    def train(self, n, g, semente, saida, janela=True, pistas=5):
         assert not os.path.exists(os.path.join(saida, "fitness.csv")), f"pasta de outro treino: {saida}"
         usadas.append(saida)
         open(os.path.join(saida, "fitness.csv"), "w").close()

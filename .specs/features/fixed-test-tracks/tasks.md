@@ -183,10 +183,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `test_opcao_pistas`: `--pistas 3` chega a `train` como `pistas=3` com e sem janela; sem a opção, o `config.json` do treino traz `pistas` 5
-- [ ] `test_pistas_invalido_codigo_2`: `--pistas 0`, `--pistas -1` e `--pistas 2.5` encerram com código 2 sem criar pasta em `treinos/`
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
-- [ ] Test count: os 124 testes anteriores + 2 de `test_pistas.py` passam (126)
+- [x] `test_opcao_pistas`: `--pistas 3` chega a `train` como `pistas=3` com e sem janela; sem a opção, o `config.json` do treino traz `pistas` 5
+- [x] `test_pistas_invalido_codigo_2`: `--pistas 0`, `--pistas -1` e `--pistas 2.5` encerram com código 2 sem criar pasta em `treinos/`
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
+- [x] Test count: os 124 testes anteriores + 2 de `test_pistas.py` passam (126)
 
 **Tests**: integration
 **Gate**: full

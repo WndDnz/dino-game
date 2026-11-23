@@ -65,6 +65,12 @@ def main(argv=None):
     parser.add_argument("--individuos", type=_um_ou_mais, default=350)
     parser.add_argument("--geracoes", type=_um_ou_mais, default=30)
     parser.add_argument(
+        "--pistas",
+        type=_um_ou_mais,
+        default=5,
+        help="pistas de treino por geração; o fitness é a média nelas (padrão 5)",
+    )
+    parser.add_argument(
         "--saida",
         metavar="PASTA",
         help="pasta do treino (padrão: treinos/<data-hora>_s<semente>)",
@@ -119,10 +125,10 @@ def main(argv=None):
 
     game = DinoGame.DinoGame()
     if args.sem_janela:
-        game.train(args.individuos, args.geracoes, semente, pasta(), janela=False)
+        game.train(args.individuos, args.geracoes, semente, pasta(), janela=False, pistas=args.pistas)
     elif not game.introscreen():  # introscreen devolve True se o usuário fechou
         # train devolve True quando o usuário pede outro treino na tela de fim
-        while game.train(args.individuos, args.geracoes, semente, pasta()):
+        while game.train(args.individuos, args.geracoes, semente, pasta(), pistas=args.pistas):
             pass
     return 0
 

@@ -4,6 +4,7 @@ import csv
 import json
 import os
 import random
+import shutil
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 os.environ["SDL_AUDIODRIVER"] = "dummy"
@@ -13,6 +14,7 @@ import numpy as np  # noqa: E402
 import pygame  # noqa: E402
 import pytest  # noqa: E402
 
+import autodino  # noqa: E402
 import DinoGame  # noqa: E402
 import RedeNeural  # noqa: E402
 
@@ -464,3 +466,54 @@ def test_csv_igual_com_e_sem_janela_com_pistas(jogo, monkeypatch, tmp_path, caps
         assert all(v != "" for v in l.values())
         assert float(l["teste"]) > 0
         assert int(l["mortes_cacto"]) + int(l["mortes_ptera"]) == 20  # 10 dinos x 2 pistas
+
+
+# ---- T5: opcao --pistas ------------------------------------------------------
+
+REPO = os.path.dirname(os.path.abspath(__file__))
+
+
+@pytest.fixture
+def pasta(tmp_path, monkeypatch):
+    """Diretorio de trabalho temporario com os sprites."""
+    shutil.copytree(os.path.join(REPO, "sprites"), tmp_path / "sprites")
+    monkeypatch.chdir(tmp_path)
+    pygame.init()
+    pygame.mixer.quit()
+    return tmp_path
+
+
+def test_opcao_pistas(pasta, monkeypatch, capsys):
+    chamadas = []
+
+    def train(self, nIndividuals=20, nGenerations=100, semente_base=0, saida=".", janela=True, pistas=None):
+        chamadas.append((janela, pistas))
+
+    monkeypatch.setattr(DinoGame.DinoGame, "train", train)
+    monkeypatch.setattr(DinoGame.DinoGame, "introscreen", lambda self: False)
+    assert autodino.main(["--sem-janela", "--pistas", "3"]) == 0
+    assert autodino.main(["--pistas", "3"]) == 0
+    assert autodino.main(["--sem-janela", "--pistas", "1"]) == 0
+    assert chamadas == [(False, 3), (True, 3), (False, 1)]
+    # treino de verdade: com a opcao, N pistas; sem ela, 5
+    monkeypatch.undo()
+    monkeypatch.chdir(pasta)
+    partidas = _espia_pistas(monkeypatch)
+    base = ["--sem-janela", "--individuos", "4", "--geracoes", "1", "--semente", "7"]
+    assert autodino.main(base + ["--saida", "tres", "--pistas", "3"]) == 0
+    assert _json(pasta / "tres" / "config.json")["pistas"] == 3
+    assert [estado for _, n, _, estado in partidas if n == 4] == [_estado_apos_seed(s) for s in (8, 9, 10)]
+    partidas.clear()
+    assert autodino.main(base + ["--saida", "padrao"]) == 0
+    assert _json(pasta / "padrao" / "config.json")["pistas"] == 5
+    assert [estado for _, n, _, estado in partidas if n == 4] == [_estado_apos_seed(s) for s in range(8, 13)]
+
+
+def test_pistas_invalido_codigo_2(pasta, monkeypatch, capsys):
+    treinou = []
+    monkeypatch.setattr(DinoGame.DinoGame, "train", lambda self, *a, **k: treinou.append(1))
+    for valor in ("0", "-1", "2.5", "duas"):
+        with pytest.raises(SystemExit) as saida:
+            autodino.main(["--sem-janela", "--pistas", valor])
+        assert saida.value.code == 2, valor
+    assert treinou == [] and not (pasta / "treinos").exists()

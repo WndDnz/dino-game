@@ -763,7 +763,7 @@ def _espia_treino(monkeypatch):
     """Troca train por um registrador: devolve a lista das chamadas (argumentos nomeados)."""
     chamadas = []
 
-    def train(self, nIndividuals=20, nGenerations=100, semente_base=0, saida=".", janela=True):
+    def train(self, nIndividuals=20, nGenerations=100, semente_base=0, saida=".", janela=True, pistas=5):
         chamadas.append(dict(n=nIndividuals, g=nGenerations, semente=semente_base, janela=janela))
 
     monkeypatch.setattr(DinoGame.DinoGame, "train", train)

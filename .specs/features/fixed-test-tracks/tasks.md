@@ -23,7 +23,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 - **Várias pistas**: `avalia(redes, sementes, janela)` é o único lugar que semeia `random` para uma pista e agrega scores e estatísticas. O treino a usa duas vezes por geração: população nas pistas de treino, melhor rede nas de teste (sempre sem janela).
 - **Ordem do resultado**: `avalia` devolve na ordem da população, então o desempate do melhor é sempre o de menor índice.
 - **Registro**: `registra_geracao` ganha o parâmetro `teste` e a 13ª coluna; as outras colunas saem do `ranked` (agora fitness) e das estatísticas agregadas, sem mudar de nome.
-- **Reprodutibilidade**: as pistas usam só `random`; a população, o crossover e a mutação usam só `numpy.random`. Rodar o teste entre gerações não muda a sequência do numpy.
+- **Reprodutibilidade**: as pistas usam `random`, e o torneio e o crossover do AG também. O treino guarda o estado de `random` antes das pistas de teste e o repõe depois, para o teste não influenciar os sorteios da seleção.
 - **Testes**: arquivo novo `test_pistas.py` na raiz, no padrão dos outros três (driver SDL `dummy`). Os testes antigos que não tratam de pistas passam `pistas=1` quando isso só serve para não ficarem mais lentos.
 
 ---
@@ -154,17 +154,17 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `test_melhor_corre_nas_pistas_de_teste`: a cada geração, `avalia` é chamada com uma única rede, a de maior fitness, e as sementes 900001 a 900020
-- [ ] `test_coluna_teste_e_a_media`: com scores de teste fixados, `teste` é a média deles; conferido também contra a pista real para a rede salva em `bestDino.din`
-- [ ] `test_cabecalho_com_teste`: a primeira linha do `fitness.csv` é a de 13 colunas da spec
-- [ ] `test_selecao_ignora_o_teste`: trocar os scores de teste por outros valores não muda nenhuma outra coluna do `fitness.csv` nem a rede salva
-- [ ] `test_pistas_de_teste_independem_das_opcoes`: treinos com `semente_base` 3 e 11 e `pistas` 1 e 3 usam as mesmas 20 sementes de teste
-- [ ] `test_resumo_traz_teste_do_melhor`: `teste_do_melhor` é o `teste` da linha da geração `geracao_do_melhor`
-- [ ] `test_linha_impressa_com_teste`: sem janela, a linha de cada geração é `Geração <g>: melhor=<melhor> media=<media> teste=<teste>` com os valores do CSV
-- [ ] `test_csv_igual_com_e_sem_janela_com_pistas`: 10 dinos, 3 gerações, 2 pistas, com e sem janela: os dois `fitness.csv` são idênticos e têm 13 colunas
-- [ ] Asserções de cabeçalho e de linha impressa dos testes existentes atualizadas para o formato novo
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
-- [ ] Test count: os 116 testes anteriores + 8 de `test_pistas.py` passam (124)
+- [x] `test_melhor_corre_nas_pistas_de_teste`: a cada geração, `avalia` é chamada com uma única rede, a de maior fitness, e as sementes 900001 a 900020
+- [x] `test_coluna_teste_e_a_media`: com scores de teste fixados, `teste` é a média deles; conferido também contra a pista real para a rede salva em `bestDino.din`
+- [x] `test_cabecalho_com_teste`: a primeira linha do `fitness.csv` é a de 13 colunas da spec
+- [x] `test_selecao_ignora_o_teste`: trocar os scores de teste por outros valores não muda nenhuma outra coluna do `fitness.csv` nem a rede salva
+- [x] `test_pistas_de_teste_independem_das_opcoes`: treinos com `semente_base` 3 e 11 e `pistas` 1 e 3 usam as mesmas 20 sementes de teste
+- [x] `test_resumo_traz_teste_do_melhor`: `teste_do_melhor` é o `teste` da linha da geração `geracao_do_melhor`
+- [x] `test_linha_impressa_com_teste`: sem janela, a linha de cada geração é `Geração <g>: melhor=<melhor> media=<media> teste=<teste>` com os valores do CSV
+- [x] `test_csv_igual_com_e_sem_janela_com_pistas`: 10 dinos, 3 gerações, 2 pistas, com e sem janela: os dois `fitness.csv` são idênticos e têm 13 colunas
+- [x] Asserções de cabeçalho e de linha impressa dos testes existentes atualizadas para o formato novo
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
+- [x] Test count: os 116 testes anteriores + 8 de `test_pistas.py` passam (124)
 
 **Tests**: integration
 **Gate**: full

@@ -385,8 +385,9 @@ def test_imprime_linha_por_geracao(jogo, monkeypatch, tmp_path, capsys):
     linhas = [l for l in capsys.readouterr().out.splitlines() if l.startswith("Geração")]
     esperadas = []
     for dados in csv.splitlines()[1:]:
-        g, melhor, media = dados.split(",")[:3]  # formato de 12 colunas (AD-008)
-        esperadas.append(f"Geração {g}: melhor={melhor} media={media}")
+        g, melhor, media = dados.split(",")[:3]  # formato de 13 colunas (AD-009)
+        teste = dados.split(",")[-1]
+        esperadas.append(f"Geração {g}: melhor={melhor} media={media} teste={teste}")
     assert len(esperadas) == 2
     assert linhas == esperadas
 

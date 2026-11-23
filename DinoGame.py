@@ -540,7 +540,7 @@ class DinoGame:
             json.dump(config, f, indent=2)
         inicio = time.perf_counter()
         frames_total = 0
-        geracao_do_melhor = None
+        geracao_do_melhor = teste_do_melhor = None
         ag = AGMLP.RNA_AG(
             TOPOLOGIA,
             None,
@@ -561,18 +561,25 @@ class DinoGame:
             if ranked is None:  # o usuário fechou a janela
                 pygame.quit()
                 quit()
+            estatisticas = self.estatisticas  # as do treino: avalia() as troca no teste
+            # a melhor rede da geração nas pistas de teste, que não entram na seleção
+            _, campea = max(ranked, key=lambda par: par[0])
+            sorteio = random.getstate()  # o AG sorteia com `random`: o teste não pode mexer nele
+            teste = self.avalia([campea], SEMENTES_TESTE, janela=False)[0][0]
+            random.setstate(sorteio)
             recorde_antes = DinoGame.train.recorde
             DinoGame.train.recorde = registra_geracao(
-                ranked, geracao, DinoGame.train.recorde, saida, self.estatisticas
+                ranked, geracao, DinoGame.train.recorde, saida, estatisticas, teste
             )
             if DinoGame.train.recorde != recorde_antes:
                 geracao_do_melhor = geracao
-            frames_total += self.estatisticas["frames"]
+                teste_do_melhor = teste
+            frames_total += estatisticas["frames"]
             melhor = max(score for score, _ in ranked)
             DinoGame.train.currentBest = melhor
             if not janela:
                 media = float(np.mean([score for score, _ in ranked]))  # a mesma conta do CSV
-                print(f"Geração {geracao}: melhor={melhor} media={media}")
+                print(f"Geração {geracao}: melhor={melhor} media={media} teste={teste}")
             if geracao < nGenerations:
                 redes = ag.proximaGeracao(ranked)
 
@@ -580,6 +587,7 @@ class DinoGame:
             "geracoes_concluidas": nGenerations,
             "melhor_score": DinoGame.train.recorde,
             "geracao_do_melhor": geracao_do_melhor,
+            "teste_do_melhor": teste_do_melhor,
             "frames_total": frames_total,
             "segundos_total": time.perf_counter() - inicio,
         }
@@ -797,16 +805,17 @@ def versao_do_codigo():
 
 COLUNAS = (
     "geracao,melhor,media,mediana,desvio,pior,frames,obstaculos_melhor,"
-    "obstaculos_media,mortes_cacto,mortes_ptera,diversidade"
+    "obstaculos_media,mortes_cacto,mortes_ptera,diversidade,teste"
 )
 
 
-def registra_geracao(ranked, geracao, melhor_score, saida=".", estatisticas=None):
+def registra_geracao(ranked, geracao, melhor_score, saida=".", estatisticas=None, teste=None):
     """
-    Acrescenta a linha da geração a fitness.csv (colunas em COLUNAS, AD-008) e salva
-    a melhor rede da geração em bestDino.din quando ela supera `melhor_score`
-    (None = ainda não há recorde). `estatisticas` vem de `DinoGame.roda_geracao`;
-    sem ela, frames, obstáculos e mortes valem 0. Devolve o recorde atualizado.
+    Acrescenta a linha da geração a fitness.csv (colunas em COLUNAS, AD-008 e AD-009)
+    e salva a melhor rede da geração em bestDino.din quando ela supera `melhor_score`
+    (None = ainda não há recorde). `estatisticas` vem de `DinoGame.avalia`; sem ela,
+    frames, obstáculos e mortes valem 0. `teste` é o score da melhor rede nas pistas
+    de teste; sem ele, a coluna fica vazia. Devolve o recorde atualizado.
     """
     scores = np.array([s for s, _ in ranked], dtype=float)
     score, rede = max(ranked, key=lambda par: par[0])
@@ -826,6 +835,7 @@ def registra_geracao(ranked, geracao, melhor_score, saida=".", estatisticas=None
         e["mortes_cacto"],
         e["mortes_ptera"],
         AGMLP.diversidade([r for _, r in ranked]),
+        "" if teste is None else teste,
     ]
     caminho = os.path.join(saida, "fitness.csv")
     novo = not os.path.exists(caminho)

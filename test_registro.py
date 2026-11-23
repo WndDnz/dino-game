@@ -191,6 +191,7 @@ CABECALHO = (
     "geracao,melhor,media,mediana,desvio,pior,frames,obstaculos_melhor,"
     "obstaculos_media,mortes_cacto,mortes_ptera,diversidade"
 )
+CABECALHO_13 = CABECALHO + ",teste"  # AD-009
 
 
 def _linhas(pasta):
@@ -202,7 +203,7 @@ def _linhas(pasta):
 
 def test_cabecalho_do_fitness_csv(tmp_path):
     DinoGame.registra_geracao([(10, RedeNeural.RedeNeural(CFG))], 1, None, str(tmp_path))
-    assert (tmp_path / "fitness.csv").read_text().splitlines()[0] == CABECALHO
+    assert (tmp_path / "fitness.csv").read_text().splitlines()[0] == CABECALHO_13
 
 
 def test_mediana_desvio_e_pior(tmp_path):
@@ -300,7 +301,10 @@ def test_resumo_json_no_fim(jogo, tmp_path, capsys):
     resumo = _json(tmp_path / "resumo.json")
     linhas = _linhas(tmp_path)
     melhor = max(linhas, key=lambda l: float(l["melhor"]))  # max devolve o primeiro em caso de empate
-    assert set(resumo) == {"geracoes_concluidas", "melhor_score", "geracao_do_melhor", "frames_total", "segundos_total"}
+    assert set(resumo) == {
+        "geracoes_concluidas", "melhor_score", "geracao_do_melhor", "frames_total", "segundos_total",
+        "teste_do_melhor",  # AD-009
+    }
     assert resumo["geracoes_concluidas"] == 3 == len(linhas)
     assert resumo["melhor_score"] == float(melhor["melhor"])  # fitness: media nas pistas (AD-009)
     assert resumo["geracao_do_melhor"] == int(melhor["geracao"])
@@ -336,7 +340,7 @@ def test_csv_completo_igual_com_e_sem_janela(jogo, monkeypatch, tmp_path, capsys
     com = (tmp_path / "com" / "fitness.csv").read_text()
     assert com == (tmp_path / "sem" / "fitness.csv").read_text()
     linhas = _linhas(tmp_path / "com")
-    assert len(linhas) == 3 and list(linhas[0]) == CABECALHO.split(",")
+    assert len(linhas) == 3 and list(linhas[0]) == CABECALHO_13.split(",")
     for l in linhas:
         assert int(l["mortes_cacto"]) + int(l["mortes_ptera"]) == 50  # 10 dinos x 5 pistas (AD-009)
         assert float(l["pior"]) <= float(l["mediana"]) <= float(l["melhor"])
@@ -470,7 +474,7 @@ FITNESS = [
 
 def _fitness(pasta, linhas=FITNESS, cabecalho=None):
     pasta.mkdir(parents=True, exist_ok=True)
-    texto = (cabecalho or DinoGame.COLUNAS) + "\n" + "".join(",".join(map(str, l)) + "\n" for l in linhas)
+    texto = (cabecalho or CABECALHO) + "\n" + "".join(",".join(map(str, l)) + "\n" for l in linhas)
     (pasta / "fitness.csv").write_text(texto)
     return pasta
 

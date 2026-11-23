@@ -314,3 +314,153 @@ def test_janela_fechada_nao_registra_geracao(jogo, monkeypatch, tmp_path, capsys
     assert [(g, n) for g, n, janela, _ in partidas if janela] == [(1, 6), (1, 6), (2, 6), (2, 6)]
     assert [l["geracao"] for l in _linhas(tmp_path)] == ["1"]
     assert not (tmp_path / "resumo.json").exists()
+
+
+# ---- T4: pistas de teste -----------------------------------------------------
+
+TESTE = list(range(900001, 900021))
+CABECALHO = (
+    "geracao,melhor,media,mediana,desvio,pior,frames,obstaculos_melhor,"
+    "obstaculos_media,mortes_cacto,mortes_ptera,diversidade,teste"
+)
+
+
+class _Fim(Exception):
+    pass
+
+
+def test_melhor_corre_nas_pistas_de_teste(jogo, monkeypatch, tmp_path, capsys):
+    assert list(DinoGame.SEMENTES_TESTE) == TESTE
+    chamadas = []
+    avalia = DinoGame.DinoGame.avalia
+
+    def espia(self, redes, sementes, janela=True):
+        resultado = avalia(self, redes, sementes, janela)
+        chamadas.append((list(redes), list(sementes), janela, resultado))
+        return resultado
+
+    monkeypatch.setattr(DinoGame.DinoGame, "avalia", espia)
+    jogo.train(8, 3, semente_base=7, saida=str(tmp_path), janela=False, pistas=2)
+    assert len(chamadas) == 6  # por geracao: a populacao no treino, depois uma rede no teste
+    for treino, teste in zip(chamadas[0::2], chamadas[1::2]):
+        assert len(treino[0]) == 8 and treino[1] == [8, 9]
+        campea = max(treino[3], key=lambda par: par[0])[1]
+        assert teste[0] == [campea]  # so a rede de maior fitness da geracao
+        assert teste[1] == TESTE
+        assert teste[2] is False  # as pistas de teste rodam sem desenho
+
+
+def test_coluna_teste_e_a_media(jogo, monkeypatch, tmp_path, capsys):
+    # scores de teste fixados: 1, 2, ..., 20 -> media 10.5
+    roda = DinoGame.DinoGame.roda_geracao
+    sozinha = []
+
+    def roda_com_teste_fixo(self, redes, janela=True):
+        if len(redes) > 1:
+            return roda(self, redes, janela)
+        sozinha.append(1)
+        self.estatisticas = {"frames": 1, "obstaculos": [0], "mortes_cacto": 1, "mortes_ptera": 0}
+        return [(len(sozinha), redes[0])]
+
+    monkeypatch.setattr(DinoGame.DinoGame, "roda_geracao", roda_com_teste_fixo)
+    (tmp_path / "fixo").mkdir()
+    jogo.train(6, 1, semente_base=7, saida=str(tmp_path / "fixo"), janela=False, pistas=2)
+    assert float(_linhas(tmp_path / "fixo")[0]["teste"]) == 10.5
+    # pista real: a media dos scores da rede salva, rodada em cada pista de teste
+    monkeypatch.undo()
+    (tmp_path / "real").mkdir()
+    jogo.train(40, 1, semente_base=7, saida=str(tmp_path / "real"), janela=False, pistas=2)
+    campea = DinoGame.carrega_rede(str(tmp_path / "real" / "bestDino.din"))
+    scores = []
+    for semente in TESTE:
+        random.seed(semente)
+        scores.append(jogo.roda_geracao([campea], janela=False)[0][0])
+    assert len(set(scores)) > 1  # pistas diferentes, scores diferentes
+    assert float(_linhas(tmp_path / "real")[0]["teste"]) == pytest.approx(sum(scores) / 20)
+
+
+def test_cabecalho_com_teste(jogo, tmp_path, capsys):
+    jogo.train(4, 1, semente_base=1, saida=str(tmp_path), janela=False, pistas=1)
+    assert (tmp_path / "fitness.csv").read_text().splitlines()[0] == CABECALHO
+
+
+def test_selecao_ignora_o_teste(jogo, monkeypatch, tmp_path, capsys):
+    def treina(nome):
+        (tmp_path / nome).mkdir()
+        jogo.train(12, 4, semente_base=7, saida=str(tmp_path / nome), janela=False, pistas=2)
+        return _linhas(tmp_path / nome), (tmp_path / nome / "bestDino.din").read_bytes()
+
+    normal, rede_normal = treina("normal")
+    # outro teste: scores diferentes e o `random` deixado em outro estado
+    avalia = DinoGame.DinoGame.avalia
+
+    def outro_teste(self, redes, sementes, janela=True):
+        if list(sementes) != TESTE:
+            return avalia(self, redes, sementes, janela)
+        random.seed(len(redes) * 31337)
+        random.random()
+        return [(999.0, redes[0])]
+
+    monkeypatch.setattr(DinoGame.DinoGame, "avalia", outro_teste)
+    trocado, rede_trocada = treina("trocado")
+    assert [l["teste"] for l in trocado] == ["999.0"] * 4 != [l["teste"] for l in normal]
+    for a, b in zip(normal, trocado):
+        assert {k: v for k, v in a.items() if k != "teste"} == {k: v for k, v in b.items() if k != "teste"}
+    assert rede_normal == rede_trocada
+    assert len({l["media"] for l in normal}) > 1  # as geracoes diferem: a selecao agiu
+
+
+def test_pistas_de_teste_independem_das_opcoes(jogo, monkeypatch, tmp_path, capsys):
+    esperado = [_estado_apos_seed(s) for s in TESTE]
+    for semente, pistas in ((3, 1), (11, 3)):
+        partidas = _espia_pistas(monkeypatch)
+        saida = tmp_path / f"s{semente}"
+        saida.mkdir()
+        jogo.train(4, 2, semente_base=semente, saida=str(saida), janela=False, pistas=pistas)
+        teste = [estado for _, n, _, estado in partidas if n == 1]
+        assert teste == esperado * 2  # as mesmas 20 pistas, nas duas geracoes
+        monkeypatch.undo()
+
+
+def test_resumo_traz_teste_do_melhor(jogo, monkeypatch, tmp_path, capsys):
+    # recorde na geracao 2; a geracao 3 tem teste maior, mas fitness menor
+    _avalia_falsa(monkeypatch, [[50, 10, 10, 10], [10, 70, 10, 10], [60, 10, 10, 10]], teste=[11.0, 22.5, 33.0])
+    jogo.train(4, 3, semente_base=1, saida=str(tmp_path), janela=False)
+    resumo = _json(tmp_path / "resumo.json")
+    assert (resumo["geracao_do_melhor"], resumo["teste_do_melhor"]) == (2, 22.5)
+    assert [float(l["teste"]) for l in _linhas(tmp_path)] == [11.0, 22.5, 33.0]
+
+
+def test_linha_impressa_com_teste(jogo, monkeypatch, tmp_path, capsys):
+    (tmp_path / "real").mkdir()
+    jogo.train(6, 2, semente_base=7, saida=str(tmp_path / "real"), janela=False, pistas=2)
+    impressas = [l for l in capsys.readouterr().out.splitlines() if l.startswith("Geração")]
+    linhas = _linhas(tmp_path / "real")
+    assert len(linhas) == 2
+    assert impressas == [
+        f"Geração {l['geracao']}: melhor={l['melhor']} media={l['media']} teste={l['teste']}" for l in linhas
+    ]
+    _avalia_falsa(monkeypatch, [[10.5, 20.0, 60.0, 30.0]], teste=[42.5])
+    jogo.train(4, 1, semente_base=1, saida=str(tmp_path), janela=False)
+    impressas = [l for l in capsys.readouterr().out.splitlines() if l.startswith("Geração")]
+    assert impressas == ["Geração 1: melhor=60.0 media=30.125 teste=42.5"]
+
+
+def test_csv_igual_com_e_sem_janela_com_pistas(jogo, monkeypatch, tmp_path, capsys):
+    def fim(*args):
+        raise _Fim
+
+    monkeypatch.setattr(DinoGame.DinoGame, "disp_gameOver_msg", fim)
+    (tmp_path / "com").mkdir()
+    (tmp_path / "sem").mkdir()
+    with pytest.raises(_Fim):
+        jogo.train(10, 3, semente_base=6, saida=str(tmp_path / "com"), pistas=2)
+    jogo.train(10, 3, semente_base=6, saida=str(tmp_path / "sem"), janela=False, pistas=2)
+    com = (tmp_path / "com" / "fitness.csv").read_text()
+    assert com == (tmp_path / "sem" / "fitness.csv").read_text()
+    linhas = _linhas(tmp_path / "com")
+    assert len(linhas) == 3 and list(linhas[0]) == CABECALHO.split(",")
+    for l in linhas:
+        assert all(v != "" for v in l.values())
+        assert float(l["teste"]) > 0
+        assert int(l["mortes_cacto"]) + int(l["mortes_ptera"]) == 20  # 10 dinos x 2 pistas

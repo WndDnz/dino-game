@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Design**: none - fase Design pulada; as decisões de estrutura estão em "Design inline" abaixo
 **Status**: In Progress
 **Approved**: 2026-11-23 - user: "Aprovo, pode executar."
-**Build**: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py`
+**Build**: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py graficos.py`
 **Run unit**: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
 
 ---
@@ -449,8 +449,11 @@ Proof: run unit | test_registro.py::test_csv_sem_geracoes PASSED
 ## Handoff
 
 **Settled mid-build:** 2026-11-23 - execução inline, sem sub-agentes: oferta feita com o plano ("Aprova o plano de tarefas, com execução nesta sessão?"), usuário: "Aprovo, pode executar."
-**Dispatched:** none
-**Walked:** none
+**Dispatched:** Verifier (sub-agente independente) em `HEAD` 8d29af2, 2026-11-23 - aguardando retorno. Sem sub-agente de telas: nenhum critério cita captura.
+**Walked:** 2026-11-23, em `5167c71` + README, numa pasta temporária com cópia de `sprites/`, rodando os comandos do README.
+- `python autodino.py --sem-janela --individuos 30 --geracoes 4 --semente 7` criou `treinos/20261123-102903_s7/` com `bestDino.din`, `config.json`, `fitness.csv` (12 colunas) e `resumo.json` (melhor 117 na geração 3, 2731 frames). `--saida meu_treino` gravou em `meu_treino/`; repetir o mesmo `--saida` imprimiu `Pasta já tem um treino: meu_treino` com código 1.
+- `python graficos.py <treino> meu_treino` gravou os cinco PNG na pasta do treino e `comparacao.png` na pasta atual. `aptidao.png` mostrou melhor subindo de 49 a 117, média entre 22 e 26, faixa de ± desvio; `mortes.png` mostrou as 30 mortes de cada geração em cacto (pteras só aparecem depois do frame 700, que gerações tão curtas não alcançaram). Um `fitness.csv` de 3 colunas gerou só `aptidao.png` e avisou os outros quatro.
+- `--assistir` sem arquivo carregou a rede `(5, 8, 4, 2)` do treino mais recente; com um `.din` antigo da raiz, `Arquivo inválido`; sem `treinos/`, `Nenhum treino encontrado em: treinos`, código 1.
 
 ---
 

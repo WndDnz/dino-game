@@ -322,10 +322,11 @@ def test_semente_por_geracao(jogo, monkeypatch, tmp_path, capsys):
         np.random.seed(len(csvs) + 1)  # estado do numpy diferente antes de cada treino
         _treina(jogo, monkeypatch, tmp_path / nome, geracoes=2, semente_base=7)
         csvs.append((tmp_path / nome / "fitness.csv").read_text())
-    # o primeiro obstaculo da geracao g nasce com o random recem-semeado em semente_base + g
+    # pistas fixas (AD-009): em toda geracao, o primeiro obstaculo nasce com o random
+    # recem-semeado em semente_base + 1, a primeira pista de treino
     assert [g for g, _ in estados[:2]] == [1, 2]
     for g, estado in estados[:2]:
-        random.seed(7 + g)
+        random.seed(7 + 1)
         assert estado == random.getstate()
     # mesma semente, mesmo treino
     assert len(csvs[0].splitlines()) == 3

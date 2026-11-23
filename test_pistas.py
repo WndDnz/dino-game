@@ -192,3 +192,125 @@ def test_empate_no_melhor_e_reproduzivel(jogo):
         fit = jogo.avalia(redes, (8, 9), janela=False)
         assert fit[1][0] == fit[2][0] > fit[0][0]  # empate no maior fitness
         assert max(fit, key=lambda par: par[0])[1] is redes[1]  # sempre o de menor indice
+
+
+# ---- T3: treino com pistas fixas ---------------------------------------------
+
+
+def _linhas(pasta):
+    with open(pasta / "fitness.csv", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def _json(caminho):
+    with open(caminho, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _estado_apos_seed(semente):
+    random.seed(semente)
+    return random.getstate()
+
+
+def _espia_pistas(monkeypatch):
+    """Estado do random no comeco de cada partida: (geracao, n de redes, janela, estado)."""
+    partidas = []
+    roda = DinoGame.DinoGame.roda_geracao
+
+    def espia(self, redes, janela=True):
+        partidas.append((DinoGame.DinoGame.train.currentGeneration, len(redes), janela, random.getstate()))
+        return roda(self, redes, janela)
+
+    monkeypatch.setattr(DinoGame.DinoGame, "roda_geracao", espia)
+    return partidas
+
+
+def _avalia_falsa(monkeypatch, fitness, teste=None):
+    """avalia de mentira: na geracao g, o individuo i tem fitness[g-1][i]; a rede que corre
+    sozinha nas pistas de teste faz teste[g-1]. Devolve {geracao: populacao avaliada}."""
+    populacoes = {}
+
+    def avalia(self, redes, sementes, janela=True):
+        g = DinoGame.DinoGame.train.currentGeneration
+        self.estatisticas = {
+            "frames": 7, "obstaculos": [0.0] * len(redes), "mortes_cacto": len(redes), "mortes_ptera": 0,
+        }
+        if list(sementes) == list(DinoGame.SEMENTES_TESTE):
+            return [(teste[g - 1] if teste else 0.0, redes[0])]
+        populacoes[g] = list(redes)
+        return list(zip(fitness[g - 1], redes))
+
+    monkeypatch.setattr(DinoGame.DinoGame, "avalia", avalia)
+    return populacoes
+
+
+def test_mesmas_pistas_em_todas_as_geracoes(jogo, monkeypatch, tmp_path, capsys):
+    partidas = _espia_pistas(monkeypatch)
+    jogo.train(6, 3, semente_base=7, saida=str(tmp_path), janela=False, pistas=2)
+    treino = [(g, estado) for g, n, _, estado in partidas if n == 6]  # a populacao inteira
+    assert [g for g, _ in treino] == [1, 1, 2, 2, 3, 3]
+    assert [estado for _, estado in treino] == [_estado_apos_seed(8), _estado_apos_seed(9)] * 3
+
+
+def test_estatisticas_sobre_o_fitness(jogo, monkeypatch, tmp_path, capsys):
+    import statistics
+
+    fitness = [10.5, 20.0, 60.0, 30.0]
+    _avalia_falsa(monkeypatch, [fitness])
+    jogo.train(4, 1, semente_base=1, saida=str(tmp_path), janela=False)
+    (linha,) = _linhas(tmp_path)
+    assert float(linha["melhor"]) == 60.0
+    assert float(linha["media"]) == 30.125
+    assert float(linha["mediana"]) == 25.0
+    assert float(linha["pior"]) == 10.5
+    assert float(linha["desvio"]) == pytest.approx(statistics.pstdev(fitness))
+
+
+def test_recorde_pelo_fitness(jogo, monkeypatch, tmp_path, capsys):
+    # maior fitness por geracao: 50, 50 (empata, outra rede), 40 (menor), 70.5 (recorde)
+    fitness = [[50, 10, 10, 10], [10, 50, 10, 10], [40, 10, 10, 10], [10, 10, 70.5, 10]]
+    populacoes = _avalia_falsa(monkeypatch, fitness)
+    gravadas = []
+    salva = RedeNeural.RedeNeural.save_object
+
+    def espia(rede, caminho):
+        gravadas.append((DinoGame.DinoGame.train.currentGeneration, rede, os.path.basename(caminho)))
+        return salva(rede, caminho)
+
+    monkeypatch.setattr(RedeNeural.RedeNeural, "save_object", staticmethod(espia))
+    jogo.train(4, 4, semente_base=1, saida=str(tmp_path), janela=False)
+    assert [(g, nome) for g, _, nome in gravadas] == [(1, "bestDino.din"), (4, "bestDino.din")]
+    assert gravadas[0][1] is populacoes[1][0] and gravadas[1][1] is populacoes[4][2]
+    no_disco = DinoGame.carrega_rede(str(tmp_path / "bestDino.din"))
+    for a, b in zip(no_disco.pesos + no_disco.bias, populacoes[4][2].pesos + populacoes[4][2].bias):
+        assert np.array_equal(a, b)
+    assert _json(tmp_path / "resumo.json")["melhor_score"] == 70.5
+
+
+def test_config_traz_pistas(jogo, tmp_path, capsys):
+    jogo.train(4, 1, semente_base=1, saida=str(tmp_path), janela=False, pistas=3)
+    config = _json(tmp_path / "config.json")
+    assert (config["pistas"], config["pistas_teste"], config["limite_frames"]) == (3, 20, 14000)
+
+
+def test_uma_pista_so(jogo, monkeypatch, tmp_path, capsys):
+    partidas = _espia_pistas(monkeypatch)
+    jogo.train(6, 3, semente_base=7, saida=str(tmp_path), janela=False, pistas=1)
+    treino = [(g, estado) for g, n, _, estado in partidas if n == 6]
+    assert [g for g, _ in treino] == [1, 2, 3]
+    assert [estado for _, estado in treino] == [_estado_apos_seed(8)] * 3
+
+
+def test_janela_fechada_nao_registra_geracao(jogo, monkeypatch, tmp_path, capsys):
+    partidas = _espia_pistas(monkeypatch)
+
+    def eventos(self):
+        com_janela = [p for p in partidas if p[2]]
+        return len(com_janela) < 4  # fecha na 2a pista da geracao 2 (2 pistas por geracao)
+
+    monkeypatch.setattr(DinoGame.DinoGame, "_eventos_treino", eventos)
+    with pytest.raises(SystemExit):
+        jogo.train(6, 3, semente_base=7, saida=str(tmp_path), pistas=2)
+    assert [(g, n) for g, n, janela, _ in partidas if janela] == [(1, 6), (1, 6), (2, 6), (2, 6)]
+    assert [l["geracao"] for l in _linhas(tmp_path)] == ["1"]
+    assert not (tmp_path / "resumo.json").exists()

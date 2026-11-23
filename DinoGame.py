@@ -504,11 +504,14 @@ class DinoGame:
         semente_base=0,
         saida=".",
         janela=True,
+        pistas=PISTAS,
     ):
         """
-        Treina `nIndividuals` redes por `nGenerations` gerações. Com `janela`, mostra
-        o treino e, ao fim, a tela de fim de treino. Sem `janela`, imprime uma linha
-        por geração e retorna depois da última.
+        Treina `nIndividuals` redes por `nGenerations` gerações. O fitness de cada rede
+        é a média do score em `pistas` pistas fixas, de sementes semente_base + 1 em
+        diante, as mesmas em toda geração (AD-009). Com `janela`, mostra o treino e, ao
+        fim, a tela de fim de treino. Sem `janela`, imprime uma linha por geração e
+        retorna depois da última.
         """
         DinoGame.train.currentGeneration = 1
         DinoGame.train.currentBest = None
@@ -526,6 +529,9 @@ class DinoGame:
             "elite": ELITE,
             "torneio": AGMLP.TORNEIO,
             "alpha_blx": AGMLP.ALPHA_BLX,
+            "pistas": pistas,
+            "pistas_teste": len(SEMENTES_TESTE),
+            "limite_frames": LIMITE_FRAMES,
             "commit": commit,
             "alteracoes_locais": alteracoes,
             "inicio": datetime.datetime.now().isoformat(timespec="seconds"),
@@ -545,14 +551,13 @@ class DinoGame:
             elite=ELITE,
         )
         redes = ag.iniciaPopulacao()
+        sementes = [semente_base + i for i in range(1, pistas + 1)]
 
         for geracao in range(1, nGenerations + 1):
             DinoGame.train.currentGeneration = geracao
-            # pista reproduzível: mesma semente, mesma sequência de obstáculos
-            random.seed(semente_base + geracao)
             if janela:
                 print(f"Starting generation {geracao}.")
-            ranked = self.roda_geracao(redes, janela)
+            ranked = self.avalia(redes, sementes, janela)
             if ranked is None:  # o usuário fechou a janela
                 pygame.quit()
                 quit()
@@ -566,7 +571,7 @@ class DinoGame:
             melhor = max(score for score, _ in ranked)
             DinoGame.train.currentBest = melhor
             if not janela:
-                media = sum(score for score, _ in ranked) / len(ranked)
+                media = float(np.mean([score for score, _ in ranked]))  # a mesma conta do CSV
                 print(f"Geração {geracao}: melhor={melhor} media={media}")
             if geracao < nGenerations:
                 redes = ag.proximaGeracao(ranked)

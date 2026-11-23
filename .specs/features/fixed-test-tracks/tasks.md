@@ -127,15 +127,15 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `test_mesmas_pistas_em_todas_as_geracoes`: em 3 gerações com `semente_base=7` e `pistas=2`, as sementes usadas são (8, 9) em cada geração
-- [ ] `test_estatisticas_sobre_o_fitness`: com fitness fixados em (10.5, 20.0, 60.0, 30.0), a linha traz melhor 60.0, média 30.125, mediana 25.0, pior 10.5 e o desvio populacional desses valores
-- [ ] `test_recorde_pelo_fitness`: `bestDino.din` é regravado na geração em que o maior fitness passa do recorde e fica intacto quando o maior fitness é igual ou menor
-- [ ] `test_config_traz_pistas`: `config.json` traz `pistas` 3 quando o treino usa 3, `pistas_teste` 20 e `limite_frames` 14000
-- [ ] `test_uma_pista_so`: com `pistas=1` e `semente_base=7`, a única semente usada em todas as gerações é 8
-- [ ] `test_janela_fechada_nao_registra_geracao`: fechar a janela na 2ª pista da geração 2 encerra o treino com o `fitness.csv` contendo só a geração 1
-- [ ] `test_semente_por_geracao` (`test_ga.py`) e o teste de mesma pista entre assistir e treino (`test_modos.py`) atualizados para pistas fixas; nenhum teste removido
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
-- [ ] Test count: os 110 testes anteriores + 6 de `test_pistas.py` passam (116)
+- [x] `test_mesmas_pistas_em_todas_as_geracoes`: em 3 gerações com `semente_base=7` e `pistas=2`, as sementes usadas são (8, 9) em cada geração
+- [x] `test_estatisticas_sobre_o_fitness`: com fitness fixados em (10.5, 20.0, 60.0, 30.0), a linha traz melhor 60.0, média 30.125, mediana 25.0, pior 10.5 e o desvio populacional desses valores
+- [x] `test_recorde_pelo_fitness`: `bestDino.din` é regravado na geração em que o maior fitness passa do recorde e fica intacto quando o maior fitness é igual ou menor
+- [x] `test_config_traz_pistas`: `config.json` traz `pistas` 3 quando o treino usa 3, `pistas_teste` 20 e `limite_frames` 14000
+- [x] `test_uma_pista_so`: com `pistas=1` e `semente_base=7`, a única semente usada em todas as gerações é 8
+- [x] `test_janela_fechada_nao_registra_geracao`: fechar a janela na 2ª pista da geração 2 encerra o treino com o `fitness.csv` contendo só a geração 1
+- [x] `test_semente_por_geracao` (`test_ga.py`) e o teste de mesma pista entre assistir e treino (`test_modos.py`) atualizados para pistas fixas; nenhum teste removido
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
+- [x] Test count: os 110 testes anteriores + 6 de `test_pistas.py` passam (116)
 
 **Tests**: integration
 **Gate**: full

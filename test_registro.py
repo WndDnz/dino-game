@@ -289,6 +289,7 @@ def test_config_json_antes_da_primeira_geracao(jogo, monkeypatch, tmp_path, caps
     assert config == {
         "individuos": 10, "geracoes": 2, "semente": 4, "janela": False, "topologia": [5, 8, 4, 2],
         "taxa_mutacao": 0.05, "sigma_mutacao": 0.5, "elite": 0.1, "torneio": 3, "alpha_blx": 0.1,
+        "pistas": 5, "pistas_teste": 20, "limite_frames": 14000,  # AD-009
         "commit": commit, "alteracoes_locais": sujo,
     }
     assert datetime.datetime.fromisoformat(inicio).year >= 2026
@@ -298,10 +299,10 @@ def test_resumo_json_no_fim(jogo, tmp_path, capsys):
     jogo.train(10, 3, semente_base=4, saida=str(tmp_path), janela=False)
     resumo = _json(tmp_path / "resumo.json")
     linhas = _linhas(tmp_path)
-    melhor = max(linhas, key=lambda l: int(l["melhor"]))  # max devolve o primeiro em caso de empate
+    melhor = max(linhas, key=lambda l: float(l["melhor"]))  # max devolve o primeiro em caso de empate
     assert set(resumo) == {"geracoes_concluidas", "melhor_score", "geracao_do_melhor", "frames_total", "segundos_total"}
     assert resumo["geracoes_concluidas"] == 3 == len(linhas)
-    assert resumo["melhor_score"] == int(melhor["melhor"])
+    assert resumo["melhor_score"] == float(melhor["melhor"])  # fitness: media nas pistas (AD-009)
     assert resumo["geracao_do_melhor"] == int(melhor["geracao"])
     assert resumo["frames_total"] == sum(int(l["frames"]) for l in linhas)
     assert isinstance(resumo["segundos_total"], float) and resumo["segundos_total"] > 0
@@ -337,7 +338,7 @@ def test_csv_completo_igual_com_e_sem_janela(jogo, monkeypatch, tmp_path, capsys
     linhas = _linhas(tmp_path / "com")
     assert len(linhas) == 3 and list(linhas[0]) == CABECALHO.split(",")
     for l in linhas:
-        assert int(l["mortes_cacto"]) + int(l["mortes_ptera"]) == 10
+        assert int(l["mortes_cacto"]) + int(l["mortes_ptera"]) == 50  # 10 dinos x 5 pistas (AD-009)
         assert float(l["pior"]) <= float(l["mediana"]) <= float(l["melhor"])
         assert int(l["frames"]) > 0
 

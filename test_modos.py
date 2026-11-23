@@ -788,7 +788,8 @@ def test_opcoes_de_treino_sao_usadas(pasta, monkeypatch, capsys):
     monkeypatch.setattr(DinoGame.Cactus, "__init__", espia)
     assert autodino.main(["--sem-janela", "--individuos", "7", "--geracoes", "2", "--semente", "9"]) == 0
     assert tamanhos == [7, 7]
-    assert estados == [_estado_apos_seed(9 + 1), _estado_apos_seed(9 + 2)]
+    # pistas fixas (AD-009): toda geracao comeca na pista de semente 9 + 1
+    assert estados == [_estado_apos_seed(9 + 1), _estado_apos_seed(9 + 1)]
     monkeypatch.undo()
     # sem as opcoes: 350, 30 e 0, nos dois modos de treino
     monkeypatch.chdir(pasta)

@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: none - fase Design pulada; as decisões de estrutura estão em "Design inline" abaixo
-**Status**: In Progress
+**Status**: Done
 **Approved**: 2026-11-23 - user: "Aprovo, pode executar."
 **Build**: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py graficos.py`
 **Run unit**: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
@@ -435,6 +435,12 @@ Proof: run unit | test_registro.py::test_csv_antigo_pula_graficos PASSED
 **C25** - Dois treinos com a mesma semente no mesmo segundo: a segunda pasta ganha o sufixo `-2` (REC-08, Edge Case 1)
 Proof: run unit | test_registro.py::test_mesmo_segundo_ganha_sufixo PASSED
 
+**C29** - Dois treinos simultâneos nunca recebem a mesma pasta, mesmo quando o segundo começa enquanto o primeiro espera na tela inicial (REC-08, Edge Case 1; acrescentado na verificação)
+Proof: run unit | test_registro.py::test_treinos_simultaneos_nao_dividem_pasta PASSED
+
+**C30** - Um novo treino pedido na tela de fim vai para outra pasta e não altera o treino anterior (REC-01, AC 1 e Goal 1; acrescentado na verificação)
+Proof: run unit | test_registro.py::test_novo_treino_na_tela_de_fim_vai_para_outra_pasta PASSED
+
 **C26** - Treino interrompido: `config.json`, `fitness.csv` parcial e `bestDino.din`, sem `resumo.json` (REC-09, Edge Case 2)
 Proof: run unit | test_registro.py::test_treino_interrompido_sem_resumo PASSED
 
@@ -449,7 +455,7 @@ Proof: run unit | test_registro.py::test_csv_sem_geracoes PASSED
 ## Handoff
 
 **Settled mid-build:** 2026-11-23 - execução inline, sem sub-agentes: oferta feita com o plano ("Aprova o plano de tarefas, com execução nesta sessão?"), usuário: "Aprovo, pode executar."
-**Dispatched:** Verifier (sub-agente independente) em `HEAD` 1c81948 (código em 10a82a2), 2026-11-23 - aguardando retorno. Sem sub-agente de telas: nenhum critério cita captura.
+**Dispatched:** Verifier (sub-agente independente) em `HEAD` 1c81948 (código em 10a82a2), 2026-11-23 - returned: FAIL, 5 achados (3 defeitos de comportamento com testes verdes, 2 testes frouxos). Fechados por f97693a, 9ac9501, ff81d11. Sem sub-agente de telas: nenhum critério cita captura.
 **Walked:** 2026-11-23, em `5167c71` + README, numa pasta temporária com cópia de `sprites/`, rodando os comandos do README.
 - `python autodino.py --sem-janela --individuos 30 --geracoes 4 --semente 7` criou `treinos/20261123-102903_s7/` com `bestDino.din`, `config.json`, `fitness.csv` (12 colunas) e `resumo.json` (melhor 117 na geração 3, 2731 frames). `--saida meu_treino` gravou em `meu_treino/`; repetir o mesmo `--saida` imprimiu `Pasta já tem um treino: meu_treino` com código 1.
 - `python graficos.py <treino> meu_treino` gravou os cinco PNG na pasta do treino e `comparacao.png` na pasta atual. `aptidao.png` mostrou melhor subindo de 49 a 117, média entre 22 e 26, faixa de ± desvio; `mortes.png` mostrou as 30 mortes de cada geração em cacto (pteras só aparecem depois do frame 700, que gerações tão curtas não alcançaram). Um `fitness.csv` de 3 colunas gerou só `aptidao.png` e avisou os outros quatro.

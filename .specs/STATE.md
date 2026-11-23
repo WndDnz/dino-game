@@ -70,11 +70,11 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 
 ## Handoff
 
-- **Feature**: `.specs/features/training-record-and-plots/` - spec aprovada em 2026-11-22; `tasks.md` em rascunho, sem aprovação
-- **Phase / Task**: Tasks - aguardando aprovação do usuário
-- **Completed**: none
+- **Feature**: `.specs/features/training-record-and-plots/` - concluída em 2026-11-23, exceto o gate final
+- **Phase / Task**: Execute: 12/12 tarefas, 5 achados do Verifier fechados, provas verdes
+- **Completed**: T1-T12; achados fechados por f97693a, 9ac9501, ff81d11
 - **In-progress** (file:line): none
-- **Next step**: Usuário aprova `tasks.md` e responde a oferta de sub-agentes (12 tarefas); então Execute a partir de T1. Pistas de teste fixas ficam para uma spec separada.
-- **Blockers**: none
-- **Uncommitted files**: `.specs/features/training-record-and-plots/` (spec, tasks), `.specs/STATE.md`; do usuário, fora do escopo: `bestDino.din` (modificado por um treino dele), `fitness.csv`
-- **Branch**: master
+- **Next step**: `validate_verification.py` exige árvore limpa; o usuário decide o destino de `bestDino.din` (modificado) e `fitness.csv` (não versionado) na raiz, que são de um treino dele. Depois: push, e a spec das pistas de teste fixas.
+- **Blockers**: decisão do usuário sobre os dois arquivos da raiz
+- **Uncommitted files**: `bestDino.din`, `fitness.csv` (do usuário)
+- **Branch**: master (commits locais desta feature, sem push)

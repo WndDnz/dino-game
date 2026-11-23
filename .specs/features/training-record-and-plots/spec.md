@@ -140,34 +140,34 @@ Um treino hoje deixa só `fitness.csv` com o melhor score e a média de cada ger
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| REC-01 | P1: Registro (critério 1) | Tasks | In Tasks |
-| REC-02 | P1: Registro (critério 2) | Tasks | In Tasks |
-| REC-03 | P1: Registro (critério 3) | Tasks | In Tasks |
-| REC-04 | P1: Registro (critério 4) | Tasks | In Tasks |
-| REC-05 | P1: Registro (critério 5) | Tasks | In Tasks |
-| REC-06 | P1: Registro (critério 6) | Tasks | In Tasks |
-| REC-07 | P1: Registro (critério 7) | Tasks | In Tasks |
-| MET-01 | P1: Métricas (critério 1) | Tasks | In Tasks |
-| MET-02 | P1: Métricas (critério 2) | Tasks | In Tasks |
-| MET-03 | P1: Métricas (critério 3) | Tasks | In Tasks |
-| MET-04 | P1: Métricas (critério 4) | Tasks | In Tasks |
-| MET-05 | P1: Métricas (critério 5) | Tasks | In Tasks |
-| MET-06 | P1: Métricas (critério 6) | Tasks | In Tasks |
-| MET-07 | P1: Métricas (critério 7) | Tasks | In Tasks |
-| PLOT-01 | P1: Gráficos (critério 1) | Tasks | In Tasks |
-| PLOT-02 | P1: Gráficos (critério 2) | Tasks | In Tasks |
-| PLOT-03 | P1: Gráficos (critério 3) | Tasks | In Tasks |
-| PLOT-04 | P1: Gráficos (critério 4) | Tasks | In Tasks |
-| PLOT-05 | P1: Gráficos (critério 5) | Tasks | In Tasks |
-| PLOT-06 | P1: Gráficos (critério 6) | Tasks | In Tasks |
-| PLOT-07 | P1: Gráficos (critério 7) | Tasks | In Tasks |
-| PLOT-08 | P1: Gráficos (critério 8) | Tasks | In Tasks |
-| PLOT-09 | P1: Gráficos (critério 9) | Tasks | In Tasks |
-| PLOT-10 | P1: Gráficos (critério 10) | Tasks | In Tasks |
-| REC-08 | Edge case 1 | Tasks | In Tasks |
-| REC-09 | Edge case 2 | Tasks | In Tasks |
-| REC-10 | Edge case 3 | Tasks | In Tasks |
-| PLOT-11 | Edge case 4 | Tasks | In Tasks |
+| REC-01 | P1: Registro (critério 1) | Execute | Verified |
+| REC-02 | P1: Registro (critério 2) | Execute | Verified |
+| REC-03 | P1: Registro (critério 3) | Execute | Verified |
+| REC-04 | P1: Registro (critério 4) | Execute | Verified |
+| REC-05 | P1: Registro (critério 5) | Execute | Verified |
+| REC-06 | P1: Registro (critério 6) | Execute | Verified |
+| REC-07 | P1: Registro (critério 7) | Execute | Verified |
+| MET-01 | P1: Métricas (critério 1) | Execute | Verified |
+| MET-02 | P1: Métricas (critério 2) | Execute | Verified |
+| MET-03 | P1: Métricas (critério 3) | Execute | Verified |
+| MET-04 | P1: Métricas (critério 4) | Execute | Verified |
+| MET-05 | P1: Métricas (critério 5) | Execute | Verified |
+| MET-06 | P1: Métricas (critério 6) | Execute | Verified |
+| MET-07 | P1: Métricas (critério 7) | Execute | Verified |
+| PLOT-01 | P1: Gráficos (critério 1) | Execute | Verified |
+| PLOT-02 | P1: Gráficos (critério 2) | Execute | Verified |
+| PLOT-03 | P1: Gráficos (critério 3) | Execute | Verified |
+| PLOT-04 | P1: Gráficos (critério 4) | Execute | Verified |
+| PLOT-05 | P1: Gráficos (critério 5) | Execute | Verified |
+| PLOT-06 | P1: Gráficos (critério 6) | Execute | Verified |
+| PLOT-07 | P1: Gráficos (critério 7) | Execute | Verified |
+| PLOT-08 | P1: Gráficos (critério 8) | Execute | Verified |
+| PLOT-09 | P1: Gráficos (critério 9) | Execute | Verified |
+| PLOT-10 | P1: Gráficos (critério 10) | Execute | Verified |
+| REC-08 | Edge case 1 | Execute | Verified |
+| REC-09 | Edge case 2 | Execute | Verified |
+| REC-10 | Edge case 3 | Execute | Verified |
+| PLOT-11 | Edge case 4 | Execute | Verified |
 
 **Coverage:** 28 total, 28 mapped to tasks, 0 unmapped.
 

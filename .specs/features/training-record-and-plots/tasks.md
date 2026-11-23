@@ -94,9 +94,9 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_diversidade_media_do_desvio_por_gene`: 0.0 para redes idênticas; para duas redes que diferem de 2.0 em todos os genes, 1.0; para 3 redes construídas à mão, o valor calculado gene a gene
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 1 de `test_registro.py` passam
+- [x] `test_diversidade_media_do_desvio_por_gene`: 0.0 para redes idênticas; para duas redes que diferem de 2.0 em todos os genes, 1.0; para 3 redes construídas à mão, o valor calculado gene a gene
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 1 de `test_registro.py` passam
 
 **Tests**: unit
 **Gate**: quick

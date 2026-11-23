@@ -10,6 +10,14 @@ A classe RNA_AG usa um algoritmo genético para treinar uma RNA do tipo feed-for
 """
 
 
+def diversidade(redes):
+    """Média, sobre os genes, do desvio padrão de cada gene entre as redes; 0 se todas são iguais."""
+    genes = np.stack(
+        [np.concatenate([a.ravel() for a in r.pesos + r.bias]) for r in redes]
+    )
+    return float(genes.std(axis=0).mean())
+
+
 class RNA_AG:
 
     def __init__(

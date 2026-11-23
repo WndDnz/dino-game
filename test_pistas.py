@@ -16,6 +16,7 @@ import pytest  # noqa: E402
 
 import autodino  # noqa: E402
 import DinoGame  # noqa: E402
+import graficos  # noqa: E402
 import RedeNeural  # noqa: E402
 
 CFG = (5, 8, 4, 2)
@@ -517,3 +518,67 @@ def test_pistas_invalido_codigo_2(pasta, monkeypatch, capsys):
             autodino.main(["--sem-janela", "--pistas", valor])
         assert saida.value.code == 2, valor
     assert treinou == [] and not (pasta / "treinos").exists()
+
+
+# ---- T6 e T7: graficos -------------------------------------------------------
+
+CABECALHO_12 = CABECALHO.rsplit(",", 1)[0]
+FITNESS = [
+    # geracao,melhor,media,mediana,desvio,pior,frames,obst_melhor,obst_media,mortes_cacto,mortes_ptera,diversidade,teste
+    (1, 50.0, 20.0, 18.0, 6.0, 5.0, 300, 2.0, 0.5, 9, 1, 3.9, 31.5),
+    (2, 90.0, 35.0, 30.0, 12.0, 8.0, 520, 4.0, 1.25, 6, 4, 3.5, 77.25),
+    (3, 140.0, 60.0, 55.0, 20.0, 11.0, 900, 7.0, 2.75, 3, 7, 2.8, 64.0),
+]
+
+
+def _fitness(pasta, linhas=FITNESS, colunas=13):
+    """Grava um fitness.csv com as primeiras `colunas` colunas de `linhas`."""
+    pasta.mkdir(parents=True, exist_ok=True)
+    cabecalho = ",".join(CABECALHO.split(",")[:colunas])
+    corpo = [",".join(map(str, l[:colunas])) for l in linhas]
+    (pasta / "fitness.csv").write_text("\n".join([cabecalho, *corpo]) + "\n")
+    return pasta
+
+
+def _figuras(monkeypatch):
+    """Guarda cada figura salva por graficos.py: {nome do arquivo: figura}."""
+    import matplotlib.figure
+
+    salvas = {}
+    savefig = matplotlib.figure.Figure.savefig
+
+    def guarda(self, caminho, *a, **k):
+        salvas[os.path.basename(str(caminho))] = self
+        return savefig(self, caminho, *a, **k)
+
+    monkeypatch.setattr(matplotlib.figure.Figure, "savefig", guarda)
+    return salvas
+
+
+def _curvas(fig):
+    """{rotulo: (x, y)} das linhas do primeiro eixo."""
+    return {l.get_label(): (list(l.get_xdata()), list(l.get_ydata())) for l in fig.axes[0].get_lines()}
+
+
+def test_aptidao_com_curva_de_teste(tmp_path, monkeypatch):
+    salvas = _figuras(monkeypatch)
+    pasta = _fitness(tmp_path / "t")
+    assert graficos.main([str(pasta)]) == 0
+    assert (pasta / "aptidao.png").stat().st_size > 0
+    curvas = _curvas(salvas["aptidao.png"])
+    assert set(curvas) == {"melhor", "mediana", "média", "pior", "teste"}
+    assert curvas["teste"] == ([1.0, 2.0, 3.0], [31.5, 77.25, 64.0])
+    assert curvas["melhor"] == ([1.0, 2.0, 3.0], [50.0, 90.0, 140.0])  # as outras curvas continuam
+    legenda = [t.get_text() for t in salvas["aptidao.png"].axes[0].get_legend().get_texts()]
+    assert "teste" in legenda
+
+
+def test_aptidao_sem_coluna_teste(tmp_path, monkeypatch, capsys):
+    salvas = _figuras(monkeypatch)
+    pasta = _fitness(tmp_path / "antigo", colunas=12)
+    assert (pasta / "fitness.csv").read_text().splitlines()[0] == CABECALHO_12
+    assert graficos.main([str(pasta)]) == 0
+    assert (pasta / "aptidao.png").stat().st_size > 0
+    assert set(_curvas(salvas["aptidao.png"])) == {"melhor", "mediana", "média", "pior"}
+    assert capsys.readouterr().out == ""  # nenhum aviso
+    assert sorted(p.name for p in pasta.glob("*.png")) == sorted(graficos.GRAFICOS)  # nada pulado

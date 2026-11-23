@@ -205,10 +205,10 @@ T5 → T6 → T7 → T8
 
 **Done when**:
 
-- [ ] `test_aptidao_com_curva_de_teste`: a figura tem uma curva de legenda `teste` com os valores da coluna, por geração
-- [ ] `test_aptidao_sem_coluna_teste`: com o CSV de 12 colunas, aptidao.png é gravado sem curva `teste` e a saída não tem `Gráfico pulado` para ele
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
-- [ ] Test count: os 126 testes anteriores + 2 de `test_pistas.py` passam (128)
+- [x] `test_aptidao_com_curva_de_teste`: a figura tem uma curva de legenda `teste` com os valores da coluna, por geração
+- [x] `test_aptidao_sem_coluna_teste`: com o CSV de 12 colunas, aptidao.png é gravado sem curva `teste` e a saída não tem `Gráfico pulado` para ele
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py test_pistas.py -v`
+- [x] Test count: os 126 testes anteriores + 2 de `test_pistas.py` passam (128)
 
 **Tests**: unit
 **Gate**: quick

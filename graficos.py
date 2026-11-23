@@ -15,7 +15,8 @@ def le(pasta):
     with open(os.path.join(pasta, "fitness.csv"), newline="") as f:
         linhas = list(csv.DictReader(f))
     colunas = linhas[0].keys() if linhas else []
-    return {c: [float(l[c]) for l in linhas] for c in colunas}
+    # uma coluna sem valor em alguma linha (CSV antigo, teste não medido) fica de fora
+    return {c: [float(l[c]) for l in linhas] for c in colunas if all(l[c] not in ("", None) for l in linhas)}
 
 
 def _figura(titulo, ylabel, xlabel="geração"):
@@ -43,6 +44,8 @@ def aptidao(d):
     ax.plot(g, d["media"], label="média")
     if "pior" in d:
         ax.plot(g, d["pior"], label="pior")
+    if "teste" in d:  # a melhor rede da geração nas pistas de teste (AD-009)
+        ax.plot(g, d["teste"], label="teste", linestyle="--", color="black")
     ax.legend()
     return fig
 

@@ -60,13 +60,21 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 - **Date**: 2026-11-22
 - **Status**: active
 
+### AD-008
+- **Decision**: Cada treino iniciado pela linha de comando grava em uma pasta própria, `treinos/<AAAAMMDD-HHMMSS>_s<semente>/` ou a indicada por `--saida`: `config.json`, `fitness.csv`, `bestDino.din` e `resumo.json`. A raiz do repositório não recebe mais saída de treino, e `--assistir` sem arquivo usa o treino mais recente. O `fitness.csv` tem as colunas `geracao,melhor,media,mediana,desvio,pior,frames,obstaculos_melhor,obstaculos_media,mortes_cacto,mortes_ptera,diversidade` e nenhum valor que dependa do relógio.
+- **Reason**: Um treino apagava o anterior e não registrava hiperparâmetros, semente nem versão do código, então treinos não eram comparáveis. Usuário: "1. Concordo 2. no próprio fitness.csv 3. OK".
+- **Trade-off**: Muda o cabeçalho do `fitness.csv` fixado em LOG-02 e o padrão de `--assistir` fixado em WATCH-02; CSVs antigos têm 3 colunas. O tempo por geração não é registrado, para o CSV continuar idêntico entre execuções com a mesma semente.
+- **Scope**: `autodino.py`, `DinoGame.train`, `registra_geracao`, `graficos.py`, pasta `treinos/`
+- **Date**: 2026-11-22
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: `.specs/features/headless-training-and-watch/` - concluída em 2026-11-22
-- **Phase / Task**: Execute encerrado: 10/10 tarefas, 5 achados do Verifier fechados, gate final verde
-- **Completed**: T1-T10; achados fechados por e74fc87 + 465a33a, ffd1082, 3d9e657, 33a18e5, 0e6573c
+- **Feature**: `.specs/features/training-record-and-plots/` - spec aprovada em 2026-11-22; `tasks.md` em rascunho, sem aprovação
+- **Phase / Task**: Tasks - aguardando aprovação do usuário
+- **Completed**: none
 - **In-progress** (file:line): none
-- **Next step**: Nenhum nesta feature. Pendências conhecidas: o `bestDino.din` versionado tem topologia (4, 8, 2) e `--assistir` o recusa até um treino regravá-lo; `fitness.csv` e `bestDino.din` de treinos reais não estão no `.gitignore`. Candidata a próxima feature: limpeza de código morto (`AGT`, `SGD`, `acasala0`, `acasala2`, `start`) e dos arquivos `AGMLP`, `np`, `profile`.
+- **Next step**: Usuário aprova `tasks.md` e responde a oferta de sub-agentes (12 tarefas); então Execute a partir de T1. Pistas de teste fixas ficam para uma spec separada.
 - **Blockers**: none
-- **Uncommitted files**: none
-- **Branch**: master (commits locais desta feature, sem push)
+- **Uncommitted files**: `.specs/features/training-record-and-plots/` (spec, tasks), `.specs/STATE.md`; do usuário, fora do escopo: `bestDino.din` (modificado por um treino dele), `fitness.csv`
+- **Branch**: master

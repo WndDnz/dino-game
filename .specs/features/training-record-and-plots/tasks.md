@@ -347,9 +347,9 @@ T11 → T12
 
 **Done when**:
 
-- [ ] Cada comando e nome de arquivo citado no README existe e se comporta como descrito, conferido rodando os comandos em uma pasta temporária
-- [ ] Gate check passes: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py; python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 31 de `test_registro.py` passam
+- [x] Cada comando e nome de arquivo citado no README existe e se comporta como descrito, conferido rodando os comandos em uma pasta temporária
+- [x] Gate check passes: `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py; python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 31 de `test_registro.py` passam
 
 **Tests**: none
 **Gate**: build

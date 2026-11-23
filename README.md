@@ -14,10 +14,11 @@ O jogo base é o **T-Rex Rush**, de **Shivam Shekhar**: um remake em Python e py
 
 - Python 3 (testado com 3.11)
 - `pygame`, `numpy`, `tqdm`
+- `matplotlib`, para os gráficos
 - `pytest`, só para rodar os testes
 
 ```
-pip install pygame numpy tqdm pytest
+pip install pygame numpy tqdm matplotlib pytest
 ```
 
 Rode os comandos a partir da raiz do repositório: os sprites são carregados pelo caminho relativo `sprites/`.
@@ -28,8 +29,9 @@ Rode os comandos a partir da raiz do repositório: os sprites são carregados pe
 | --- | --- |
 | `python autodino.py` | Treino com janela: tela inicial (ESPAÇO para começar) e depois 350 dinos por 30 gerações |
 | `python autodino.py --sem-janela` | Treino sem janela: mais rápido, imprime uma linha por geração e termina sozinho |
-| `python autodino.py --assistir` | A rede salva em `bestDino.din` joga sozinha |
+| `python autodino.py --assistir` | A melhor rede do treino mais recente em `treinos/` joga sozinha |
 | `python autodino.py --assistir outro.din` | Assiste a rede de outro arquivo |
+| `python graficos.py treinos/<pasta>` | Gera os gráficos de um treino |
 
 Opções:
 
@@ -38,6 +40,7 @@ Opções:
 | `--individuos N` | 350 | os dois treinos |
 | `--geracoes G` | 30 | os dois treinos |
 | `--semente S` | 0 | treino: semente base; assistir: mesma pista em toda partida |
+| `--saida PASTA` | `treinos/<data-hora>_s<semente>` | os dois treinos |
 
 Exemplo: `python autodino.py --sem-janela --individuos 350 --geracoes 100 --semente 7`
 
@@ -57,16 +60,52 @@ python -c "import DinoGame; DinoGame.DinoGame().start()"
 
 ### O que o treino grava
 
-Na pasta em que o comando roda:
+Cada treino ganha uma pasta própria, `treinos/<AAAAMMDD-HHMMSS>_s<semente>/`, ou a indicada em `--saida`. Um treino nunca sobrescreve outro: uma pasta que já tem `fitness.csv` é recusada, e dois treinos no mesmo segundo ganham o sufixo `-2`. A pasta `treinos/` está no `.gitignore`.
 
-- `fitness.csv`: uma linha por geração, com `geracao,melhor,media`. É recriado a cada treino.
-- `bestDino.din`: a melhor rede até o momento, regravada a cada recorde. Um treino interrompido deixa a melhor das gerações concluídas.
+| Arquivo | Conteúdo |
+| --- | --- |
+| `config.json` | Indivíduos, gerações, semente, janela, topologia, hiperparâmetros do algoritmo genético, commit do código e se havia alterações locais, horário de início. Gravado antes da primeira geração |
+| `fitness.csv` | Uma linha por geração (colunas abaixo) |
+| `bestDino.din` | A melhor rede até o momento, regravada a cada recorde |
+| `resumo.json` | Gerações concluídas, melhor score, geração em que ele apareceu, frames e segundos totais. Gravado depois da última geração; um treino interrompido não tem resumo |
 
-O treino é reproduzível: a mesma `--semente` com os mesmos `--individuos` e `--geracoes` dá o mesmo `fitness.csv`, com ou sem janela. Como a semente padrão é 0, dois treinos sem `--semente` saem iguais; passe outro valor para variar.
+Colunas do `fitness.csv`:
+
+| Coluna | Significado |
+| --- | --- |
+| `geracao` | Número da geração, a partir de 1 |
+| `melhor`, `media`, `mediana`, `desvio`, `pior` | Estatísticas dos scores da geração; o desvio é o populacional |
+| `frames` | Frames simulados na geração (o custo dela) |
+| `obstaculos_melhor`, `obstaculos_media` | Obstáculos vencidos: o maior valor e a média entre os dinos |
+| `mortes_cacto`, `mortes_ptera` | Quantos dinos morreram em cada tipo de obstáculo |
+| `diversidade` | Média, sobre os genes, do desvio padrão de cada gene na população; cai para 0 quando todos são iguais |
+
+O treino é reproduzível: a mesma `--semente` com os mesmos `--individuos` e `--geracoes` dá o mesmo `fitness.csv`, com ou sem janela. Como a semente padrão é 0, dois treinos sem `--semente` saem iguais; passe outro valor para variar. O tempo de relógio fica só no `resumo.json`, para não quebrar essa garantia.
+
+### Gráficos
+
+```
+python graficos.py treinos/<pasta>
+python graficos.py treinos/<pasta1> treinos/<pasta2> --mostrar
+```
+
+Para cada pasta, grava dentro dela:
+
+| Arquivo | Conteúdo |
+| --- | --- |
+| `aptidao.png` | Melhor, mediana, média e pior por geração, com a faixa de média ± desvio |
+| `aptidao_por_frames.png` | Melhor e média pelos frames simulados acumulados |
+| `mortes.png` | Mortes por cacto e por ptera em barras empilhadas |
+| `obstaculos.png` | Obstáculos vencidos, melhor e média |
+| `diversidade.png` | Diversidade da população |
+
+Com mais de uma pasta, grava também `comparacao.png` na pasta atual, com a média por geração de cada treino. `--mostrar` abre os gráficos depois de gravá-los; sem ele, nada abre janela. Um `fitness.csv` antigo, de 3 colunas, gera só `aptidao.png` e avisa os gráficos pulados.
+
+A linha "melhor" oscila entre gerações porque cada geração corre numa pista diferente; a média é o sinal mais estável de aprendizado.
 
 ### Avisos
 
-- O `bestDino.din` versionado neste repositório é de uma versão antiga da rede. `--assistir` responde `Arquivo inválido: bestDino.din` até um treino regravá-lo. O mesmo vale para os outros `.din` da raiz.
+- Os `.din` versionados na raiz são de versões antigas da rede: `--assistir bestDino.din` responde `Arquivo inválido`. Sem arquivo, `--assistir` usa o treino mais recente e responde `Nenhum treino encontrado em: treinos` se ainda não houver nenhum.
 - Os arquivos `.din` são `pickle`: abrir um `.din` de terceiros executa código. Use o modo assistir só com arquivos gerados pelo seu próprio treino.
 
 ## Como funciona
@@ -90,7 +129,7 @@ As duas saídas são pular e abaixar; cada ação dispara quando a saída passa 
 ## Testes
 
 ```
-python -m pytest test_ga.py test_modos.py -v
+python -m pytest test_ga.py test_modos.py test_registro.py -v
 ```
 
 Rodam sem abrir janela (driver de vídeo `dummy` do SDL) e não gravam nada na raiz do repositório.
@@ -100,9 +139,11 @@ Rodam sem abrir janela (driver de vídeo `dummy` do SDL) e não gravam nada na r
 | Caminho | Conteúdo |
 | --- | --- |
 | `autodino.py` | Linha de comando: os três modos |
-| `DinoGame.py` | Jogo, pista, treino, modo assistir |
+| `DinoGame.py` | Jogo, pista, treino, registro, modo assistir |
 | `AGMLP.py` | Algoritmo genético |
 | `RedeNeural.py` | Rede neural |
-| `test_ga.py`, `test_modos.py` | Testes |
+| `graficos.py` | Gráficos de um ou mais treinos |
+| `test_ga.py`, `test_modos.py`, `test_registro.py` | Testes |
+| `treinos/` | Um treino por pasta (não versionada) |
 | `sprites/` | Imagens e sons do jogo original |
 | `.specs/` | Especificações, decisões de projeto (`STATE.md`) e relatórios de verificação de cada feature |

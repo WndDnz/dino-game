@@ -68,13 +68,21 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 - **Date**: 2026-11-22
 - **Status**: active
 
+### AD-009
+- **Decision**: O fitness de um indivíduo é a média do score em um conjunto fixo de pistas de treino (5 por padrão, `--pistas N`; sementes `semente + 1` a `semente + N`), as mesmas em todas as gerações. A melhor rede de cada geração corre em 20 pistas de teste (sementes 900001 a 900020), que nunca entram na seleção, e a média vai para a coluna nova `teste`, no fim do `fitness.csv`. Cada partida termina aos 14000 frames. `melhor`, `media`, `mediana`, `desvio` e `pior` passam a ser estatísticas do fitness; `frames` e as mortes somam as pistas de treino; os obstáculos são a média por pista de cada dino.
+- **Reason**: Medição de 2026-11-23: a mesma rede varia de 105 a 518 pontos conforme a pista (desvio 65), então uma pista por geração mede mais a sorte que a rede. Usuário: "Fixas (Recomendado)", "5 (Recomendado)" e, sobre a spec, "Aprova".
+- **Trade-off**: O treino fica cerca de 5 vezes mais longo. Muda o cabeçalho e o significado das colunas fixados em AD-008; os scores deixam de ser comparáveis com os treinos de uma pista por geração.
+- **Scope**: `DinoGame.train`, `roda_geracao`, `registra_geracao`, `autodino.py`, `graficos.py`
+- **Date**: 2026-11-23
+- **Status**: active
+
 ## Handoff
 
-- **Feature**: `.specs/features/training-record-and-plots/` - concluída em 2026-11-23, gate final verde
-- **Phase / Task**: Execute encerrado: 12/12 tarefas, 5 achados do Verifier fechados
-- **Completed**: T1-T12; achados fechados por f97693a, 9ac9501, ff81d11
+- **Feature**: `.specs/features/fixed-test-tracks/` - spec e tarefas aprovadas em 2026-11-23
+- **Phase / Task**: Execute, T1 de 8
+- **Completed**: none
 - **In-progress** (file:line): none
-- **Next step**: Push, quando o usuário autorizar. Próxima feature pedida: pistas de teste fixas (spec separada). O treino que o usuário rodou na raiz foi movido, a pedido dele, para `treinos/antigo-raiz/` (fora do git).
+- **Next step**: T1 (teto de frames em `roda_geracao`). Depois desta feature: spec de sensores novos (segundo obstáculo, estado do dino) e queda rápida, já aceita pelo usuário ("Queda rápida parece bom e é mecânica do original que não foi reproduzida. Ok, pode entrar.").
 - **Blockers**: none
-- **Uncommitted files**: none
-- **Branch**: master (commits locais desta feature, sem push)
+- **Uncommitted files**: `simula_pista.py` (entra no commit de T8)
+- **Branch**: master

@@ -159,3 +159,50 @@ def test_mortes_por_tipo_de_obstaculo(jogo, monkeypatch):
     e = jogo.estatisticas
     assert e["mortes_cacto"] + e["mortes_ptera"] == 40
     assert len(e["obstaculos"]) == 40
+
+
+CABECALHO = (
+    "geracao,melhor,media,mediana,desvio,pior,frames,obstaculos_melhor,"
+    "obstaculos_media,mortes_cacto,mortes_ptera,diversidade"
+)
+
+
+def _linhas(pasta):
+    import csv
+
+    with open(pasta / "fitness.csv", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def test_cabecalho_do_fitness_csv(tmp_path):
+    DinoGame.registra_geracao([(10, RedeNeural.RedeNeural(CFG))], 1, None, str(tmp_path))
+    assert (tmp_path / "fitness.csv").read_text().splitlines()[0] == CABECALHO
+
+
+def test_mediana_desvio_e_pior(tmp_path):
+    redes = [RedeNeural.RedeNeural(CFG) for _ in range(4)]
+    estat = {"frames": 321, "obstaculos": [4, 0, 2], "mortes_cacto": 2, "mortes_ptera": 1}
+    DinoGame.registra_geracao([(10, redes[0]), (60, redes[1]), (20, redes[2])], 1, None, str(tmp_path), estat)
+    estat2 = {"frames": 99, "obstaculos": [1, 3, 5, 7], "mortes_cacto": 0, "mortes_ptera": 4}
+    DinoGame.registra_geracao([(5, r) for r in redes[:2]] + [(15, redes[2]), (40, redes[3])], 2, 60, str(tmp_path), estat2)
+    l1, l2 = _linhas(tmp_path)
+    assert (l1["melhor"], l1["pior"]) == ("60", "10")
+    assert float(l1["media"]) == pytest.approx(30.0)
+    assert float(l1["mediana"]) == 20.0
+    assert float(l1["desvio"]) == pytest.approx(21.602468994692867)  # populacional: divisor 3, nao 2
+    assert (l1["frames"], l1["obstaculos_melhor"], l1["mortes_cacto"], l1["mortes_ptera"]) == ("321", "4", "2", "1")
+    assert float(l1["obstaculos_media"]) == pytest.approx(2.0)
+    assert float(l2["mediana"]) == 10.0  # par: media dos dois do meio, 5 e 15
+    assert l2["pior"] == "5" and float(l2["desvio"]) == pytest.approx(np.std([5, 5, 15, 40]))
+    assert (l2["frames"], l2["obstaculos_melhor"], l2["mortes_ptera"]) == ("99", "7", "4")
+    assert float(l2["obstaculos_media"]) == pytest.approx(4.0)
+
+
+def test_diversidade_no_csv(tmp_path):
+    np.random.seed(2)
+    redes = [RedeNeural.RedeNeural(CFG) for _ in range(5)]
+    DinoGame.registra_geracao([(i, r) for i, r in enumerate(redes)], 1, None, str(tmp_path))
+    assert float(_linhas(tmp_path)[0]["diversidade"]) == pytest.approx(AGMLP.diversidade(redes))
+    copias = [redes[0]] * 3
+    DinoGame.registra_geracao([(1, r) for r in copias], 2, 4, str(tmp_path))
+    assert float(_linhas(tmp_path)[1]["diversidade"]) == pytest.approx(0.0, abs=1e-12)  # ruido de ponto flutuante do std

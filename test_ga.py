@@ -269,8 +269,8 @@ def test_csv_linha_por_geracao(tmp_path):
     recorde = DinoGame.registra_geracao(g1, 1, None, str(tmp_path))
     DinoGame.registra_geracao(g2, 2, recorde, str(tmp_path))
     linhas = (tmp_path / "fitness.csv").read_text().splitlines()
-    assert linhas[0] == "geracao,melhor,media"
-    assert [linha.split(",") for linha in linhas[1:]] == [["1", "30", "20.0"], ["2", "50", "35.0"]]
+    assert linhas[0].startswith("geracao,melhor,media,")  # formato de 12 colunas (AD-008)
+    assert [linha.split(",")[:3] for linha in linhas[1:]] == [["1", "30", "20.0"], ["2", "50", "35.0"]]
 
 
 def test_salva_melhor_de_todos(tmp_path):

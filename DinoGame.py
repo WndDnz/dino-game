@@ -496,7 +496,7 @@ class DinoGame:
                 pygame.quit()
                 quit()
             DinoGame.train.recorde = registra_geracao(
-                ranked, geracao, DinoGame.train.recorde, saida
+                ranked, geracao, DinoGame.train.recorde, saida, self.estatisticas
             )
             melhor = max(score for score, _ in ranked)
             DinoGame.train.currentBest = melhor
@@ -698,20 +698,44 @@ def remove_colididos(dinos, obstaculo, ranked):
                 DinoGame.die_sound.play()
 
 
-def registra_geracao(ranked, geracao, melhor_score, saida="."):
+COLUNAS = (
+    "geracao,melhor,media,mediana,desvio,pior,frames,obstaculos_melhor,"
+    "obstaculos_media,mortes_cacto,mortes_ptera,diversidade"
+)
+
+
+def registra_geracao(ranked, geracao, melhor_score, saida=".", estatisticas=None):
     """
-    Acrescenta `geracao,melhor,media` a fitness.csv e salva a melhor rede da geração
-    em bestDino.din quando ela supera `melhor_score` (None = ainda não há recorde).
-    Devolve o recorde atualizado.
+    Acrescenta a linha da geração a fitness.csv (colunas em COLUNAS, AD-008) e salva
+    a melhor rede da geração em bestDino.din quando ela supera `melhor_score`
+    (None = ainda não há recorde). `estatisticas` vem de `DinoGame.roda_geracao`;
+    sem ela, frames, obstáculos e mortes valem 0. Devolve o recorde atualizado.
     """
+    scores = np.array([s for s, _ in ranked], dtype=float)
     score, rede = max(ranked, key=lambda par: par[0])
-    media = sum(s for s, _ in ranked) / len(ranked)
+    pior = min(s for s, _ in ranked)
+    e = estatisticas or {"frames": 0, "obstaculos": [0], "mortes_cacto": 0, "mortes_ptera": 0}
+    obstaculos = e["obstaculos"] or [0]
+    valores = [
+        geracao,
+        score,
+        float(scores.mean()),
+        float(np.median(scores)),
+        float(scores.std()),  # populacional: a geração inteira é medida
+        pior,
+        e["frames"],
+        max(obstaculos),
+        float(np.mean(obstaculos)),
+        e["mortes_cacto"],
+        e["mortes_ptera"],
+        AGMLP.diversidade([r for _, r in ranked]),
+    ]
     caminho = os.path.join(saida, "fitness.csv")
     novo = not os.path.exists(caminho)
     with open(caminho, "a") as f:
         if novo:
-            f.write("geracao,melhor,media\n")
-        f.write(f"{geracao},{score},{media}\n")
+            f.write(COLUNAS + "\n")
+        f.write(",".join(str(v) for v in valores) + "\n")
     if melhor_score is None or score > melhor_score:
         RedeNeural.RedeNeural.save_object(rede, os.path.join(saida, "bestDino.din"))
         return score

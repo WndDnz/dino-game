@@ -159,12 +159,12 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_cabecalho_do_fitness_csv`: a primeira linha é exatamente a da spec
-- [ ] `test_mediana_desvio_e_pior`: para scores 10, 20, 60 a linha traz mediana 20.0, desvio populacional 21.602468994692867 e pior 10; para um número par de scores a mediana é a média dos dois do meio
-- [ ] `test_diversidade_no_csv`: a coluna `diversidade` é `AGMLP.diversidade` das redes da geração
-- [ ] `test_ga.py` `test_csv_linha_por_geracao` e `test_modos.py` `test_sem_janela_termina_com_codigo_0` atualizados: mesmas verificações, no formato de 12 colunas (mudança aprovada pelo usuário na spec)
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 8 de `test_registro.py` passam
+- [x] `test_cabecalho_do_fitness_csv`: a primeira linha é exatamente a da spec
+- [x] `test_mediana_desvio_e_pior`: para scores 10, 20, 60 a linha traz mediana 20.0, desvio populacional 21.602468994692867 e pior 10; para um número par de scores a mediana é a média dos dois do meio
+- [x] `test_diversidade_no_csv`: a coluna `diversidade` é `AGMLP.diversidade` das redes da geração
+- [x] `test_ga.py` `test_csv_linha_por_geracao` e `test_modos.py` `test_sem_janela_termina_com_codigo_0` atualizados: mesmas verificações, no formato de 12 colunas (mudança aprovada pelo usuário na spec)
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 8 de `test_registro.py` passam
 
 **Tests**: unit
 **Gate**: quick

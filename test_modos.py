@@ -385,7 +385,7 @@ def test_imprime_linha_por_geracao(jogo, monkeypatch, tmp_path, capsys):
     linhas = [l for l in capsys.readouterr().out.splitlines() if l.startswith("Geração")]
     esperadas = []
     for dados in csv.splitlines()[1:]:
-        g, melhor, media = dados.split(",")
+        g, melhor, media = dados.split(",")[:3]  # formato de 12 colunas (AD-008)
         esperadas.append(f"Geração {g}: melhor={melhor} media={media}")
     assert len(esperadas) == 2
     assert linhas == esperadas
@@ -753,7 +753,7 @@ def test_sem_janela_termina_com_codigo_0(pasta):
     linhas = [l for l in p.stdout.splitlines() if l.startswith("Geração")]
     assert [l.split(":")[0] for l in linhas] == ["Geração 1", "Geração 2"]
     csv = (pasta / "fitness.csv").read_text().splitlines()
-    assert csv[0] == "geracao,melhor,media" and len(csv) == 3
+    assert csv[0].startswith("geracao,melhor,media,") and len(csv) == 3  # formato de 12 colunas (AD-008)
     assert (pasta / "bestDino.din").exists()
 
 

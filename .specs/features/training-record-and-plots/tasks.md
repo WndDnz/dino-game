@@ -276,13 +276,13 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_grafico_de_aptidao`: `aptidao.png` é gravado; a figura tem as curvas `melhor`, `mediana`, `média` e `pior` com os valores do CSV por geração e uma faixa entre média − desvio e média + desvio
-- [ ] `test_grafico_de_aptidao_por_frames`: `aptidao_por_frames.png` é gravado; o eixo x das curvas `melhor` e `média` é a soma acumulada da coluna `frames`
-- [ ] `test_graficos_nao_abrem_janela`: sem `--mostrar`, o backend é `agg` e `plt.show` não é chamado
-- [ ] `test_pasta_sem_fitness_csv`: imprime `Sem fitness.csv em: <pasta>` e devolve 1
-- [ ] `test_csv_sem_geracoes`: só com o cabeçalho, imprime `Sem gerações em: <pasta>` e devolve 1
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 25 de `test_registro.py` passam
+- [x] `test_grafico_de_aptidao`: `aptidao.png` é gravado; a figura tem as curvas `melhor`, `mediana`, `média` e `pior` com os valores do CSV por geração e uma faixa entre média − desvio e média + desvio
+- [x] `test_grafico_de_aptidao_por_frames`: `aptidao_por_frames.png` é gravado; o eixo x das curvas `melhor` e `média` é a soma acumulada da coluna `frames`
+- [x] `test_graficos_nao_abrem_janela`: sem `--mostrar`, o backend é `agg` e `plt.show` não é chamado
+- [x] `test_pasta_sem_fitness_csv`: imprime `Sem fitness.csv em: <pasta>` e devolve 1
+- [x] `test_csv_sem_geracoes`: só com o cabeçalho, imprime `Sem gerações em: <pasta>` e devolve 1
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 25 de `test_registro.py` passam
 
 **Tests**: unit
 **Gate**: quick

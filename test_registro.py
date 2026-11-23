@@ -19,6 +19,7 @@ import pytest  # noqa: E402
 import AGMLP  # noqa: E402
 import autodino  # noqa: E402
 import DinoGame  # noqa: E402
+import graficos  # noqa: E402
 import RedeNeural  # noqa: E402
 
 CFG = (5, 8, 4, 2)
@@ -418,3 +419,95 @@ def test_assistir_sem_nenhum_treino(pasta, monkeypatch, capsys, cria_pasta):
     assert autodino.main(["--assistir"]) == 1
     assert capsys.readouterr().out.splitlines() == ["Nenhum treino encontrado em: treinos"]
     assert janelas == [] and partidas == []
+
+
+# ---- graficos.py -------------------------------------------------------------
+
+FITNESS = [
+    # geracao,melhor,media,mediana,desvio,pior,frames,obst_melhor,obst_media,mortes_cacto,mortes_ptera,diversidade
+    (1, 50, 20.0, 18.0, 6.0, 5, 300, 2, 0.5, 9, 1, 3.9),
+    (2, 90, 35.0, 30.0, 12.0, 8, 520, 4, 1.25, 6, 4, 3.5),
+    (3, 140, 60.0, 55.0, 20.0, 11, 900, 7, 2.75, 3, 7, 2.8),
+]
+
+
+def _fitness(pasta, linhas=FITNESS, cabecalho=None):
+    pasta.mkdir(parents=True, exist_ok=True)
+    texto = (cabecalho or DinoGame.COLUNAS) + "\n" + "".join(",".join(map(str, l)) + "\n" for l in linhas)
+    (pasta / "fitness.csv").write_text(texto)
+    return pasta
+
+
+def _figuras(monkeypatch):
+    """Guarda cada figura salva por graficos.py: {nome do arquivo: figura}."""
+    import matplotlib.figure
+
+    salvas = {}
+    savefig = matplotlib.figure.Figure.savefig
+
+    def guarda(self, caminho, *a, **k):
+        salvas[os.path.basename(str(caminho))] = self
+        return savefig(self, caminho, *a, **k)
+
+    monkeypatch.setattr(matplotlib.figure.Figure, "savefig", guarda)
+    return salvas
+
+
+def _curvas(fig):
+    """{rotulo: (x, y)} das linhas do primeiro eixo."""
+    return {l.get_label(): (list(l.get_xdata()), list(l.get_ydata())) for l in fig.axes[0].get_lines()}
+
+
+def _col(i):
+    return [float(l[i]) for l in FITNESS]
+
+
+def test_grafico_de_aptidao(tmp_path, monkeypatch):
+    salvas = _figuras(monkeypatch)
+    pasta = _fitness(tmp_path / "t")
+    assert graficos.main([str(pasta)]) == 0
+    assert (pasta / "aptidao.png").stat().st_size > 0
+    curvas = _curvas(salvas["aptidao.png"])
+    assert set(curvas) == {"melhor", "mediana", "média", "pior"}
+    for rotulo, i in (("melhor", 1), ("média", 2), ("mediana", 3), ("pior", 5)):
+        assert curvas[rotulo] == ([1.0, 2.0, 3.0], _col(i))
+    (faixa,) = salvas["aptidao.png"].axes[0].collections  # media - desvio ate media + desvio
+    ys = faixa.get_paths()[0].vertices[:, 1]
+    assert min(ys) == pytest.approx(min(m - d for m, d in zip(_col(2), _col(4))))
+    assert max(ys) == pytest.approx(max(m + d for m, d in zip(_col(2), _col(4))))
+    assert faixa.get_label() == "média ± desvio"
+
+
+def test_grafico_de_aptidao_por_frames(tmp_path, monkeypatch):
+    salvas = _figuras(monkeypatch)
+    pasta = _fitness(tmp_path / "t")
+    assert graficos.main([str(pasta)]) == 0
+    assert (pasta / "aptidao_por_frames.png").stat().st_size > 0
+    curvas = _curvas(salvas["aptidao_por_frames.png"])
+    acumulado = [300.0, 820.0, 1720.0]
+    assert curvas == {"melhor": (acumulado, _col(1)), "média": (acumulado, _col(2))}
+
+
+def test_graficos_nao_abrem_janela(tmp_path, monkeypatch):
+    import matplotlib
+    import matplotlib.pyplot as plt
+
+    shows = []
+    monkeypatch.setattr(plt, "show", lambda *a, **k: shows.append(1))
+    assert graficos.main([str(_fitness(tmp_path / "t"))]) == 0
+    assert matplotlib.get_backend().lower() == "agg"
+    assert shows == []
+    assert plt.get_fignums() == []  # nenhuma figura ficou aberta
+
+
+def test_pasta_sem_fitness_csv(tmp_path, capsys):
+    (tmp_path / "vazia").mkdir()
+    assert graficos.main([str(tmp_path / "vazia")]) == 1
+    assert capsys.readouterr().out.splitlines() == [f"Sem fitness.csv em: {tmp_path / 'vazia'}"]
+
+
+def test_csv_sem_geracoes(tmp_path, capsys):
+    pasta = _fitness(tmp_path / "t", linhas=[])
+    assert graficos.main([str(pasta)]) == 1
+    assert capsys.readouterr().out.splitlines() == [f"Sem gerações em: {pasta}"]
+    assert not (pasta / "aptidao.png").exists()

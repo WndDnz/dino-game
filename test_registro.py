@@ -4,6 +4,8 @@ import datetime
 import json
 import os
 import random
+import re
+import shutil
 import subprocess
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
@@ -15,6 +17,7 @@ import pygame  # noqa: E402
 import pytest  # noqa: E402
 
 import AGMLP  # noqa: E402
+import autodino  # noqa: E402
 import DinoGame  # noqa: E402
 import RedeNeural  # noqa: E402
 
@@ -314,3 +317,64 @@ def test_csv_completo_igual_com_e_sem_janela(jogo, monkeypatch, tmp_path, capsys
         assert int(l["mortes_cacto"]) + int(l["mortes_ptera"]) == 10
         assert float(l["pior"]) <= float(l["mediana"]) <= float(l["melhor"])
         assert int(l["frames"]) > 0
+
+
+REPO = os.path.dirname(os.path.abspath(__file__))
+
+
+@pytest.fixture
+def pasta(tmp_path, monkeypatch):
+    """Diretorio de trabalho temporario com os sprites."""
+    shutil.copytree(os.path.join(REPO, "sprites"), tmp_path / "sprites")
+    monkeypatch.chdir(tmp_path)
+    pygame.init()
+    pygame.mixer.quit()
+    return tmp_path
+
+
+def _treinos(pasta):
+    raiz = pasta / "treinos"
+    return sorted(p.name for p in raiz.iterdir()) if raiz.exists() else []
+
+
+def test_treino_cria_pasta_com_data_e_semente(pasta, capsys):
+    antes = datetime.datetime.now().replace(microsecond=0)
+    assert autodino.main(["--sem-janela", "--individuos", "5", "--geracoes", "2", "--semente", "7"]) == 0
+    depois = datetime.datetime.now()
+    (nome,) = _treinos(pasta)
+    assert re.fullmatch(r"\d{8}-\d{6}_s7", nome)
+    criada = datetime.datetime.strptime(nome[:15], "%Y%m%d-%H%M%S")
+    assert antes <= criada <= depois
+    assert sorted(os.listdir(pasta / "treinos" / nome)) == ["bestDino.din", "config.json", "fitness.csv", "resumo.json"]
+    assert not (pasta / "fitness.csv").exists() and not (pasta / "bestDino.din").exists()
+
+
+def test_saida_escolhida(pasta, capsys):
+    assert autodino.main(["--sem-janela", "--individuos", "5", "--geracoes", "1", "--saida", "meu_treino"]) == 0
+    assert sorted(os.listdir(pasta / "meu_treino")) == ["bestDino.din", "config.json", "fitness.csv", "resumo.json"]
+    assert not (pasta / "treinos").exists()
+    # pasta vazia que ja existe e aceita
+    (pasta / "vazia").mkdir()
+    assert autodino.main(["--sem-janela", "--individuos", "5", "--geracoes", "1", "--saida", "vazia"]) == 0
+    assert (pasta / "vazia" / "fitness.csv").exists()
+
+
+def test_pasta_com_treino_e_recusada(pasta, monkeypatch, capsys):
+    (pasta / "antigo").mkdir()
+    (pasta / "antigo" / "fitness.csv").write_text("conteudo anterior")
+    treinos = []
+    monkeypatch.setattr(DinoGame.DinoGame, "train", lambda self, *a, **k: treinos.append(a))
+    monkeypatch.setattr(DinoGame.DinoGame, "introscreen", lambda self: False)
+    for modo in (["--sem-janela"], []):
+        assert autodino.main([*modo, "--saida", "antigo"]) == 1
+        assert capsys.readouterr().out.splitlines() == ["Pasta já tem um treino: antigo"]
+    assert treinos == []
+    assert (pasta / "antigo" / "fitness.csv").read_text() == "conteudo anterior"
+
+
+def test_mesmo_segundo_ganha_sufixo(pasta, monkeypatch, capsys):
+    monkeypatch.setattr(autodino.time, "strftime", lambda formato, *a: "20261123-101500")
+    monkeypatch.setattr(DinoGame.DinoGame, "train", lambda self, *a, **k: None)
+    for _ in range(3):
+        assert autodino.main(["--sem-janela", "--semente", "4"]) == 0
+    assert _treinos(pasta) == ["20261123-101500_s4", "20261123-101500_s4-2", "20261123-101500_s4-3"]

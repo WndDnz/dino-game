@@ -4,6 +4,7 @@
 import argparse
 import os
 import sys
+import time
 import traceback
 
 
@@ -19,6 +20,15 @@ def _semente(texto):
     if not 0 <= n <= 2**32 - 1:  # faixa aceita por np.random.seed
         raise argparse.ArgumentTypeError("deve estar entre 0 e 4294967295")
     return n
+
+
+def _pasta_do_treino(semente):
+    """treinos/<AAAAMMDD-HHMMSS>_s<semente>, com sufixo -2, -3... se o nome já existe."""
+    base = os.path.join("treinos", time.strftime("%Y%m%d-%H%M%S") + f"_s{semente}")
+    caminho, n = base, 2
+    while os.path.exists(caminho):
+        caminho, n = f"{base}-{n}", n + 1
+    return caminho
 
 
 def main(argv=None):
@@ -37,6 +47,11 @@ def main(argv=None):
     )
     parser.add_argument("--individuos", type=_um_ou_mais, default=350)
     parser.add_argument("--geracoes", type=_um_ou_mais, default=30)
+    parser.add_argument(
+        "--saida",
+        metavar="PASTA",
+        help="pasta do treino (padrão: treinos/<data-hora>_s<semente>)",
+    )
     parser.add_argument(
         "--semente",
         type=_semente,
@@ -63,11 +78,17 @@ def main(argv=None):
         return 0
 
     semente = args.semente or 0
+    saida = args.saida or _pasta_do_treino(semente)
+    if os.path.exists(os.path.join(saida, "fitness.csv")):  # nunca sobrescrever um treino
+        print(f"Pasta já tem um treino: {saida}")
+        return 1
     game = DinoGame.DinoGame()
     if args.sem_janela:
-        game.train(args.individuos, args.geracoes, semente_base=semente, janela=False)
+        os.makedirs(saida, exist_ok=True)
+        game.train(args.individuos, args.geracoes, semente, saida, janela=False)
     elif not game.introscreen():  # introscreen devolve True se o usuário fechou
-        game.train(args.individuos, args.geracoes, semente_base=semente)
+        os.makedirs(saida, exist_ok=True)
+        game.train(args.individuos, args.geracoes, semente, saida)
     return 0
 
 

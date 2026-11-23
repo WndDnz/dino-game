@@ -752,9 +752,10 @@ def test_sem_janela_termina_com_codigo_0(pasta):
     assert p.returncode == 0, p.stderr  # terminou sozinho: stdin fechado, nenhuma tecla
     linhas = [l for l in p.stdout.splitlines() if l.startswith("Geração")]
     assert [l.split(":")[0] for l in linhas] == ["Geração 1", "Geração 2"]
-    csv = (pasta / "fitness.csv").read_text().splitlines()
+    (treino,) = (pasta / "treinos").iterdir()  # uma pasta por treino (AD-008)
+    csv = (treino / "fitness.csv").read_text().splitlines()
     assert csv[0].startswith("geracao,melhor,media,") and len(csv) == 3  # formato de 12 colunas (AD-008)
-    assert (pasta / "bestDino.din").exists()
+    assert (treino / "bestDino.din").exists()
 
 
 def _espia_treino(monkeypatch):

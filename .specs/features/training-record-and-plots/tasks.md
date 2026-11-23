@@ -229,12 +229,12 @@ T11 → T12
 
 **Done when**:
 
-- [ ] `test_treino_cria_pasta_com_data_e_semente`: `--sem-janela --semente 7` cria `treinos/<data-hora>_s7` com `fitness.csv` e `bestDino.din`, e não cria nenhum dos dois na pasta atual
-- [ ] `test_saida_escolhida`: com `--saida meu_treino`, os arquivos vão para `meu_treino` e `treinos/` não é criada
-- [ ] `test_pasta_com_treino_e_recusada`: `--saida` apontando para uma pasta com `fitness.csv` imprime `Pasta já tem um treino: <caminho>`, devolve 1 e deixa o arquivo intacto; uma pasta vazia existente é aceita
-- [ ] `test_mesmo_segundo_ganha_sufixo`: dois treinos com a mesma semente no mesmo segundo criam `<nome>` e `<nome>-2`
-- [ ] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
-- [ ] Test count: os 70 testes existentes + 18 de `test_registro.py` passam
+- [x] `test_treino_cria_pasta_com_data_e_semente`: `--sem-janela --semente 7` cria `treinos/<data-hora>_s7` com `fitness.csv` e `bestDino.din`, e não cria nenhum dos dois na pasta atual
+- [x] `test_saida_escolhida`: com `--saida meu_treino`, os arquivos vão para `meu_treino` e `treinos/` não é criada
+- [x] `test_pasta_com_treino_e_recusada`: `--saida` apontando para uma pasta com `fitness.csv` imprime `Pasta já tem um treino: <caminho>`, devolve 1 e deixa o arquivo intacto; uma pasta vazia existente é aceita
+- [x] `test_mesmo_segundo_ganha_sufixo`: dois treinos com a mesma semente no mesmo segundo criam `<nome>` e `<nome>-2`
+- [x] Gate check passes: `python -m pytest test_ga.py test_modos.py test_registro.py -v`
+- [x] Test count: os 70 testes existentes + 18 de `test_registro.py` passam
 
 **Tests**: integration
 **Gate**: full

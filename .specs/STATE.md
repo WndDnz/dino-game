@@ -70,11 +70,11 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 
 ## Handoff
 
-- **Feature**: `.specs/features/training-record-and-plots/` - concluída em 2026-11-23, exceto o gate final
-- **Phase / Task**: Execute: 12/12 tarefas, 5 achados do Verifier fechados, provas verdes
+- **Feature**: `.specs/features/training-record-and-plots/` - concluída em 2026-11-23, gate final verde
+- **Phase / Task**: Execute encerrado: 12/12 tarefas, 5 achados do Verifier fechados
 - **Completed**: T1-T12; achados fechados por f97693a, 9ac9501, ff81d11
 - **In-progress** (file:line): none
-- **Next step**: `validate_verification.py` exige árvore limpa; o usuário decide o destino de `bestDino.din` (modificado) e `fitness.csv` (não versionado) na raiz, que são de um treino dele. Depois: push, e a spec das pistas de teste fixas.
-- **Blockers**: decisão do usuário sobre os dois arquivos da raiz
-- **Uncommitted files**: `bestDino.din`, `fitness.csv` (do usuário)
+- **Next step**: Push, quando o usuário autorizar. Próxima feature pedida: pistas de teste fixas (spec separada). O treino que o usuário rodou na raiz foi movido, a pedido dele, para `treinos/antigo-raiz/` (fora do git).
+- **Blockers**: none
+- **Uncommitted files**: none
 - **Branch**: master (commits locais desta feature, sem push)

@@ -74,6 +74,36 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: .specs/features/headless-training-and-watch/verification.md finding 5 / C30 (cli)
 - last seen: 2026-11-22T23:52:30Z
 
+### L-011 - When a flow can restart itself, test that the second run does not touch what the first one wrote
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `cli` · harmful: 0
+- features: training-record-and-plots
+- evidence: .specs/features/training-record-and-plots/verification.md finding 1 / C30 (cli)
+- last seen: 2026-11-23T14:01:40Z
+
+### L-012 - Reserve a resource by creating it, not by checking that it does not exist
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `cli` · harmful: 0
+- features: training-record-and-plots
+- evidence: .specs/features/training-record-and-plots/verification.md finding 2 / C29 (cli)
+- last seen: 2026-11-23T14:01:40Z
+
+### L-013 - Define most recent by a timestamp, not by sorting names
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `cli` · harmful: 0
+- features: training-record-and-plots
+- evidence: .specs/features/training-record-and-plots/verification.md finding 3 / C6 (cli)
+- last seen: 2026-11-23T14:01:40Z
+
+### L-014 - Test a per-item value on a population where the items differ
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: training-record-and-plots
+- evidence: .specs/features/training-record-and-plots/verification.md finding 4 / C11 (tests)
+- last seen: 2026-11-23T14:01:41Z
+
+### L-015 - Assert a formula against a hand-computed value, not against the function that produces it
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: training-record-and-plots
+- evidence: .specs/features/training-record-and-plots/verification.md finding 5 / C13 (tests)
+- last seen: 2026-11-23T14:01:41Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

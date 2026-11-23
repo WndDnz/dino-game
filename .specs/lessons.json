@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 11,
+  "next_id": 16,
   "lessons": [
     {
       "id": "L-001",
@@ -184,6 +184,96 @@
       ],
       "created": "2026-11-22T23:52:30Z",
       "last_seen": "2026-11-22T23:52:30Z"
+    },
+    {
+      "id": "L-011",
+      "key": "ac_gap::when a flow can restart itself test that the second run does not touch what the first one wrote",
+      "text": "When a flow can restart itself, test that the second run does not touch what the first one wrote",
+      "signal": "ac_gap",
+      "scope": "cli",
+      "status": "candidate",
+      "features": [
+        "training-record-and-plots"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/training-record-and-plots/verification.md finding 1 / C30 (cli)"
+      ],
+      "created": "2026-11-23T14:01:40Z",
+      "last_seen": "2026-11-23T14:01:40Z"
+    },
+    {
+      "id": "L-012",
+      "key": "ac_gap::reserve a resource by creating it not by checking that it does not exist",
+      "text": "Reserve a resource by creating it, not by checking that it does not exist",
+      "signal": "ac_gap",
+      "scope": "cli",
+      "status": "candidate",
+      "features": [
+        "training-record-and-plots"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/training-record-and-plots/verification.md finding 2 / C29 (cli)"
+      ],
+      "created": "2026-11-23T14:01:40Z",
+      "last_seen": "2026-11-23T14:01:40Z"
+    },
+    {
+      "id": "L-013",
+      "key": "ac_gap::define most recent by a timestamp not by sorting names",
+      "text": "Define most recent by a timestamp, not by sorting names",
+      "signal": "ac_gap",
+      "scope": "cli",
+      "status": "candidate",
+      "features": [
+        "training-record-and-plots"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/training-record-and-plots/verification.md finding 3 / C6 (cli)"
+      ],
+      "created": "2026-11-23T14:01:40Z",
+      "last_seen": "2026-11-23T14:01:40Z"
+    },
+    {
+      "id": "L-014",
+      "key": "weak_test::test a per item value on a population where the items differ",
+      "text": "Test a per-item value on a population where the items differ",
+      "signal": "weak_test",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "training-record-and-plots"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/training-record-and-plots/verification.md finding 4 / C11 (tests)"
+      ],
+      "created": "2026-11-23T14:01:41Z",
+      "last_seen": "2026-11-23T14:01:41Z"
+    },
+    {
+      "id": "L-015",
+      "key": "weak_test::assert a formula against a hand computed value not against the function that produces it",
+      "text": "Assert a formula against a hand-computed value, not against the function that produces it",
+      "signal": "weak_test",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "training-record-and-plots"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        ".specs/features/training-record-and-plots/verification.md finding 5 / C13 (tests)"
+      ],
+      "created": "2026-11-23T14:01:41Z",
+      "last_seen": "2026-11-23T14:01:41Z"
     }
   ]
 }

@@ -1,9 +1,9 @@
 # training-record-and-plots proofs
 
-**HEAD**: 1c81948
+**HEAD**: fa62a76
 **Tree**: dirty - bestDino.din, fitness.csv
 **Shell**: C:/Program Files/Git\bin\bash.exe
-**Result**: 29 pass, 0 fail
+**Result**: 31 pass, 0 fail
 
 | Check | Proof | Result |
 | --- | --- | --- |
@@ -32,6 +32,8 @@
 | C23 | `run unit / test_registro.py::test_pasta_sem_fitness_csv PASSED` | pass |
 | C24 | `run unit / test_registro.py::test_csv_antigo_pula_graficos PASSED` | pass |
 | C25 | `run unit / test_registro.py::test_mesmo_segundo_ganha_sufixo PASSED` | pass |
+| C29 | `run unit / test_registro.py::test_treinos_simultaneos_nao_dividem_pasta PASSED` | pass |
+| C30 | `run unit / test_registro.py::test_novo_treino_na_tela_de_fim_vai_para_outra_pasta PASSED` | pass |
 | C26 | `run unit / test_registro.py::test_treino_interrompido_sem_resumo PASSED` | pass |
 | C27 | `run unit / test_registro.py::test_versao_sem_git PASSED` | pass |
 | C28 | `run unit / test_registro.py::test_csv_sem_geracoes PASSED` | pass |
@@ -42,19 +44,19 @@
 `Run unit` - exit 0
 
 ```
-test_registro.py::test_assistir_sem_nenhum_treino[False] PASSED          [ 88%]
-test_registro.py::test_assistir_sem_nenhum_treino[True] PASSED           [ 89%]
-test_registro.py::test_grafico_de_aptidao PASSED                         [ 90%]
-test_registro.py::test_grafico_de_aptidao_por_frames PASSED              [ 91%]
-test_registro.py::test_graficos_nao_abrem_janela PASSED                  [ 92%]
-test_registro.py::test_pasta_sem_fitness_csv PASSED                      [ 93%]
-test_registro.py::test_csv_sem_geracoes PASSED                           [ 94%]
-test_registro.py::test_grafico_de_mortes PASSED                          [ 95%]
-test_registro.py::test_grafico_de_obstaculos PASSED                      [ 96%]
-test_registro.py::test_grafico_de_diversidade PASSED                     [ 97%]
-test_registro.py::test_csv_antigo_pula_graficos PASSED                   [ 98%]
-test_registro.py::test_comparacao_entre_treinos PASSED                   [ 99%]
-test_registro.py::test_mostrar_abre_os_graficos PASSED                   [100%]
+test_registro.py::test_grafico_de_aptidao PASSED                         [ 88%]
+test_registro.py::test_grafico_de_aptidao_por_frames PASSED              [ 89%]
+test_registro.py::test_graficos_nao_abrem_janela PASSED                  [ 90%]
+test_registro.py::test_pasta_sem_fitness_csv PASSED                      [ 91%]
+test_registro.py::test_csv_sem_geracoes PASSED                           [ 92%]
+test_registro.py::test_grafico_de_mortes PASSED                          [ 93%]
+test_registro.py::test_grafico_de_obstaculos PASSED                      [ 94%]
+test_registro.py::test_grafico_de_diversidade PASSED                     [ 95%]
+test_registro.py::test_csv_antigo_pula_graficos PASSED                   [ 96%]
+test_registro.py::test_comparacao_entre_treinos PASSED                   [ 97%]
+test_registro.py::test_mostrar_abre_os_graficos PASSED                   [ 98%]
+test_registro.py::test_novo_treino_na_tela_de_fim_vai_para_outra_pasta PASSED [ 99%]
+test_registro.py::test_treinos_simultaneos_nao_dividem_pasta PASSED      [100%]
 
-============================ 102 passed in 34.93s =============================
+============================ 104 passed in 36.85s =============================
 ```

@@ -481,8 +481,6 @@ class DinoGame:
         DinoGame.train.currentBest = None
         DinoGame.train.recorde = None
         np.random.seed(semente_base)  # população inicial, crossover e mutação
-        if os.path.exists(os.path.join(saida, "fitness.csv")):
-            os.remove(os.path.join(saida, "fitness.csv"))
         commit, alteracoes = versao_do_codigo()
         config = {
             "individuos": nIndividuals,
@@ -553,7 +551,7 @@ class DinoGame:
         if not janela:
             return
         if self._fim_do_treino():
-            return self.train(nIndividuals, nGenerations, semente_base, saida, janela)
+            return True  # outro treino: quem chamou escolhe a pasta, para não sobrescrever esta
         pygame.quit()
         quit()
 

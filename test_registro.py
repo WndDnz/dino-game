@@ -592,3 +592,55 @@ def test_mostrar_abre_os_graficos(tmp_path, monkeypatch):
     assert existiam == [sorted(graficos.GRAFICOS)]  # uma chamada, depois de gravar os arquivos
     assert len(plt.get_fignums()) == len(graficos.GRAFICOS)  # as figuras ficaram abertas para mostrar
     plt.close("all")
+
+
+def test_novo_treino_na_tela_de_fim_vai_para_outra_pasta(pasta, monkeypatch, capsys):
+    monkeypatch.setattr(autodino.time, "strftime", lambda formato, *a: "20261123-101500")
+    monkeypatch.setattr(DinoGame.DinoGame, "FPS", 0)
+    monkeypatch.setattr(DinoGame.DinoGame, "introscreen", lambda self: False)
+    respostas = [True, True, False]  # outro treino, outro treino, sair
+    conteudos = []
+
+    def tela_de_fim(self):
+        # o que havia em cada pasta no momento em que o treino seguinte foi pedido
+        conteudos.append({p.name: (p / "fitness.csv").read_text() for p in (pasta / "treinos").iterdir()})
+        return respostas.pop(0)
+
+    monkeypatch.setattr(DinoGame.DinoGame, "_fim_do_treino", tela_de_fim)
+    with pytest.raises(SystemExit):
+        autodino.main(["--individuos", "4", "--geracoes", "1", "--semente", "4"])
+    assert _treinos(pasta) == ["20261123-101500_s4", "20261123-101500_s4-2", "20261123-101500_s4-3"]
+    for nome in _treinos(pasta):
+        assert sorted(os.listdir(pasta / "treinos" / nome)) == ["bestDino.din", "config.json", "fitness.csv", "resumo.json"]
+    # nenhum treino mexeu no anterior
+    final = {p.name: (p / "fitness.csv").read_text() for p in (pasta / "treinos").iterdir()}
+    for antes in conteudos:
+        assert all(final[nome] == texto for nome, texto in antes.items())
+    # com --saida, os treinos seguintes ganham sufixo na mesma base
+    respostas[:] = [True, False]
+    pygame.init()  # sair pela tela de fim encerrou o pygame
+    pygame.mixer.quit()
+    with pytest.raises(SystemExit):
+        autodino.main(["--individuos", "4", "--geracoes", "1", "--saida", "meu"])
+    assert (pasta / "meu" / "fitness.csv").exists() and (pasta / "meu-2" / "fitness.csv").exists()
+
+
+def test_treinos_simultaneos_nao_dividem_pasta(pasta, monkeypatch, capsys):
+    monkeypatch.setattr(autodino.time, "strftime", lambda formato, *a: "20261123-101500")
+    usadas = []
+
+    def train(self, n, g, semente, saida, janela=True):
+        assert not os.path.exists(os.path.join(saida, "fitness.csv")), f"pasta de outro treino: {saida}"
+        usadas.append(saida)
+        open(os.path.join(saida, "fitness.csv"), "w").close()
+
+    def intro_enquanto_outro_treina(self):
+        # o primeiro treino espera na tela inicial; um segundo, sem janela, comeca e termina nesse meio tempo
+        assert autodino.main(["--sem-janela", "--semente", "4"]) == 0
+        return False
+
+    monkeypatch.setattr(DinoGame.DinoGame, "train", train)
+    monkeypatch.setattr(DinoGame.DinoGame, "introscreen", intro_enquanto_outro_treina)
+    assert autodino.main(["--semente", "4"]) == 0
+    assert len(usadas) == 2 and len(set(usadas)) == 2
+    assert _treinos(pasta) == ["20261123-101500_s4", "20261123-101500_s4-2"]

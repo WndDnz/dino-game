@@ -449,7 +449,7 @@ Proof: run unit | test_registro.py::test_csv_sem_geracoes PASSED
 ## Handoff
 
 **Settled mid-build:** 2026-11-23 - execução inline, sem sub-agentes: oferta feita com o plano ("Aprova o plano de tarefas, com execução nesta sessão?"), usuário: "Aprovo, pode executar."
-**Dispatched:** Verifier (sub-agente independente) em `HEAD` 8d29af2, 2026-11-23 - aguardando retorno. Sem sub-agente de telas: nenhum critério cita captura.
+**Dispatched:** Verifier (sub-agente independente) em `HEAD` 1c81948 (código em 10a82a2), 2026-11-23 - aguardando retorno. Sem sub-agente de telas: nenhum critério cita captura.
 **Walked:** 2026-11-23, em `5167c71` + README, numa pasta temporária com cópia de `sprites/`, rodando os comandos do README.
 - `python autodino.py --sem-janela --individuos 30 --geracoes 4 --semente 7` criou `treinos/20261123-102903_s7/` com `bestDino.din`, `config.json`, `fitness.csv` (12 colunas) e `resumo.json` (melhor 117 na geração 3, 2731 frames). `--saida meu_treino` gravou em `meu_treino/`; repetir o mesmo `--saida` imprimiu `Pasta já tem um treino: meu_treino` com código 1.
 - `python graficos.py <treino> meu_treino` gravou os cinco PNG na pasta do treino e `comparacao.png` na pasta atual. `aptidao.png` mostrou melhor subindo de 49 a 117, média entre 22 e 26, faixa de ± desvio; `mortes.png` mostrou as 30 mortes de cada geração em cacto (pteras só aparecem depois do frame 700, que gerações tão curtas não alcançaram). Um `fitness.csv` de 3 colunas gerou só `aptidao.png` e avisou os outros quatro.

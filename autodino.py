@@ -22,13 +22,21 @@ def _semente(texto):
     return n
 
 
-def _pasta_do_treino(semente):
-    """treinos/<AAAAMMDD-HHMMSS>_s<semente>, com sufixo -2, -3... se o nome já existe."""
-    base = os.path.join("treinos", time.strftime("%Y%m%d-%H%M%S") + f"_s{semente}")
+def _cria_pasta(base):
+    """Cria `base`, ou base-2, base-3... a primeira que não existe, e devolve o caminho.
+    Criar a pasta é a reserva: dois treinos simultâneos nunca recebem a mesma."""
     caminho, n = base, 2
-    while os.path.exists(caminho):
-        caminho, n = f"{base}-{n}", n + 1
-    return caminho
+    while True:
+        try:
+            os.makedirs(caminho)
+            return caminho
+        except FileExistsError:
+            caminho, n = f"{base}-{n}", n + 1
+
+
+def _pasta_do_treino(semente):
+    """Cria treinos/<AAAAMMDD-HHMMSS>_s<semente> (ou com sufixo -2, -3...) e devolve o caminho."""
+    return _cria_pasta(os.path.join("treinos", time.strftime("%Y%m%d-%H%M%S") + f"_s{semente}"))
 
 
 def _rede_mais_recente(raiz="treinos"):
@@ -94,17 +102,30 @@ def main(argv=None):
         return 0
 
     semente = args.semente or 0
-    saida = args.saida or _pasta_do_treino(semente)
-    if os.path.exists(os.path.join(saida, "fitness.csv")):  # nunca sobrescrever um treino
-        print(f"Pasta já tem um treino: {saida}")
+
+    def tem_treino(pasta):
+        return os.path.exists(os.path.join(pasta, "fitness.csv"))
+
+    if args.saida and tem_treino(args.saida):  # nunca sobrescrever um treino
+        print(f"Pasta já tem um treino: {args.saida}")
         return 1
+
+    def pasta():
+        """A pasta do próximo treino, criada agora, logo antes de treinar."""
+        if not args.saida:
+            return _pasta_do_treino(semente)
+        if not tem_treino(args.saida):
+            os.makedirs(args.saida, exist_ok=True)
+            return args.saida
+        return _cria_pasta(os.path.normpath(args.saida))  # novo treino pedido na tela de fim
+
     game = DinoGame.DinoGame()
     if args.sem_janela:
-        os.makedirs(saida, exist_ok=True)
-        game.train(args.individuos, args.geracoes, semente, saida, janela=False)
+        game.train(args.individuos, args.geracoes, semente, pasta(), janela=False)
     elif not game.introscreen():  # introscreen devolve True se o usuário fechou
-        os.makedirs(saida, exist_ok=True)
-        game.train(args.individuos, args.geracoes, semente, saida)
+        # train devolve True quando o usuário pede outro treino na tela de fim
+        while game.train(args.individuos, args.geracoes, semente, pasta()):
+            pass
     return 0
 
 

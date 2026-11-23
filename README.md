@@ -7,6 +7,7 @@ Estudo de treino de redes neurais com algoritmo genético: uma população de di
 O jogo base é o **T-Rex Rush**, de **Shivam Shekhar**: um remake em Python e pygame do jogo do T-Rex do Google Chrome.
 
 - Repositório original: <https://github.com/shivamshekhar/Chrome-T-Rex-Rush> (licença MIT)
+- `LICENSE.txt` é a licença do original, copiada sem alteração, com o aviso de copyright de 2016 do autor.
 - Deste projeto são o treino por algoritmo genético, a rede neural, a pista compartilhada entre os modos, o modo sem janela e o modo assistir. Os sprites e sons em `sprites/` e a base de `DinoGame.py` vêm do original.
 
 ## Requisitos

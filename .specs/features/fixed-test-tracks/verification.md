@@ -35,6 +35,7 @@
 | C24 | `test_pistas.py` `test_uma_pista_so` | yes - mínimo de 2 pistas e a volta a uma pista por geração falham |
 | C25 | `test_pistas.py` `test_janela_fechada_nao_registra_geracao` | yes - registrar a geração parcial e sair falha; as implementações que seguem treinando depois do fechamento não falham, travam o teste na tela de fim (sem tempo limite) |
 | C26 | `test_pistas.py` `test_empate_no_melhor_e_reproduzivel` | partly - o teste aplica o próprio `max` ao resultado de `avalia`, não a escolha do treino; desempate por `id()` ou pelo último empatado no treino passa aqui e é pego só pelo teste de C12; ver finding 7 |
+| C27 | `test_pistas.py` `test_semente_das_pistas_de_teste_e_recusada` | yes - check acrescentado ao fechar o achado 2, depois da rodada do Verifier; julgado pelo autor, não por ele. Cinco implementações erradas falham no teste: sem a recusa na linha de comando, conferindo só a primeira pista, faixa de teste com uma semente a menos, `train` direto sem recusar, outra mensagem |
 
 ## Findings
 

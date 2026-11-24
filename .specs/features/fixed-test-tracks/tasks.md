@@ -341,12 +341,15 @@ Proof: run unit | test_pistas.py::test_janela_fechada_nao_registra_geracao PASSE
 **C26** - Empate no maior fitness: a escolha é a mesma em execuções repetidas (TST-09, Edge case 3)
 Proof: run unit | test_pistas.py::test_empate_no_melhor_e_reproduzivel PASSED
 
+**C27** - Semente que faria uma pista de treino cair em 900001..900020: `Semente reservada às pistas de teste: <semente>`, código 1, sem treinar (TST-10, Edge case 4)
+Proof: run unit | test_pistas.py::test_semente_das_pistas_de_teste_e_recusada PASSED
+
 ---
 
 ## Handoff
 
 **Settled mid-build:** 2026-11-23 - execução inline, sem sub-agentes de lote (8 tarefas, um lote); informado com o plano, usuário: "Aprovado, pode aplicar."
-**Dispatched:** none
+**Dispatched:** Verifier (sub-agente independente) em `HEAD` 084459b, 2026-11-23 - returned: FAIL, 7 achados (3 defeitos de comportamento, 4 testes frouxos). Sem sub-agente de telas: nenhum critério cita captura.
 **Walked:** 2026-11-23, em `2c60db7`, numa pasta temporária com cópia de `sprites/`. A feature não tem tela nova; a caminhada foi pelos comandos do README.
 - `python autodino.py --sem-janela --individuos 30 --geracoes 4 --semente 7 --pistas 3 --saida a` terminou em 3 s e imprimiu `Geração <g>: melhor=... media=... teste=...`. O `fitness.csv` tem as 13 colunas; em toda linha `mortes_cacto + mortes_ptera` é 90 (30 dinos x 3 pistas) e `melhor` não caiu entre gerações (29,67 nas quatro). `config.json` traz `pistas` 3, `pistas_teste` 20 e `limite_frames` 14000; `resumo.json` traz `teste_do_melhor` 31,6, o `teste` da geração 1, a do recorde.
 - O mesmo comando com `--semente 8` e sem `--pistas` (pasta `b`) subiu de 21,0 para 122,4 na geração 4, com `teste` de 21,0 para 128,7.

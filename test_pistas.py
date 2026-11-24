@@ -643,3 +643,29 @@ def test_obstaculos_contados_sem_depender_de_id(jogo, monkeypatch):
         vencidos = len(criados) - na_pista[0]  # todos os que nasceram, menos os que ainda nao passaram
         assert vencidos > 40
         assert jogo.estatisticas["obstaculos"] == [vencidos] * 3
+
+
+def test_semente_das_pistas_de_teste_e_recusada(pasta, jogo, monkeypatch, capsys):
+    # achado 2: as pistas de treino nunca podem ser pistas de teste
+    chamadas = []
+
+    def train(self, nIndividuals=20, nGenerations=100, semente_base=0, saida=".", janela=True, pistas=None):
+        chamadas.append((semente_base, pistas))
+
+    treina_de_verdade = DinoGame.DinoGame.train
+    monkeypatch.setattr(DinoGame.DinoGame, "train", train)
+    # (semente, pistas) cujas pistas de treino tocam 900001..900020
+    for semente, pistas in ((900000, 5), (899996, 5), (900019, 1), (900010, 1), (899981, 20)):
+        assert autodino.main(["--sem-janela", "--semente", str(semente), "--pistas", str(pistas)]) == 1
+        assert capsys.readouterr().out.splitlines()[-1] == f"Semente reservada às pistas de teste: {semente}"
+    assert chamadas == [] and not (pasta / "treinos").exists()
+    # vizinhas que nao tocam: treinam
+    for semente, pistas in ((899995, 5), (900020, 5), (899999, 1), (899980, 20)):
+        assert autodino.main(["--sem-janela", "--semente", str(semente), "--pistas", str(pistas)]) == 0
+    assert chamadas == [(899995, 5), (900020, 5), (899999, 1), (899980, 20)]
+    # chamado direto, o treino recusa antes de gravar qualquer arquivo
+    monkeypatch.setattr(DinoGame.DinoGame, "train", treina_de_verdade)
+    (pasta / "direto").mkdir()
+    with pytest.raises(ValueError):
+        jogo.train(4, 1, semente_base=900000, saida=str(pasta / "direto"), janela=False, pistas=5)
+    assert list((pasta / "direto").iterdir()) == []

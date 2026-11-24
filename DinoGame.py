@@ -513,6 +513,7 @@ class DinoGame:
         fim, a tela de fim de treino. Sem `janela`, imprime uma linha por geração e
         retorna depois da última.
         """
+        sementes = sementes_de_treino(semente_base, pistas)  # antes de gravar qualquer coisa
         DinoGame.train.currentGeneration = 1
         DinoGame.train.currentBest = None
         DinoGame.train.recorde = None
@@ -551,7 +552,6 @@ class DinoGame:
             elite=ELITE,
         )
         redes = ag.iniciaPopulacao()
-        sementes = [semente_base + i for i in range(1, pistas + 1)]
 
         for geracao in range(1, nGenerations + 1):
             DinoGame.train.currentGeneration = geracao
@@ -724,6 +724,17 @@ class Pista:
         self.clouds.draw(screen)
         self.cacti.draw(screen)
         self.pteras.draw(screen)
+
+
+def sementes_de_treino(semente_base, pistas):
+    """
+    Sementes das pistas de treino: semente_base + 1 até semente_base + pistas (AD-009).
+    Levanta ValueError se alguma é pista de teste: o teste nunca entra na seleção.
+    """
+    sementes = [semente_base + i for i in range(1, pistas + 1)]
+    if set(sementes) & set(SEMENTES_TESTE):
+        raise ValueError(f"semente reservada às pistas de teste: {semente_base}")
+    return sementes
 
 
 def carrega_rede(caminho):

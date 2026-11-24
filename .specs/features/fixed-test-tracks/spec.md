@@ -41,6 +41,7 @@ Cada geração corre em uma pista só, diferente da anterior, e o fitness de um 
 | `bestDino.din` | Regravado quando o fitness da melhor rede da geração supera o recorde do treino | Com pistas fixas o fitness é comparável entre gerações, então o recorde deixa de premiar pista fácil | n |
 | Treino com janela | Mostra as pistas de treino em sequência, como hoje mostra uma; as pistas de teste rodam sem desenho | Assistir 20 partidas extras por geração não ajuda a acompanhar o treino | n |
 | Gráfico de comparação | Usa a coluna `teste` quando todos os treinos comparados a têm; senão, a `media`, como hoje | `media` de treinos com pistas diferentes não é comparável; `teste` é | n |
+| `--semente` que faria uma pista de treino coincidir com uma de teste (899981 a 900019, conforme `--pistas`) | Recusada com mensagem e código 1 | Achado 2 do Verifier: sem isso o `teste` mediria as próprias pistas de treino, sem aviso. Critério acrescentado depois da aprovação da spec | n |
 | `simula_pista.py` | Entra no repositório como ferramenta de investigação, citado no README, sem critérios novos | Foi o que mediu o problema desta spec; hoje está sem commit na raiz | n |
 
 **Open questions:** none - all resolved or logged above. As linhas com `n` são padrões técnicos escolhidos pelo agente, abertos a correção.
@@ -116,6 +117,7 @@ Cada geração corre em uma pista só, diferente da anterior, e o fitness de um 
 - WHEN `--pistas 1` é informado THEN o treino SHALL usar uma única pista de treino, de semente `semente + 1`, em todas as gerações.
 - IF o usuário fecha a janela durante qualquer pista de uma geração THEN o treino SHALL encerrar sem registrar essa geração.
 - IF dois indivíduos empatam no maior fitness THEN o treino SHALL escolher o mesmo deles em execuções repetidas com as mesmas opções.
+- IF alguma pista de treino teria semente entre 900001 e 900020 THEN o programa SHALL imprimir `Semente reservada às pistas de teste: <semente>` e encerrar com código de saída 1, sem treinar.
 
 ---
 
@@ -123,7 +125,7 @@ Cada geração corre em uma pista só, diferente da anterior, e o fitness de um 
 
 | Dimension | Resolution |
 | --------- | ---------- |
-| Input validation & bounds | Fitness, critério 5; edge case 1 |
+| Input validation & bounds | Fitness, critério 5; edge cases 1 e 4 |
 | Failure / partial-failure states | Edge case 2; o treino interrompido continua coberto por REC-09 |
 | Idempotency / retry / duplicate handling | Teste, critério 8; edge case 3 |
 | Auth boundaries & rate limits | N/A because é um programa local de um usuário |
@@ -165,8 +167,9 @@ Cada geração corre em uma pista só, diferente da anterior, e o fitness de um 
 | FIT-12 | Edge case 1 | Execute | Implementing |
 | FIT-13 | Edge case 2 | Execute | Implementing |
 | TST-09 | Edge case 3 | Execute | Implementing |
+| TST-10 | Edge case 4 (acrescentado na verificação) | Execute | Implementing |
 
-**Coverage:** 26 total, 26 mapped to tasks, 0 unmapped.
+**Coverage:** 27 total, 27 mapped to tasks, 0 unmapped.
 
 ---
 

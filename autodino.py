@@ -110,6 +110,11 @@ def main(argv=None):
     def tem_treino(pasta):
         return os.path.exists(os.path.join(pasta, "fitness.csv"))
 
+    try:
+        DinoGame.sementes_de_treino(semente, args.pistas)
+    except ValueError:  # as pistas de treino não podem ser as de teste
+        print(f"Semente reservada às pistas de teste: {semente}")
+        return 1
     if args.saida and tem_treino(args.saida):  # nunca sobrescrever um treino
         print(f"Pasta já tem um treino: {args.saida}")
         return 1

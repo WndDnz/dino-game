@@ -1,9 +1,9 @@
 # fixed-test-tracks proofs
 
-**HEAD**: 084459b
+**HEAD**: b92cd8d
 **Tree**: clean
 **Shell**: C:/Program Files/Git\bin\bash.exe
-**Result**: 27 pass, 0 fail
+**Result**: 28 pass, 0 fail
 
 | Check | Proof | Result |
 | --- | --- | --- |
@@ -33,6 +33,7 @@
 | C24 | `run unit / test_pistas.py::test_uma_pista_so PASSED` | pass |
 | C25 | `run unit / test_pistas.py::test_janela_fechada_nao_registra_geracao PASSED` | pass |
 | C26 | `run unit / test_pistas.py::test_empate_no_melhor_e_reproduzivel PASSED` | pass |
+| C27 | `run unit / test_pistas.py::test_semente_das_pistas_de_teste_e_recusada PASSED` | pass |
 | Build | `python -m py_compile AGMLP.py DinoGame.py RedeNeural.py autodino.py graficos.py simula_pista.py` | pass |
 
 ## Output
@@ -40,19 +41,19 @@
 `Run unit` - exit 0
 
 ```
-test_pistas.py::test_coluna_teste_e_a_media PASSED                       [ 90%]
-test_pistas.py::test_cabecalho_com_teste PASSED                          [ 91%]
-test_pistas.py::test_selecao_ignora_o_teste PASSED                       [ 92%]
-test_pistas.py::test_pistas_de_teste_independem_das_opcoes PASSED        [ 93%]
-test_pistas.py::test_resumo_traz_teste_do_melhor PASSED                  [ 93%]
-test_pistas.py::test_linha_impressa_com_teste PASSED                     [ 94%]
-test_pistas.py::test_csv_igual_com_e_sem_janela_com_pistas PASSED        [ 95%]
-test_pistas.py::test_opcao_pistas PASSED                                 [ 96%]
-test_pistas.py::test_pistas_invalido_codigo_2 PASSED                     [ 96%]
-test_pistas.py::test_aptidao_com_curva_de_teste PASSED                   [ 97%]
-test_pistas.py::test_aptidao_sem_coluna_teste PASSED                     [ 98%]
-test_pistas.py::test_comparacao_usa_teste PASSED                         [ 99%]
-test_pistas.py::test_comparacao_sem_teste_usa_media PASSED               [100%]
+test_pistas.py::test_selecao_ignora_o_teste PASSED                       [ 90%]
+test_pistas.py::test_pistas_de_teste_independem_das_opcoes PASSED        [ 91%]
+test_pistas.py::test_resumo_traz_teste_do_melhor PASSED                  [ 92%]
+test_pistas.py::test_linha_impressa_com_teste PASSED                     [ 93%]
+test_pistas.py::test_csv_igual_com_e_sem_janela_com_pistas PASSED        [ 93%]
+test_pistas.py::test_opcao_pistas PASSED                                 [ 94%]
+test_pistas.py::test_pistas_invalido_codigo_2 PASSED                     [ 95%]
+test_pistas.py::test_aptidao_com_curva_de_teste PASSED                   [ 96%]
+test_pistas.py::test_aptidao_sem_coluna_teste PASSED                     [ 96%]
+test_pistas.py::test_comparacao_usa_teste PASSED                         [ 97%]
+test_pistas.py::test_comparacao_sem_teste_usa_media PASSED               [ 98%]
+test_pistas.py::test_obstaculos_contados_sem_depender_de_id PASSED       [ 99%]
+test_pistas.py::test_semente_das_pistas_de_teste_e_recusada PASSED       [100%]
 
-======================= 130 passed in 124.34s (0:02:04) =======================
+======================= 132 passed in 119.36s (0:01:59) =======================
 ```

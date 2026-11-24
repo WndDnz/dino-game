@@ -364,7 +364,7 @@ class DinoGame:
             "mortes_ptera": 0,
         }
         vencidos = {id(d): 0 for d in self.dinoArray}
-        ja_passaram = set()
+        ja_passaram = set()  # os obstáculos, não o id() deles: o id de um obstáculo liberado é reutilizado
 
         while self.dinoArray and stats["frames"] < LIMITE_FRAMES:
             if janela and not self._eventos_treino():
@@ -402,8 +402,8 @@ class DinoGame:
             if self.dinoArray:
                 borda = self.dinoArray[0].rect.left
                 for o in (*pista.cacti, *pista.pteras):
-                    if id(o) not in ja_passaram and o.rect.right < borda:
-                        ja_passaram.add(id(o))
+                    if o not in ja_passaram and o.rect.right < borda:
+                        ja_passaram.add(o)
                         for dino in self.dinoArray:
                             vencidos[id(dino)] += 1
 

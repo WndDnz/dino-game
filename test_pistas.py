@@ -611,3 +611,35 @@ def test_comparacao_sem_teste_usa_media(tmp_path, monkeypatch):
         "20261123-100000_s2": ([1.0, 2.0, 3.0], [40.0, 70.0, 120.0]),
     }
     assert fig.axes[0].get_ylabel() == "média"
+
+
+# ---- achados do Verifier -----------------------------------------------------
+
+
+def test_obstaculos_contados_sem_depender_de_id(jogo, monkeypatch):
+    # achado 1: um obstaculo que sai da pista e liberado, e o seguinte pode nascer com o
+    # mesmo id(); a contagem de vencidos nao pode se confundir com isso
+    criados = []  # conta os nascimentos sem guardar o objeto, para o id poder ser reutilizado
+    for classe in (DinoGame.Cactus, DinoGame.Ptera):
+        def espia(self, *a, _init=classe.__init__, **k):
+            criados.append(1)
+            _init(self, *a, **k)
+
+        monkeypatch.setattr(classe, "__init__", espia)
+    monkeypatch.setattr(pygame.sprite, "collide_mask", lambda a, b: None)  # ninguem morre
+    monkeypatch.setattr(DinoGame, "LIMITE_FRAMES", 6000)
+    na_pista = []
+    passo = DinoGame.Pista.passo
+
+    def espia_passo(self):
+        passo(self)
+        na_pista[:] = [sum(o.rect.right >= 40 for o in (*self.cacti, *self.pteras))]
+
+    monkeypatch.setattr(DinoGame.Pista, "passo", espia_passo)
+    for semente in (8, 9):
+        criados.clear()
+        random.seed(semente)
+        jogo.roda_geracao([_rede_fixa(pula=False) for _ in range(3)], janela=False)
+        vencidos = len(criados) - na_pista[0]  # todos os que nasceram, menos os que ainda nao passaram
+        assert vencidos > 40
+        assert jogo.estatisticas["obstaculos"] == [vencidos] * 3

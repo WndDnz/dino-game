@@ -76,7 +76,7 @@ Cada treino ganha uma pasta própria, `treinos/<AAAAMMDD-HHMMSS>_s<semente>/`, o
 A mesma rede faz de 105 a 518 pontos conforme a pista, então uma pista só mede mais a sorte que a rede. Por isso:
 
 - **Fitness**: cada dino corre em 5 pistas de treino (`--pistas N` muda o número) e o fitness dele é a média dos scores. As pistas são as mesmas em todas as gerações: sementes `--semente` + 1 até `--semente` + N.
-- **Teste**: ao fim de cada geração, a rede de maior fitness corre em 20 pistas de teste, que nunca entram na seleção e são as mesmas em qualquer treino (sementes 900001 a 900020). A média vai para a coluna `teste`. É a medida de generalização, e a que compara dois treinos.
+- **Teste**: ao fim de cada geração, a rede de maior fitness corre em 20 pistas de teste, que nunca entram na seleção e são as mesmas em qualquer treino (sementes 900001 a 900020). A média vai para a coluna `teste`. É a medida de generalização, e a que compara dois treinos. Uma `--semente` que faria uma pista de treino coincidir com uma de teste (899981 a 900019, conforme `--pistas`) é recusada com `Semente reservada às pistas de teste`.
 - **Teto**: uma partida termina aos 14000 frames (score 2000), mesmo com dinos vivos.
 
 O treino fica cerca de N vezes mais longo que com uma pista. Com janela, as pistas de treino aparecem em sequência e as de teste rodam sem desenho.
@@ -114,7 +114,7 @@ Para cada pasta, grava dentro dela:
 
 Com mais de uma pasta, grava também `comparacao.png` na pasta atual, com o score de teste por geração de cada treino; se algum deles não tem a coluna `teste`, usa a média. `--mostrar` abre os gráficos depois de gravá-los; sem ele, nada abre janela. Um `fitness.csv` antigo, de 3 colunas, gera só `aptidao.png` e avisa os gráficos pulados; um de 12 colunas gera todos, sem a curva de teste.
 
-Como as pistas de treino são fixas e a elite passa intacta, a linha "melhor" nunca cai de uma geração para a seguinte. A curva de teste pode cair: é sinal de que a rede está decorando as pistas de treino. Treinos feitos antes das pistas fixas (12 colunas) tinham uma pista diferente por geração e não são comparáveis com os novos.
+Como as pistas de treino são fixas e a elite passa intacta, a linha "melhor" nunca cai de uma geração para a seguinte. Isso vale com 10 indivíduos ou mais: a elite são 10% da população, arredondados para baixo, e com menos de 10 fica vazia. A curva de teste pode cair: é sinal de que a rede está decorando as pistas de treino. Treinos feitos antes das pistas fixas (12 colunas) tinham uma pista diferente por geração e não são comparáveis com os novos.
 
 ### Investigar as pistas
 

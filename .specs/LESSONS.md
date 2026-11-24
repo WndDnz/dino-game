@@ -104,6 +104,36 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: .specs/features/training-record-and-plots/verification.md finding 5 / C13 (tests)
 - last seen: 2026-11-23T14:01:41Z
 
+### L-016 - Never key a set or dict by id() of an object that can be freed while the collection lives: the id is reused; hold the object itself.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `DinoGame.py` · harmful: 0
+- features: fixed-test-tracks
+- evidence: verification.md finding 1; DinoGame.py roda_geracao (DinoGame.py)
+- last seen: 2026-11-24T01:07:03Z
+
+### L-017 - Pick test values that tell the right rule from its nearest wrong one: asymmetric data for mean vs median, a value beating the previous step but not the record, numbers with many decimals for printed output.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: fixed-test-tracks
+- evidence: verification.md findings 4-6; C9 C10 C18 (tests)
+- last seen: 2026-11-24T01:07:03Z
+
+### L-018 - A test for a choice made inside the training loop must run the loop; re-applying the same max() in the test proves nothing about the loop's tie-break.
+- signal: `weak_test` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
+- features: fixed-test-tracks
+- evidence: verification.md finding 7; C26 (tests)
+- last seen: 2026-11-24T01:07:03Z
+
+### L-019 - When a spec reserves a range of seeds or ids for one purpose, add a criterion for user input that would land in that range.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: fixed-test-tracks
+- evidence: verification.md finding 2; TST-10 (spec)
+- last seen: 2026-11-24T01:07:03Z
+
+### L-020 - Do not chain the commit after 'pytest | tail' with &&: tail's exit code hides a red suite; check the pass count before committing.
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `process` · harmful: 0
+- features: fixed-test-tracks
+- evidence: commit f697005; test_modos.py::test_sem_janela_metade_do_tempo (process)
+- last seen: 2026-11-24T01:07:03Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

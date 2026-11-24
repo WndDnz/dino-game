@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 16,
+  "next_id": 21,
   "lessons": [
     {
       "id": "L-001",
@@ -274,6 +274,96 @@
       ],
       "created": "2026-11-23T14:01:41Z",
       "last_seen": "2026-11-23T14:01:41Z"
+    },
+    {
+      "id": "L-016",
+      "key": "ac_gap::never key a set or dict by id of an object that can be freed while the collection lives the id is reused hold the object itself",
+      "text": "Never key a set or dict by id() of an object that can be freed while the collection lives: the id is reused; hold the object itself.",
+      "signal": "ac_gap",
+      "scope": "DinoGame.py",
+      "status": "candidate",
+      "features": [
+        "fixed-test-tracks"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 1; DinoGame.py roda_geracao (DinoGame.py)"
+      ],
+      "created": "2026-11-24T01:07:03Z",
+      "last_seen": "2026-11-24T01:07:03Z"
+    },
+    {
+      "id": "L-017",
+      "key": "weak_test::pick test values that tell the right rule from its nearest wrong one asymmetric data for mean vs median a value beating the previous step but not the record numbers with many decimals for printed output",
+      "text": "Pick test values that tell the right rule from its nearest wrong one: asymmetric data for mean vs median, a value beating the previous step but not the record, numbers with many decimals for printed output.",
+      "signal": "weak_test",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "fixed-test-tracks"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md findings 4-6; C9 C10 C18 (tests)"
+      ],
+      "created": "2026-11-24T01:07:03Z",
+      "last_seen": "2026-11-24T01:07:03Z"
+    },
+    {
+      "id": "L-018",
+      "key": "weak_test::a test for a choice made inside the training loop must run the loop re applying the same max in the test proves nothing about the loop s tie break",
+      "text": "A test for a choice made inside the training loop must run the loop; re-applying the same max() in the test proves nothing about the loop's tie-break.",
+      "signal": "weak_test",
+      "scope": "tests",
+      "status": "candidate",
+      "features": [
+        "fixed-test-tracks"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 7; C26 (tests)"
+      ],
+      "created": "2026-11-24T01:07:03Z",
+      "last_seen": "2026-11-24T01:07:03Z"
+    },
+    {
+      "id": "L-019",
+      "key": "ac_gap::when a spec reserves a range of seeds or ids for one purpose add a criterion for user input that would land in that range",
+      "text": "When a spec reserves a range of seeds or ids for one purpose, add a criterion for user input that would land in that range.",
+      "signal": "ac_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "fixed-test-tracks"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "verification.md finding 2; TST-10 (spec)"
+      ],
+      "created": "2026-11-24T01:07:03Z",
+      "last_seen": "2026-11-24T01:07:03Z"
+    },
+    {
+      "id": "L-020",
+      "key": "gate_fail::do not chain the commit after pytest tail with tail s exit code hides a red suite check the pass count before committing",
+      "text": "Do not chain the commit after 'pytest | tail' with &&: tail's exit code hides a red suite; check the pass count before committing.",
+      "signal": "gate_fail",
+      "scope": "process",
+      "status": "candidate",
+      "features": [
+        "fixed-test-tracks"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "commit f697005; test_modos.py::test_sem_janela_metade_do_tempo (process)"
+      ],
+      "created": "2026-11-24T01:07:03Z",
+      "last_seen": "2026-11-24T01:07:03Z"
     }
   ]
 }

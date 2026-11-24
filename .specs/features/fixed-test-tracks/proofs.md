@@ -1,6 +1,6 @@
 # fixed-test-tracks proofs
 
-**HEAD**: b92cd8d
+**HEAD**: 1c72170
 **Tree**: clean
 **Shell**: C:/Program Files/Git\bin\bash.exe
 **Result**: 28 pass, 0 fail
@@ -55,5 +55,5 @@ test_pistas.py::test_comparacao_sem_teste_usa_media PASSED               [ 98%]
 test_pistas.py::test_obstaculos_contados_sem_depender_de_id PASSED       [ 99%]
 test_pistas.py::test_semente_das_pistas_de_teste_e_recusada PASSED       [100%]
 
-======================= 132 passed in 119.36s (0:01:59) =======================
+======================= 132 passed in 117.52s (0:01:57) =======================
 ```

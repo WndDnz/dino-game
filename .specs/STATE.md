@@ -78,11 +78,12 @@ Entradas AD-001 a AD-004 são retroativas: reconstruídas do código e do git lo
 
 ## Handoff
 
-- **Feature**: `.specs/features/fixed-test-tracks/` - spec e tarefas aprovadas em 2026-11-23
-- **Phase / Task**: Execute, T1 de 8
-- **Completed**: none
+- **Feature**: `.specs/features/fixed-test-tracks/` - concluída em 2026-11-23, gate final verde (28 provas)
+- **Phase / Task**: Execute encerrado: 8/8 tarefas, 7 achados do Verifier fechados
+- **Completed**: T1-T8; achados fechados por 6917f3f, a80156f, 4b7bcc7, e619f2c
 - **In-progress** (file:line): none
-- **Next step**: T1 (teto de frames em `roda_geracao`). Depois desta feature: spec de sensores novos (segundo obstáculo, estado do dino) e queda rápida, já aceita pelo usuário ("Queda rápida parece bom e é mecânica do original que não foi reproduzida. Ok, pode entrar.").
+- **Next step**: Push, quando o usuário autorizar. Próxima feature, já aceita pelo usuário: sensores novos (próximo e segundo obstáculo sem distinguir cacto de ptera, estado do próprio dino) e queda rápida ("Queda rápida parece bom e é mecânica do original que não foi reproduzida. Ok, pode entrar."). Topologia só se o platô continuar. Medir o antes com um treino de pistas fixas (coluna `teste`) antes de mudar os sensores.
 - **Blockers**: none
-- **Uncommitted files**: `simula_pista.py` (entra no commit de T8)
-- **Branch**: master
+- **Uncommitted files**: none
+- **Branch**: master (commits locais desta feature, sem push)
+- **Notas**: `test_modos.py::test_sem_janela_metade_do_tempo` mede tempo e falha com a máquina ocupada. No treino com janela, as 20 pistas de teste rodam sem tratar eventos: com redes que chegam ao teto, a janela fica sem responder por alguns segundos a cada geração (observação do Verifier, fora dos critérios).

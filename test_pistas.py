@@ -168,7 +168,13 @@ def test_frames_e_mortes_somam_as_pistas(jogo):
     assert len({e["frames"] for e in separado}) >= 2  # pistas diferentes, valores diferentes
 
 
-def test_obstaculos_media_por_pista(jogo, monkeypatch):
+def test_obstaculos_media_por_pista(jogo, monkeypatch, tmp_path, capsys):
+    # no CSV: o maior valor e a media (nao a mediana, que seria 0.25) entre os dinos
+    _avalia_falsa(monkeypatch, [[10, 20, 30, 40]], obstaculos=[0.0, 0.0, 0.5, 8.5])
+    jogo.train(4, 1, semente_base=1, saida=str(tmp_path), janela=False)
+    (linha,) = _linhas(tmp_path)
+    assert (float(linha["obstaculos_melhor"]), float(linha["obstaculos_media"])) == (8.5, 2.25)
+    monkeypatch.undo()
     redes = _redes(3, 1)
     _roda_falsa(monkeypatch, [(1, 1, 1)] * 3, obstaculos=[(0, 0, 0), (2, 4, 9), (1, 1, 2)])
     jogo.avalia(redes, (1, 2, 3), janela=False)
@@ -184,8 +190,20 @@ def test_obstaculos_media_por_pista(jogo, monkeypatch):
     assert max(jogo.estatisticas["obstaculos"]) > 0
 
 
-def test_empate_no_melhor_e_reproduzivel(jogo):
+def test_empate_no_melhor_e_reproduzivel(jogo, monkeypatch, tmp_path, capsys):
     import copy
+
+    # no treino: com empate no maior fitness (indices 1 e 2), a rede levada ao teste e a
+    # salva em bestDino.din sao sempre a de menor indice
+    for vez in ("a", "b"):
+        populacoes = _avalia_falsa(monkeypatch, [[50, 70, 70, 10]])
+        salvas = []
+        monkeypatch.setattr(RedeNeural.RedeNeural, "save_object", staticmethod(lambda rede, caminho: salvas.append(rede)))
+        (tmp_path / vez).mkdir()
+        jogo.train(4, 1, semente_base=1, saida=str(tmp_path / vez), janela=False)
+        assert populacoes[("teste", 1)] is populacoes[1][1]
+        assert salvas == [populacoes[1][1]]
+        monkeypatch.undo()
 
     a = _redes(40, 5)
     random.seed(8)
@@ -228,9 +246,10 @@ def _espia_pistas(monkeypatch):
     return partidas
 
 
-def _avalia_falsa(monkeypatch, fitness, teste=None):
-    """avalia de mentira: na geracao g, o individuo i tem fitness[g-1][i]; a rede que corre
-    sozinha nas pistas de teste faz teste[g-1]. Devolve {geracao: populacao avaliada}."""
+def _avalia_falsa(monkeypatch, fitness, teste=None, obstaculos=None):
+    """avalia de mentira: na geracao g, o individuo i tem fitness[g-1][i] e venceu obstaculos[i]
+    obstaculos por pista; a rede que corre sozinha nas pistas de teste faz teste[g-1].
+    Devolve {geracao: populacao avaliada, ("teste", geracao): rede levada ao teste}."""
     populacoes = {}
 
     def avalia(self, redes, sementes, janela=True):
@@ -239,7 +258,10 @@ def _avalia_falsa(monkeypatch, fitness, teste=None):
             "frames": 7, "obstaculos": [0.0] * len(redes), "mortes_cacto": len(redes), "mortes_ptera": 0,
         }
         if list(sementes) == list(DinoGame.SEMENTES_TESTE):
+            populacoes[("teste", g)] = redes[0]
             return [(teste[g - 1] if teste else 0.0, redes[0])]
+        if obstaculos:
+            self.estatisticas["obstaculos"] = list(obstaculos)
         populacoes[g] = list(redes)
         return list(zip(fitness[g - 1], redes))
 
@@ -270,8 +292,9 @@ def test_estatisticas_sobre_o_fitness(jogo, monkeypatch, tmp_path, capsys):
 
 
 def test_recorde_pelo_fitness(jogo, monkeypatch, tmp_path, capsys):
-    # maior fitness por geracao: 50, 50 (empata, outra rede), 40 (menor), 70.5 (recorde)
-    fitness = [[50, 10, 10, 10], [10, 50, 10, 10], [40, 10, 10, 10], [10, 10, 70.5, 10]]
+    # maior fitness por geracao: 50, 50 (empata, outra rede), 40 (menor),
+    # 45 (supera a geracao anterior, mas nao o recorde), 70.5 (recorde)
+    fitness = [[50, 10, 10, 10], [10, 50, 10, 10], [40, 10, 10, 10], [45, 10, 10, 10], [10, 10, 70.5, 10]]
     populacoes = _avalia_falsa(monkeypatch, fitness)
     gravadas = []
     salva = RedeNeural.RedeNeural.save_object
@@ -281,13 +304,14 @@ def test_recorde_pelo_fitness(jogo, monkeypatch, tmp_path, capsys):
         return salva(rede, caminho)
 
     monkeypatch.setattr(RedeNeural.RedeNeural, "save_object", staticmethod(espia))
-    jogo.train(4, 4, semente_base=1, saida=str(tmp_path), janela=False)
-    assert [(g, nome) for g, _, nome in gravadas] == [(1, "bestDino.din"), (4, "bestDino.din")]
-    assert gravadas[0][1] is populacoes[1][0] and gravadas[1][1] is populacoes[4][2]
+    jogo.train(4, 5, semente_base=1, saida=str(tmp_path), janela=False)
+    assert [(g, nome) for g, _, nome in gravadas] == [(1, "bestDino.din"), (5, "bestDino.din")]
+    assert gravadas[0][1] is populacoes[1][0] and gravadas[1][1] is populacoes[5][2]
     no_disco = DinoGame.carrega_rede(str(tmp_path / "bestDino.din"))
-    for a, b in zip(no_disco.pesos + no_disco.bias, populacoes[4][2].pesos + populacoes[4][2].bias):
+    for a, b in zip(no_disco.pesos + no_disco.bias, populacoes[5][2].pesos + populacoes[5][2].bias):
         assert np.array_equal(a, b)
-    assert _json(tmp_path / "resumo.json")["melhor_score"] == 70.5
+    resumo = _json(tmp_path / "resumo.json")
+    assert (resumo["melhor_score"], resumo["geracao_do_melhor"]) == (70.5, 5)
 
 
 def test_config_traz_pistas(jogo, tmp_path, capsys):
@@ -443,10 +467,13 @@ def test_linha_impressa_com_teste(jogo, monkeypatch, tmp_path, capsys):
     assert impressas == [
         f"Geração {l['geracao']}: melhor={l['melhor']} media={l['media']} teste={l['teste']}" for l in linhas
     ]
-    _avalia_falsa(monkeypatch, [[10.5, 20.0, 60.0, 30.0]], teste=[42.5])
+    # valores com muitas casas: a linha traz os mesmos numeros do CSV, sem arredondar
+    _avalia_falsa(monkeypatch, [[10.5, 20.0, 61.333333333333336, 30.0]], teste=[42.4375])
     jogo.train(4, 1, semente_base=1, saida=str(tmp_path), janela=False)
     impressas = [l for l in capsys.readouterr().out.splitlines() if l.startswith("Geração")]
-    assert impressas == ["Geração 1: melhor=60.0 media=30.125 teste=42.5"]
+    assert impressas == ["Geração 1: melhor=61.333333333333336 media=30.458333333333336 teste=42.4375"]
+    (linha,) = _linhas(tmp_path)
+    assert (linha["melhor"], linha["media"], linha["teste"]) == ("61.333333333333336", "30.458333333333336", "42.4375")
 
 
 def test_csv_igual_com_e_sem_janela_com_pistas(jogo, monkeypatch, tmp_path, capsys):
